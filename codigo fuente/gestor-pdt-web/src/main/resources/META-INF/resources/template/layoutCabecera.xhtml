@@ -1,0 +1,72 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:c="http://java.sun.com/jstl/core"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<f:view locale="#{localeSwitcher.locale}" contentType="text/html">
+
+	<h:head>
+		<ui:insert name="header">
+			<ui:include src="header.xhtml" />
+		</ui:insert>
+	</h:head>
+
+
+	<h:body>
+	
+		<style type="text/css">
+		    .loading-icon {
+		       font-size: 3rem;
+		    }
+		</style>
+
+    	<p:ajaxStatus onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()"/>
+
+	    <p:dialog widgetVar="statusDialog" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+	        <div class="p-text-center status-div">
+	            <i class="pi pi-spin pi-spinner loading-icon" aria-hidden="true"></i>
+	        </div>
+	    </p:dialog>
+
+		<div class="ui-g">
+			<div class="ui-g-12">
+				<ui:include src="#{navegacionBean.get('CABECERA_WEB')}" />
+			</div>					
+			
+
+			
+			<div id="panelContenidoLogin" style="width: 100%;">
+					<ui:insert name="content" >
+						Bienvenid@
+					</ui:insert>		
+<!-- 					Nombre corto para el growl	 -->
+<!-- 					<c:set var="growl"  value=":growlForm:growl"  /> -->
+	
+<!-- 					<div class="ui-g-12 ui-g-nopad"> -->
+<!-- 						<p:outputPanel id="layoutCentral"> -->
+<!-- 							<h:form prependId="false" id="growlForm"> -->
+<!-- 								<p:growl id="growl" showDetail="true" showSummary="false" -->
+<!-- 								 	sticky="false" life="10000" > -->
+<!-- 									<h:outputScript> -->
+<!-- 							            $("#growl_container").effect("shake", { times:1}); -->
+<!-- 							        </h:outputScript> -->
+<!-- 								</p:growl> -->
+<!-- 							</h:form> -->
+<!-- 							<ui:insert name="content" />							 -->
+<!-- 						</p:outputPanel> -->
+					</div>						
+<!-- 				</div> -->
+
+		</div>
+
+		<h:outputScript>
+			//aplicarAlineacionesTablas();
+        </h:outputScript>
+
+
+
+	</h:body>
+</f:view>
+</html>

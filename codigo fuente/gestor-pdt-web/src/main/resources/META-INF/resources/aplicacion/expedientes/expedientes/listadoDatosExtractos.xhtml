@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:c="http://java.sun.com/jstl/core"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:sec="https://joinfaces.org/security"
+	xmlns:fu="http://joinfaces.org/functions">
+
+<ui:composition>
+
+		
+	<c:set var="bean" value="#{datosExpedientesDatosExtractosBean}" />
+
+	<!-- TABLA DATOS EXTRACTOS EXPEDIENTES -->
+		<p:dataTable var="det" id="tablaExtractosExpedientes"
+			styleClass="listado-extractos"
+			value="#{bean.lazyModel}"
+			paginator="true"
+			paginatorTemplate=" {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+			rowsPerPageTemplate="10,20,50,100" rows="10"
+			currentPageReportTemplate="#{mensaje['paginador.template']}"
+			paginatorPosition="bottom"
+			sortBy="#{bean.defaultOrdenList}"
+			selectionMode="single" rowKey="#{det.id}">
+
+			<p:column headerText="#{mensaje['f.genera']}" width="85"
+				sortBy="#{det.tramiteExpediente.fechaIni}">
+				<h:outputText value="#{det.tramiteExpediente.fechaIni}">				
+					<f:convertDateTime pattern="dd/MM/yyyy" />
+				</h:outputText>
+			</p:column>
+            <p:column sortBy="#{det.tramiteExpediente.id}" style="display:none">
+                <h:outputText value="#{det.tramiteExpediente.id}"/>
+            </p:column>
+			
+			<p:column headerText="#{mensaje['incluir']}" width="80">
+				<p:selectBooleanCheckbox value="#{det.extractoExpediente}" disabled="#{!editable or not det.tramiteExpediente.finalizado}">
+					<p:ajax listener="#{bean.onChangeIncluir(det)}" 
+						update="@(.listado-extractos), 
+							formFormularioExpedientes:tabViewPestanasExpediente:panelListadoTramitesExpediente"/>
+				</p:selectBooleanCheckbox>
+			</p:column>
+			
+			<p:column headerText="#{mensaje['extracto']}">
+				<p:outputLabel rows="1" style="width: 100%; font-weight: bold" readonly="true" autoResize="false" 
+					value="#{det.tramiteExpediente.descripcion}" />
+				<p:inputTextarea rows="3" style="width: 100%" readonly="true" autoResize="false"
+					value="#{det.textoExtractoExpediente}" />
+			</p:column>
+			
+			<p:column width="45" rendered="#{editable and bean.permisoEditarExtracto}"><!--  Acciones -->
+				<p:commandButton id="editarExtracto" icon="pi pi-pencil" rendered="#{det.tramiteExpediente.finalizado}"
+					action="#{bean.editar(det.id)}" 
+					update="@form:dialogExtracto" oncomplete="if(args.ok) PF('dialogExtracto').show()">
+				</p:commandButton>
+				<p:tooltip for="editarExtracto" value="#{mensaje['editar.extracto']}" rendered="#{det.tramiteExpediente.finalizado}"
+					showEffect="fade" hideEffect="fade" position="top" showDelay="500" />
+			</p:column>
+		</p:dataTable>
+		
+
+</ui:composition>
+
+</html>
+

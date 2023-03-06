@@ -1,0 +1,76 @@
+node {
+   def nombre = 'PIPELINE CTPDA'
+   def jdk = 'JDK 11'
+   def mavenH = 'MVN 3.8.2'
+   def containerName='ctpda-gestorpdt-web'
+   def procesarSonar="${PROCESAR_SONAR}"
+   def sonarHost="${SONAR_HOST}"
+   def sonarToken="${SONAR_TOKEN}"
+   def procesarunitTest="${PROCESAR_UNITTEST}"   
+   def rama="*/${RAMA}"
+   def sufijo_imagen="${RAMA}"
+   def credentialsId="${JENKINS_GIT_USER}"
+   def giturl = "${URL_SOURCECODE}"
+   def jdbcURL="${SPRING_DATASOURCE_JDBCURL}"
+   def puerto="${PUERTO}"
+   def databaseUsername="${SPRING_DATASOURCE_USERNAME}"
+   def databasePassword="${SPRING_DATASOURCE_PASSWORD}"
+   def databaseSchema="${SPRING_DATASOURCE_SCHEMA}"
+
+ stage('Preparation') {
+	  sh "rm -rf *"
+    sh "git config --global http.sslverify false"
+	  checkout([$class: 'GitSCM', 
+	    branches: [[name: rama]],
+	    userRemoteConfigs: [[credentialsId: credentialsId,
+	    url: giturl]]])
+   }
+
+    stage('check java & maven') {
+			env.JAVA_HOME= tool "${jdk}"
+			env.PATH="${env.JAVA_HOME}/bin:${env.PATH}"
+            sh "java -version"
+      mvnHome = tool "${mavenH}"
+            sh "'${mvnHome}/bin/mvn' --version"
+    }
+
+ 
+   stage('build') {      
+         sh "'${mvnHome}/bin/mvn' -Dmaven.test.failure.ignore -Dmaven.test.skip=true -P ${MVN_PROFILE} -f \"codigo fuente\" clean install "      
+   }
+   
+  stage('unit-test') {
+   
+	if (procesarunitTest == "true"){
+			  if (isUnix()) {
+				 sh "'${mvnHome}/bin/mvn' -f \"codigo fuente\" -P ${MVN_PROFILE} test "
+			  } else {
+				 bat(/"${mvnHome}\bin\mvn" test/)
+			  }
+	   }else{
+		sh "echo SKIPPED"
+	  }
+   }
+   
+   stage('sonar') {
+     if (procesarSonar == "true"){
+         sh "'${mvnHome}/bin/mvn' sonar:sonar -P ${MVN_PROFILE} -Dsonar.host.url=${SONAR_HOST} -Dsonar.login=${SONAR_TOKEN} -f \"codigo fuente\""
+     }
+   }
+
+   stage('docker-image-build') {
+     sh "docker build --tag cisoltel/"+containerName+ ":latest  \"codigo fuente\"/."
+   }
+
+   stage('docker-image-down') {
+     sh "docker rm --force "+containerName+"-deploy || echo ok"
+   }
+
+stage('docker-image-up') {
+		sh "docker run -d --hostname setentaytres188.serverov.com -p \""+puerto+":"+puerto+"\" -e ROOT_LOGLEVEL=INFO -e LOG_FILE=/app/logs/ctpdalog.log -v ctpda-logs:/app/logs -e LOG_LEVEL=DEBUG -e PUERTO="+puerto+" -e DATASOURCE_SCHEMA="+databaseSchema+" -e SPRING_DATASOURCE_PASSWORD="+databasePassword+" -e SPRING_DATASOURCE_USERNAME="+databaseUsername+" -e SPRING_DATASOURCE_JDBCURL="+jdbcURL+" --name "+containerName+"-deploy cisoltel/"+containerName+ ":latest"
+    
+}
+stage('OWASP vulnerabilities plugin ') {    
+		 sh "'${mvnHome}/bin/mvn' org.owasp:dependency-check-maven:7.2.1:check -f \"codigo fuente/gestor-pdt-web\""
+}
+}

@@ -1,0 +1,47 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:c="http://java.sun.com/jstl/core"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<f:view contentType="text/html">
+
+	<h:head>
+
+	</h:head>
+	
+	<h:body>
+		<p:layout fullPage="true">
+
+			<p:layoutUnit position="center" styleClass="layout-block"  style="m ax-width:1024px">
+				<p:layout>
+
+					<p:layoutUnit position="north">
+						<h:panelGrid columns="3" styleClass="cabecera" layout="grid"
+							columnClasses="cabecera_ja,cabecera_consejeria,cabecera_app">
+							<p:outputPanel />
+							<p:outputLabel value="#{mensaje['nombre.organismo']}" />
+						</h:panelGrid>
+					</p:layoutUnit>
+
+					<p:layoutUnit position="west" header="#{mensaje['menu']}" collapsible="false" size="190" style="overflow: wrap">
+						<h:form id="menuForm">
+							<ui:insert name="menu">
+								<ui:include src="menu.xhtml" />
+							</ui:insert>
+						</h:form>
+					</p:layoutUnit>
+
+					<p:layoutUnit position="center">
+						<ui:insert name="content" />
+					</p:layoutUnit>
+
+				</p:layout>
+
+			</p:layoutUnit>
+
+		</p:layout>
+	</h:body>
+</f:view>
+</html>

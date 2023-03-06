@@ -1,0 +1,173 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:c="http://java.sun.com/jstl/core"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:sec="https://joinfaces.org/security"
+    xmlns:comp="http://xmlns.jcp.org/jsf/composite/aplicacion/expedientes/expedientes/compTramites/cc"
+    xmlns:fu="http://joinfaces.org/functions">
+<ui:composition>
+
+	<!-- CAMPOS ASOCIADOS AL COMPORTAMIENTO C014 -->
+	<p:outputPanel id="panelTramiteComportamientoTramC014" autoUpdate="true" rendered="#{tramExp.tipoTramite.comportamiento == 'C014'}">
+		<div>
+			<div class="celda-form">
+				<p:outputLabel rendered="#{tramExp.cfgMetadatosTram != null}" for="comboInstructorCompC014-#{tramExp.id}" value="#{tramExp.cfgMetadatosTram.instructorAPI}" />
+				<p:outputLabel rendered="#{tramExp.cfgMetadatosTram == null}" for="comboInstructorCompC014-#{tramExp.id}" value="#{mensaje['etiqueta.pendiente.definir']}" />
+				<p:selectOneMenu id="comboInstructorCompC014-#{tramExp.id}"
+					value="#{tramExp.selectedNuevoInstructorAPIId}" disabled="#{!editable}">
+					<f:selectItem itemLabel="#{mensaje['seleccione.una.opcion']}" itemValue="#{null}" />
+					<f:selectItems value="#{datosTramiteExpedienteBean.listaValoresDominioInstructorAPI}" var="ins"
+						itemLabel="#{ins.descripcion}" itemValue="#{ins.id}" />
+				</p:selectOneMenu>
+			</div>	
+
+			<div class="celda-form">
+				<p:outputLabel rendered="#{tramExp.cfgMetadatosTram != null and tramExp.cfgMetadatosTram.valorTipoExpediente.codigo == 'PSAN'}" for="fechaAcuerdo-#{tramExp.id}" value="#{tramExp.cfgMetadatosTram.fechaInforme}" />
+				<p:outputLabel rendered="#{tramExp.cfgMetadatosTram == null and tramExp.cfgMetadatosTram.valorTipoExpediente.codigo == 'PSAN'}" for="fechaAcuerdo-#{tramExp.id}" value="#{mensaje['etiqueta.pendiente.definir']}" />
+				<p:datePicker id="fechaAcuerdo-#{tramExp.id}" disabled="#{!editable}" value="#{tramExp.detalleExpdteTram.fechaInforme}" 
+					locale="es" monthNavigator="true" pattern="dd/MM/yyyy" converterMessage="#{mensaje['formato.fecha.invalido']}"
+					mask="true" showButtonBar="true" readonlyInput="true"
+					rendered="#{tramExp.cfgMetadatosTram.valorTipoExpediente.codigo == 'PSAN'}">
+				</p:datePicker>
+				<p:message for="fechaAcuerdo-#{tramExp.id}" />
+			</div>			
+		</div>	
+		
+		<div class="botonera-form">
+			<p:commandButton id="generarExpPsanC014-#{tramExp.id}" value="#{tramExp.cfgMetadatosTram.btGenerarExp}" widgetVar="generarExpPsanC014-#{tramExp.id}"
+				rendered="#{editable and tramExp.detalleExpdteTram.numeroPsan == null and tramExp.detalleExpdteTram.valorInstructorAPI != null and !(tramExp.cfgMetadatosTram.btGenerarExp == null)}" 
+				action="#{datosTramiteExpedienteBean.generarExpedientePsan(tramExp)}"
+				update="formFormularioExpedientes:tabViewPestanasExpediente:numeroExpPsanCompC014-#{tramExp.id},formFormularioExpedientes:tabViewPestanasExpediente:vincularExpPsanC014-#{tramExp.id},
+						:formFormularioExpedientes,textoMigaPan"
+				icon="pi pi-plus">
+				<p:confirm header="#{mensaje['confirmar.operacion']}" message="#{mensaje['pregunta.generar.expediente.psan']}" icon="pi pi-info-circle" /> 
+			</p:commandButton>
+			<p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true">
+				<div class="botonera-form" align="right">
+					<p:commandButton value="#{mensaje['si']}" type="button" styleClass="ui-confirmdialog-yes" />
+					<p:commandButton value="#{mensaje['no']}" type="button" styleClass="ui-confirmdialog-no ui-button-flat" />
+				</div>					
+			</p:confirmDialog>
+				
+			<p:commandButton id="vincularExpPsanC014-#{tramExp.id}" value="#{tramExp.cfgMetadatosTram.btVincularExp}" widgetVar="vincularExpPsanC014-#{tramExp.id}" icon="pi pi-search"
+				rendered="#{editable and tramExp.detalleExpdteTram.numeroPsan == null and !(tramExp.cfgMetadatosTram.btVincularExp ==null)}"
+				actionListener="#{datosTramiteExpedienteBean.abrirBuscadorExpedientesPsan}"
+				update="formFormularioExpedientes:tabViewPestanasExpediente:numeroExpediente_filtroBuscadorExpPsanC014-#{tramExp.id},
+						formFormularioExpedientes:tabViewPestanasExpediente:nombreExpediente_filtroBuscadorExpPsanC014-#{tramExp.id},
+						formFormularioExpedientes:tabViewPestanasExpediente:fechaEntrada_filtroBuscadorExpPsanC014-#{tramExp.id},
+						formFormularioExpedientes:tabViewPestanasExpediente:tablaExpedientesBuscadorExpPsanC014-#{tramExp.id},
+						:formFormularioExpedientes"/>
+		</div>	
+				
+		<div>
+			<div class="celda-form">
+				<p:outputLabel rendered="#{tramExp.cfgMetadatosTram != null and !(tramExp.cfgMetadatosTram.valorTipoExpediente.codigo == 'PSAN')}" for="numeroExpPsanCompC014-#{tramExp.id}" value="#{tramExp.cfgMetadatosTram.numeroPsan}" />
+				<p:outputLabel rendered="#{tramExp.cfgMetadatosTram == null and !(tramExp.cfgMetadatosTram.valorTipoExpediente.codigo == 'PSAN')}" for="numeroExpPsanCompC014-#{tramExp.id}" value="#{mensaje['etiqueta.pendiente.definir']}" />
+				<p:inputText id="numeroExpPsanCompC014-#{tramExp.id}" size="50" value="#{tramExp.detalleExpdteTram.numeroPsan}" disabled="true" rendered="#{!(tramExp.cfgMetadatosTram.valorTipoExpediente.codigo == 'PSAN')}"/>		
+			</div>				
+		</div>
+		
+		<p:dialog id="dialogBuscadorExpPsanC014-#{tramExp.id}" header="#{mensaje['buscador.expedientes.psan']}" widgetVar="dialogBuscadorExpPsan" 
+			closable="true" resizable="false" draggable="true" modal="true" responsive="true" contentWidth="100%" contentHeight="100%" width="1200" height="500">
+		
+			<p:messages for="messagesDialogBuscadorExpPsan" id="messagesDialogBuscadorExpPsan" showDetail="true" closable="true">
+				<p:autoUpdate/> 
+	        </p:messages>
+	        
+	        <p:fieldset legend="#{mensaje['filtros.busqueda']}" id="bloqueFiltroBuscadorExpPsan" toggleable="true" toggleSpeed="250">
+				<div>
+					<div class="celda-form">
+						<p:outputLabel for="numeroExpediente_filtroBuscadorExpPsanC014-#{tramExp.id}" value="#{mensaje['numero.expediente']}" />
+						<p:inputText id="numeroExpediente_filtroBuscadorExpPsanC014-#{tramExp.id}" maxlength="255" value="#{datosTramiteExpedienteBean.numeroExpedienteFiltroBuscadorExpPsan}" />
+					</div>
+					
+					<div class="celda-form">
+						<p:outputLabel for="nombreExpediente_filtroBuscadorExpPsanC014-#{tramExp.id}" value="#{mensaje['nombre.expediente']}" />
+						<p:inputText id="nombreExpediente_filtroBuscadorExpPsanC014-#{tramExp.id}" maxlength="255" value="#{datosTramiteExpedienteBean.nombreExpedienteFiltroBuscadorExpPsan}" />
+					</div>
+	
+					<div class="celda-form">
+						<p:outputLabel for="fechaEntrada_filtroBuscadorExpPsanC014-#{tramExp.id}" value="#{mensaje['fecha.inicio.tarea']}" />
+						<p:datePicker id="fechaEntrada_filtroBuscadorExpPsanC014-#{tramExp.id}" value="#{datosTramiteExpedienteBean.fechaEntradaFiltroBuscadorExpPsan}" 
+							locale="es" monthNavigator="true" pattern="dd/MM/yyyy" converterMessage="#{mensaje['formato.fecha.invalido']}" mask="true"/>
+						<p:message for="fechaEntrada_filtroBuscadorExpPsanC014-#{tramExp.id}"/>
+					</div>
+				</div>
+	
+				<div class="botonera-form">
+					<p:commandButton id="filtrarBuscadorExpPsanC014-#{tramExp.id}" icon="pi pi-filter" value="#{mensaje['filtrar']}"
+						onstart="PF('expPsanWV').paginator.setPage(0);"
+						update="formFormularioExpedientes:tabViewPestanasExpediente:numeroExpediente_filtroBuscadorExpPsanC014-#{tramExp.id},
+							formFormularioExpedientes:tabViewPestanasExpediente:nombreExpediente_filtroBuscadorExpPsanC014-#{tramExp.id},
+							formFormularioExpedientes:tabViewPestanasExpediente:fechaEntrada_filtroBuscadorExpPsanC014-#{tramExp.id},
+							formFormularioExpedientes:tabViewPestanasExpediente:tablaExpedientesBuscadorExpPsanC014-#{tramExp.id}" /> 
+						
+					<p:commandButton id="limpiarFiltroBuscadorExpPsanC014-#{tramExp.id}" value="#{mensaje['limpiar.filtro']}" icon="pi pi-filter-slash"
+						actionListener="#{datosTramiteExpedienteBean.limpiarFiltroBuscadorExpPsan()}"
+						onstart="PF('expPsanWV').paginator.setPage(0);"
+						update="formFormularioExpedientes:tabViewPestanasExpediente:numeroExpediente_filtroBuscadorExpPsanC014-#{tramExp.id},
+							formFormularioExpedientes:tabViewPestanasExpediente:nombreExpediente_filtroBuscadorExpPsanC014-#{tramExp.id},
+							formFormularioExpedientes:tabViewPestanasExpediente:fechaEntrada_filtroBuscadorExpPsanC014-#{tramExp.id},
+							formFormularioExpedientes:tabViewPestanasExpediente:tablaExpedientesBuscadorExpPsanC014-#{tramExp.id}" />
+				</div>
+			</p:fieldset>
+			
+			<p:outputPanel id="panelResultadosBuscadorExpPsanC014-#{tramExp.id}">
+				<p:dataTable var="expPsan" id="tablaExpedientesBuscadorExpPsanC014-#{tramExp.id}"
+					value="#{datosTramiteExpedienteBean.lazyModelExpedientesBuscadorExpPsan}" 
+					paginator="true"
+					paginatorTemplate=" {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+					rowsPerPageTemplate="10,20,50,100" rows="10"
+					currentPageReportTemplate="#{mensaje['paginador.template']}"
+					selectionMode="single" sortBy="#{datosTramiteExpedienteBean.defaultOrdenBuscadorExpPsan}"
+					sortOrder="ascending" rowKey="#{expPsan.id}" 
+					paginatorPosition="bottom"
+					widgetVar="expPsanWV">
+	
+					<p:column headerText="#{mensaje['numero.expediente']}" sortBy="#{expPsan.numExpediente}">
+						<h:outputText value="#{expPsan.numExpediente}" />
+					</p:column>
+					
+					<p:column headerText="#{mensaje['nombre.expediente']}" sortBy="#{expPsan.nombreExpediente}">
+						<h:outputText value="#{expPsan.nombreExpediente}" />
+					</p:column>
+	
+					<p:column headerText="#{mensaje['fecha.inicio.tarea']}" sortBy="#{expPsan.fechaEntrada}">
+						<h:outputText value="#{expPsan.fechaEntrada}" >
+							<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+						</h:outputText>
+					</p:column>				
+					
+					<p:column headerText="#{mensaje['acciones']}" width="70px">
+						<p:commandButton id="seleccionarExpPsanBuscadorExpPsanC014-#{tramExp.id}" widgetVar="seleccionarExpPsan" icon="pi pi-plus-circle"
+							action="#{datosTramiteExpedienteBean.vincularExpedientePsan(expPsan)}"
+							update="formFormularioExpedientes:tabViewPestanasExpediente:numeroExpPsanCompC014-#{tramExp.id},
+									formFormularioExpedientes:tabViewPestanasExpediente:generarExpPsanC014-#{tramExp.id},formFormularioExpedientes:tabViewPestanasExpediente:vincularExpPsanC014-#{tramExp.id},
+									formFormularioExpedientes:tabViewPestanasExpediente:tablaExpedientesRelacionados,
+									:formFormularioExpedientes,textoMigaPan" >
+							<p:confirm header="#{mensaje['confirmar.operacion']}" icon="pi pi-info-circle"
+								message="#{mensaje['pregunta.confirma.vincular.expediente.psan.primeraparte']}
+										 #{tramExp.expediente.numExpediente}
+										 #{mensaje['pregunta.confirma.vincular.expediente.psan.segundaparte']}
+										 #{expPsan.numExpediente}
+										 #{mensaje['pregunta.confirma.vincular.expediente.psan.terceraparte']}" /> 
+						</p:commandButton>
+						<p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true">
+							<div class="botonera-form" align="right">
+								<p:commandButton value="#{mensaje['si']}" type="button" styleClass="ui-confirmdialog-yes" />
+								<p:commandButton value="#{mensaje['no']}" type="button" styleClass="ui-confirmdialog-no ui-button-flat" />
+							</div>							
+						</p:confirmDialog>							
+					</p:column>
+				</p:dataTable>
+			</p:outputPanel>
+        
+		</p:dialog>	
+				
+	</p:outputPanel>
+		
+</ui:composition>
+</html>

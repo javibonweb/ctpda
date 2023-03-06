@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+				xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:pe="http://primefaces.org/ui/extensions"                
+                xmlns:sec="https://joinfaces.org/security"
+                xmlns:fu="http://joinfaces.org/functions">
+ 
+<ui:composition template="#{navegacionBean.get('TEMPLATE_LAYOUT_GENERICO')}">  
+                
+    <ui:define name="content" >
+	                
+	<script>
+	function clickBotonFila(tablaId, id , elemId){
+		$("div[id='" + tablaId+"'] "       //tabla (id jsf completo)
+			+ "tr[data-rk='" + id + "'] "  //fila (id = rowkey del datatable)
+			+ "[id$=':" + elemId+ "']")    //botón (solo la terminación del id jsf)
+			.click();
+		
+	}
+
+	</script>     
+    
+    <c:set var="editable" value="${valoresDominioBean.formEditable}"  />
+    
+		<h:form id="formBuscadorValoresDominio">
+
+			<p:messages for="messagesListado" id="messagesListado" showDetail="true" closable="true">
+	            <p:autoUpdate/>
+	        </p:messages>	
+			
+			<!-- PANEL FILTRO DE BUSQUEDA DE VALORES DE DOMINIO -->        			
+			<p:panel header="#{valoresDominioBean.descripValorDom}" >
+			
+			<p:fieldset legend="#{mensaje['filtros.busqueda']}" id="bloqueFiltroBusqueda" toggleable="true" toggleSpeed="250">       		
+			
+			
+			<p:outputPanel id="panelFiltro">
+					<div>
+						<div class="celda-form">
+							<p:outputLabel for="codigo_filtro" value="#{mensaje['codigo.valor.dominio']}"/>
+							<p:inputText id="codigo_filtro" maxlength="15" size="15" value="#{valoresDominioBean.codigoFiltro}"/>
+						</div>					
+						<div class="celda-form">
+							<p:outputLabel for="descripcion_filtro" value="#{mensaje['descripcion']}"/>
+							<p:inputText id="descripcion_filtro" maxlength="250" size="30" value="#{valoresDominioBean.descripcionFiltro}"/>
+						</div>
+						<div class="celda-form">
+							<p:outputLabel for="abreviatura_filtro" value="#{mensaje['abreviatura']}"/>
+							<p:inputText id="abreviatura_filtro" maxlength="20" size="20" value="#{valoresDominioBean.abreviaturaFiltro}"/>
+						</div>						
+						<div class="celda-form">
+							<p:outputLabel for="check_bloqueado_filtro" value="#{mensaje['bloqueado']}"/>
+							<p:selectBooleanCheckbox id="check_bloqueado_filtro" value="#{valoresDominioBean.bloqueadoFiltro}" itemLabel="#{mensaje['si']}"/>
+						</div>
+						<div class="celda-form">
+							<p:outputLabel for="activo_filtro" value="#{mensaje['activo']}"/>
+							<p:selectBooleanCheckbox id="activo_filtro" value="#{valoresDominioBean.activoFiltro}" itemLabel="#{mensaje['si']}"/>
+						</div>
+						<div class="celda-form">
+							<p:outputLabel for="orden_filtro" value="#{mensaje['orden']}"/>
+							<p:inputText id="orden_filtro" maxlength="3" size="3" value="#{valoresDominioBean.ordenFiltro}"/>
+							<p:keyFilter regEx="/[0-9]/i"  for="orden_filtro"  preventPaste="true"/>
+						</div>						
+						<!-- FILTROS PARA VALORES DE DOMINIO QUE TIENEN NIVEL DE ANIDAMIENTO MAYOR DE CERO: 
+							* 'NIVEL ANIDAMIENTO'
+							* 'LISTADO DE VALORES DE DOMINIO SUPERIORES'-->
+							
+						<!-- FILTRO 'NIVEL ANIDAMIENTO' -->	
+						<div class="celda-form" >
+							<p:outputLabel for="nivelAnidamiento_filtro" value="#{mensaje['nivel.anidamiento']}" rendered="#{valoresDominioBean.dominio.nivelAnidamientoMaximo != 0}"/>
+					        <p:inputText id="nivelAnidamiento_filtro" maxlength="3" size="3" value="#{valoresDominioBean.nivelAnidamientoFiltro}" rendered="#{valoresDominioBean.dominio.nivelAnidamientoMaximo != 0}"/>
+					        <p:keyFilter regEx="/[0-9]/i"  for="nivelAnidamiento_filtro"  preventPaste="true"/>
+						</div>
+						
+						<!-- FILTRO 'COMBO CON EL LISTADO DE VALORES DE DOMINIO SUPERIORES' -->
+						<div class="celda-form">
+						<p:outputLabel for="superiores" value="#{valoresDominioBean.descripSuperior}" rendered="#{valoresDominioBean.dominio.nivelAnidamientoMaximo != 0}" />
+						<p:selectOneMenu id="superiores" value="#{valoresDominioBean.idSuperiorSeleccionado}" rendered="#{valoresDominioBean.dominio.nivelAnidamientoMaximo != 0}">
+               				<f:selectItem itemLabel="Todos" itemValue="#{null}" noSelectionOption="true" />
+							<f:selectItems value="#{valoresDominioBean.listaSuperiores}" var="valoresDominio" 
+								itemLabel="#{valoresDominio.descripcion}"
+								itemValue="#{valoresDominio.id}" />
+						</p:selectOneMenu>	
+						</div>
+						
+						<!-- FILTRO PARA LOS VALORES DE DOMINIO CUYO DOMINIO ASOCIADO SEA 'MATERIAS':
+							* 'LISTADO TIPOS DE EXPEDIENTES ASOCIADOS A LA MATERIA' -->
+						<div class="celda-form">
+						<p:outputLabel for="tipoExpedienteFiltro" styleClass="p-d-block" value="#{mensaje['tipos.expedientes']}" rendered="#{valoresDominioBean.dominio.codigo == 'MAT' and valoresDominioBean.dominio.nivelAnidamientoMaximo != 0}" />
+						<p:selectOneMenu id="tipoExpedienteFiltro" value="#{valoresDominioBean.idExpedienteSeleccionado}" rendered="#{valoresDominioBean.dominio.codigo == 'MAT' and valoresDominioBean.dominio.nivelAnidamientoMaximo != 0}">
+               				<f:selectItem itemLabel="Todos" itemValue="#{null}" noSelectionOption="true" />
+							<f:selectItems value="#{valoresDominioBean.listaTiposExpediente}" var="tipoExpediente" 
+								itemLabel="#{fu:ptoSusp(tipoExpediente.descripcion)}"
+								itemValue="#{tipoExpediente.id}" />
+						</p:selectOneMenu>	
+						</div>				
+					</div>
+				
+					<div class="ui-g botonera-form">
+						<div class="ui-g-12 ui-md-12" align="left">
+							<p:commandButton id="nuevoValorDominio" icon="pi pi-plus" value="#{valoresDominioBean.descripValorDominio}"
+								rendered="#{valoresDominioBean.dominio.codigo != 'MAT' and !valoresDominioBean.dominio.bloqueado and valoresDominioBean.permisoNewValorDom == true and valoresDominioBean.numerosSaltos!=2}" 
+								action="#{valoresDominioBean.onCrear()}"
+								update="formBuscadorValoresDominio:tablaValoresDominio"/>
+							<p:commandButton id="nuevoValorDominioMateria" icon="pi pi-plus" value="#{valoresDominioBean.descripValorDominio}"
+								rendered="#{valoresDominioBean.dominio.codigo == 'MAT' and valoresDominioBean.dominio.nivelAnidamientoMaximo != 0  and !valoresDominioBean.dominio.bloqueado  and valoresDominioBean.permisoNewValorDom == true and valoresDominioBean.numerosSaltos!=2}" 
+								action="#{valoresDominioBean.onCrear()}"
+								update="formBuscadorValoresDominio:tablaValoresDominioMateria"/>														
+							<p:commandButton id="filtrar" icon="pi pi-filter" value="#{mensaje['filtrar']}" 
+								update="@form,formBuscadorValoresDominio:tablaValoresDominio,formBuscadorValoresDominio:descripcion_filtro,formBuscadorValoresDominio:codigo_filtro,formBuscadorValoresDominio:orden_filtro,formBuscadorValoresDominio:check_bloqueado_filtro,formBuscadorValoresDominio:activo_filtro, formBuscadorValoresDominio:nivelAnidamiento_filtro"
+								onstart="PF('tablaValoresDominio').paginator.setPage(0);"/>
+							<p:commandButton id="limpiarFiltro" icon="pi pi-filter-slash" value="#{mensaje['limpiar.filtro']}" 
+								actionListener="#{valoresDominioBean.limpiarFiltro()}"
+								update="@form,formBuscadorValoresDominio:tablaValoresDominio,formBuscadorValoresDominio:descripcion_filtro,formBuscadorValoresDominio:codigo_filtro,formBuscadorValoresDominio:orden_filtro,formBuscadorValoresDominio:check_bloqueado_filtro,formBuscadorValoresDominio:activo_filtro, formBuscadorValoresDominio:nivelAnidamiento_filtro" 
+								onstart="PF('tablaValoresDominio').paginator.setPage(0);"/>	
+						</div>						
+					</div>		
+			</p:outputPanel>
+			</p:fieldset>
+			
+			<p:spacer height="1" />
+			
+			<!-- PANELES PARA MOSTRAR LOS RESULTADOS DE BUSQUEDA DE VALORES DE DOMINIO. EXISTEN DOS PANELES, UNO EXPECIFICO PARA MATERIAS
+				Y OTRO PARA EL RESTO DE VALORES DE DOMINIO -->
+			
+			<!-- PANEL CON LOS RESULTADOS DE BUSQUEDA DE LOS VALORES DE DOMINIO ASOCIADOS AL DOMINIO DE 'MATERIA'. 
+				* EL LISTADO DE LOS VALORES DE DOMINIO DEL DOMINIO 'MATERIA' ESTÁ COMPUESTO POR ELEMENTOS DEL TIPO 'MateriasTipoExpedienteMaestra'
+				* EL CAMPO ESPECIFICO A MOSTRAR PARA LAS MATERIAS ES EL DE TIPOS DE EXPEDIENTES RELACIONADOS CON CADA VALOR DE DOMINIO. -->
+			<p:outputPanel id="panelTabla" toggleable="true" toggleSpeed="250">
+			
+				<p:dataTable var="valorDominioMateria" id="tablaValoresDominioMateria" widgetVar="tablaValoresDominio" rendered="#{valoresDominioBean.dominio.codigo == 'MAT' and valoresDominioBean.dominio.nivelAnidamientoMaximo != 0}"
+					value="#{valoresDominioBean.lazyModelMatExpMaestra}" rows="10" 
+					paginator="true" paginatorPosition="bottom"
+					paginatorTemplate=" {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+					rowsPerPageTemplate="10,20,50,100"
+					currentPageReportTemplate="#{mensaje['paginador.template']}"
+					selectionMode="single" 
+					selection="#{valoresDominioBean.selectedMateriaTipoExpedienteMaestra}" rowKey="#{valorDominioMateria.id}">		
+					<p:ajax disabled="#{valoresDominioBean.numerosSaltos==2}"
+				        event="rowDblselect"
+				        listener="#{valoresDominioBean.onValDomMatRowDblClkSelect}"
+				        global="false"
+				        oncomplete="clickBotonFila(this.source, args.id, 'consultaValoresDominioMateria');">
+					</p:ajax>
+					
+					<p:column headerText="#{mensaje['codigo.valor.dominio']}" 
+						sortBy="#{valorDominioMateria.codigo}">
+               			<h:outputText value="#{valorDominioMateria.codigo}"/>
+					</p:column>					
+					
+					<p:column headerText="#{mensaje['descripcion']}"
+						sortBy="#{valorDominioMateria.descripcion}">
+               			<h:outputText value="#{valorDominioMateria.descripcion}"/>
+					</p:column>
+					
+					<p:column headerText="#{mensaje['abreviatura']}"
+						sortBy="#{valorDominio.abreviatura}">
+               			<h:outputText value="#{valorDominio.abreviatura}"/>
+					</p:column>						
+
+					<p:column headerText="#{mensaje['bloqueado']}"
+						sortBy="#{valorDominioMateria.bloqueado}">
+               			<h:outputText value="#{mensaje['no']}" rendered="#{valorDominioMateria.bloqueado == false}"/>
+			    		<h:outputText value="#{mensaje['si']}" rendered="#{valorDominioMateria.bloqueado == true}"/> 	               			
+					</p:column>
+
+					<p:column headerText="#{mensaje['activo']}"  
+						sortBy="#{valorDominioMateria.activo}" width="10%">
+               			<h:outputText value="#{mensaje['no']}" rendered="#{valorDominioMateria.activo == false}"/>
+			    		<h:outputText value="#{mensaje['si']}" rendered="#{valorDominioMateria.activo == true}"/> 		
+					</p:column>
+					<p:column headerText="#{mensaje['nivel.anidamiento']}" sortBy="#{valorDominioMateria.nivelAnidamiento}" rendered="#{valoresDominioBean.dominio.nivelAnidamientoMaximo != 0}">
+               			<h:outputText value="#{valorDominioMateria.nivelAnidamiento}" rendered="#{valoresDominioBean.dominio.nivelAnidamientoMaximo != 0}"/>
+					</p:column>
+					<p:column headerText="#{valoresDominioBean.descripSuperior}" sortBy="#{valorDominioMateria.valorDominioPadre.descripcion}" rendered="#{valoresDominioBean.dominio.nivelAnidamientoMaximo != 0}">
+               			<h:outputText value="#{valorDominioMateria.valorDominioPadre.descripcion}" rendered="#{valoresDominioBean.dominio.nivelAnidamientoMaximo != 0}"/>
+					</p:column>					
+					<p:column headerText="#{mensaje['orden']}"
+						sortBy="#{valorDominioMateria.orden}">
+               			<h:outputText value="#{valorDominioMateria.orden}"/>
+					</p:column>
+					<p:column headerText="#{mensaje['tipos.expedientes']}" sortBy="#{valorDominioMateria.tipExpAbrev}" rendered="#{valoresDominioBean.dominio.codigo == 'MAT' and valoresDominioBean.dominio.nivelAnidamientoMaximo != 0}">
+               			<h:outputText value="#{valorDominioMateria.tipExpAbrev}" rendered="#{valoresDominioBean.dominio.codigo == 'MAT' and valoresDominioBean.dominio.nivelAnidamientoMaximo != 0}"/>
+					</p:column>							
+					
+					<p:column headerText="#{mensaje['acciones']}">
+						<p:commandButton id="consultaValoresDominioMateria" 
+							rendered="#{valoresDominioBean.permisoConsValorDom == true and valoresDominioBean.numerosSaltos!=2}"
+							icon="pi pi-eye" action="#{valoresDominioBean.onConsultar(valorDominioMateria.id)}" immediate="true">
+    					</p:commandButton>
+					
+					
+					
+					
+					<p:commandButton id="editarValorDominioMateria" widgetVar="editarValorDominioMateria"
+							rendered="#{valoresDominioBean.dominio.codigo == 'MAT' and !valoresDominioBean.dominio.bloqueado and valorDominioMateria.activo and !valorDominioMateria.bloqueado and valoresDominioBean.permisoEditValorDom == true and valoresDominioBean.numerosSaltos!=2}"
+							icon="pi pi-pencil" action="#{valoresDominioBean.onEditar(valorDominioMateria.id)}">
+							<f:param name="id" value="#{valorDominioMateria.id}" />
+						</p:commandButton>
+						<p:commandButton id="eliminarValorDominioMateria" 
+							icon="pi pi-times" 
+							rendered="#{valoresDominioBean.dominio.codigo == 'MAT' and !valoresDominioBean.dominio.bloqueado and valorDominioMateria.activo and valoresDominioBean.permisoDesacValorDom == true}"
+							actionListener="#{valoresDominioBean.eliminarValorDominioMateria(valorDominioMateria)}"
+							update="formBuscadorValoresDominio:tablaValoresDominioMateria,formBuscadorValoresDominio">
+							<p:confirm header="#{mensaje['confirmar.operacion']}" message="#{mensaje['pregunta.confirma.eliminar']}" icon="pi pi-info-circle"/>
+						</p:commandButton>	
+						<p:commandButton id="activarValorDominioMateria" 
+							icon="pi pi-check"
+							rendered="#{valoresDominioBean.dominio.codigo == 'MAT' and !valoresDominioBean.dominio.bloqueado and !valorDominioMateria.activo  and valoresDominioBean.permisoActValorDom == true}"
+							actionListener="#{valoresDominioBean.activarValorDominioMateria(valorDominioMateria)}"
+							update="formBuscadorValoresDominio:tablaValoresDominioMateria,formBuscadorValoresDominio">
+							<p:confirm header="#{mensaje['confirmar.operacion']}" message="#{mensaje['pregunta.confirma.activar']}" icon="pi pi-info-circle"/>
+						</p:commandButton>		
+							
+						<p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true">
+				            <div class="botonera-form" align="right">
+				            	 <p:commandButton value="#{mensaje['si']}" type="button" styleClass="ui-confirmdialog-yes" />
+				            	<p:commandButton value="#{mensaje['no']}" type="button" styleClass="ui-confirmdialog-no ui-button-flat"/>
+				            </div>
+						</p:confirmDialog>							    					
+    					
+					</p:column>
+				</p:dataTable>
+				
+				<!-- PANEL CON LOS RESULTADOS DE BUSQUEDA DE LOS VALORES DE DOMINIO CUYO DOMINIO NO ES DE TIPO 'MATERIA', ES DECIR, 
+				PARA EL RESTO DE VALORES DE DOMINIO DEL SISTEMA -->
+				
+				<p:dataTable var="valorDominio" id="tablaValoresDominio" widgetVar="tablaValoresDominio"
+					value="#{valoresDominioBean.lazyModel}" rows="10" 
+					rendered="#{valoresDominioBean.dominio.codigo != 'MAT'}"
+					paginator="true" paginatorPosition="bottom"
+					paginatorTemplate=" {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+					rowsPerPageTemplate="10,20,50,100"
+					currentPageReportTemplate="#{mensaje['paginador.template']}"
+					selectionMode="single" 
+					selection="#{valoresDominioBean.selectedValorDominio}" rowKey="#{valorDominio.id}">		
+					<p:ajax disabled="#{valoresDominioBean.numerosSaltos==2}"
+				        event="rowDblselect"
+				        listener="#{valoresDominioBean.onValDomRowDblClkSelect}"
+				        global="false"
+				        oncomplete="clickBotonFila(this.source, args.id, 'consultaValoresDominio');">
+					</p:ajax>
+					
+					<p:column headerText="#{mensaje['codigo.valor.dominio']}" 
+						sortBy="#{valorDominio.codigo}">
+               			<h:outputText value="#{valorDominio.codigo}"/>
+					</p:column>					
+					
+					<p:column headerText="#{mensaje['abreviatura']}"
+						sortBy="#{valorDominio.abreviatura}">
+               			<h:outputText value="#{valorDominio.abreviatura}"/>
+					</p:column>					
+					
+					<p:column headerText="#{mensaje['descripcion']}"
+						sortBy="#{valorDominio.descripcion}">
+               			<h:outputText value="#{valorDominio.descripcion}"/>
+					</p:column>
+
+					<p:column headerText="#{mensaje['bloqueado']}"
+						sortBy="#{valorDominio.bloqueado}">
+               			<h:outputText value="#{mensaje['no']}" rendered="#{valorDominio.bloqueado == false}"/>
+			    		<h:outputText value="#{mensaje['si']}" rendered="#{valorDominio.bloqueado == true}"/> 	               			
+					</p:column>
+
+					<p:column headerText="#{mensaje['activo']}"  
+						sortBy="#{valorDominio.activo}" width="10%">
+               			<h:outputText value="#{mensaje['no']}" rendered="#{valorDominio.activo == false}"/>
+			    		<h:outputText value="#{mensaje['si']}" rendered="#{valorDominio.activo == true}"/> 		
+					</p:column>
+					<p:column headerText="#{mensaje['nivel.anidamiento']}" sortBy="#{valorDominio.nivelAnidamiento}" rendered="#{valoresDominioBean.dominio.nivelAnidamientoMaximo != 0}">
+               			<h:outputText value="#{valorDominio.nivelAnidamiento}" rendered="#{valoresDominioBean.dominio.nivelAnidamientoMaximo != 0}"/>
+					</p:column>
+					<p:column headerText="#{valoresDominioBean.descripSuperior}" sortBy="#{valorDominio.valorDominioPadre.descripcion}" rendered="#{valoresDominioBean.dominio.nivelAnidamientoMaximo != 0}">
+               			<h:outputText value="#{valorDominio.valorDominioPadre.descripcion}" rendered="#{valoresDominioBean.dominio.nivelAnidamientoMaximo != 0}"/>
+					</p:column>					
+					<p:column headerText="#{mensaje['orden']}"
+						sortBy="#{valorDominio.orden}">
+               			<h:outputText value="#{valorDominio.orden}"/>
+					</p:column>
+					<p:column headerText="#{mensaje['tipos.expedientes']}" sortBy="#{valorDominio.tiposexpedientes}" rendered="#{valoresDominioBean.dominio.codigo == 'MAT' and valoresDominioBean.dominio.nivelAnidamientoMaximo != 0}">
+               			<h:outputText value="#{valorDominio.tiposexpedientes}" rendered="#{valoresDominioBean.dominio.codigo == 'MAT' and valoresDominioBean.dominio.nivelAnidamientoMaximo != 0}"/>
+					</p:column>							
+					
+					<p:column headerText="#{mensaje['acciones']}">
+						<p:commandButton id="consultaValoresDominio" 
+							rendered="#{valoresDominioBean.permisoConsValorDom == true and valoresDominioBean.numerosSaltos!=2}"
+							icon="pi pi-eye" action="#{valoresDominioBean.onConsultar(valorDominio.id)}" immediate="true">
+    					</p:commandButton>
+
+					<p:commandButton id="editarValorDominio" widgetVar="editarValorDominio"
+							rendered="#{valoresDominioBean.dominio.codigo != 'MAT' and !valoresDominioBean.dominio.bloqueado and valorDominio.activo and !valorDominio.bloqueado and valoresDominioBean.permisoEditValorDom == true and valoresDominioBean.numerosSaltos!=2}"
+							icon="pi pi-pencil" action="#{valoresDominioBean.onEditar(valorDominio.id)}">
+							<f:param name="id" value="#{valorDominio.id}" />
+						</p:commandButton>
+						<p:commandButton id="eliminarValorDominio" 
+							icon="pi pi-times" 
+							rendered="#{valoresDominioBean.dominio.codigo != 'MAT' and !valoresDominioBean.dominio.bloqueado and valorDominio.activo and !valorDominio.bloqueado and valoresDominioBean.permisoDesacValorDom == true}"
+							actionListener="#{valoresDominioBean.eliminarValorDominio(valorDominio)}"
+							update="formBuscadorValoresDominio:tablaValoresDominio,formBuscadorValoresDominio">
+							<p:confirm header="#{mensaje['confirmar.operacion']}" message="#{mensaje['pregunta.confirma.eliminar']}" icon="pi pi-info-circle"/>
+						</p:commandButton>	
+						<p:commandButton id="activarValorDominio" 
+							icon="pi pi-check"
+							rendered="#{valoresDominioBean.dominio.codigo != 'MAT' and !valoresDominioBean.dominio.bloqueado and !valorDominio.activo  and valoresDominioBean.permisoActValorDom == true}"
+							actionListener="#{valoresDominioBean.activarValorDominio(valorDominio)}"
+							update="formBuscadorValoresDominio:tablaValoresDominio,formBuscadorValoresDominio">
+							<p:confirm header="#{mensaje['confirmar.operacion']}" message="#{mensaje['pregunta.confirma.activar']}" icon="pi pi-info-circle"/>
+						</p:commandButton>		
+							
+						<p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true">
+				            <div class="botonera-form" align="right">
+				            	<p:commandButton value="#{mensaje['si']}" type="button" styleClass="ui-confirmdialog-yes" />
+				            	<p:commandButton value="#{mensaje['no']}" type="button" styleClass="ui-confirmdialog-no ui-button-flat"/>
+				            </div>
+						</p:confirmDialog>	    					
+    					
+					</p:column>
+				</p:dataTable>
+
+			</p:outputPanel>			
+
+			</p:panel>
+			<br/>
+			<p:commandButton id="volverPuntoMenu" value="#{mensaje['volver']}" rendered="#{valoresDominioBean.puntoMenu}"
+				actionListener="#{volverBean.migaPanVolver()}"
+				oncomplete="document.location.href='#{request.contextPath}/aplicacion/bienvenido.xhtml'">
+			</p:commandButton>
+			
+			<p:commandButton id="volver" value="#{mensaje['volver']}" rendered="#{!valoresDominioBean.puntoMenu}"
+				actionListener="#{volverBean.migaPanVolver('Listado de dominios')}"
+				oncomplete="document.location.href='#{request.contextPath}/aplicacion/administracion/dominios/listadoDominios.xhtml'">
+			</p:commandButton>		
+
+		</h:form>	
+		
+	</ui:define>
+    
+</ui:composition>
+
+</html>

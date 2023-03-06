@@ -1,0 +1,346 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:sec="https://joinfaces.org/security"
+	xmlns:c="http://java.sun.com/jstl/core"
+	xmlns:fu="http://joinfaces.org/functions">
+	
+<ui:composition template="#{navegacionBean.get('TEMPLATE_LAYOUT_GENERICO')}">
+
+	<ui:define name="content">
+	
+		<script type="text/javascript">
+			function clickBotonFila(tablaId, id, elemId) {
+				$("div[id='" + tablaId + "'] " //tabla (id jsf completo)
+						+ "tr[data-rk='" + id + "'] " //fila (id = rowkey del datatable)
+						+ "[id$=':" + elemId + "']") //botón (solo la terminación del id jsf)
+				.click();
+			}
+		</script>
+
+		<c:set var="editable" value="#{tareasBean.formEditable}" />
+
+		<h:form id="formListadoMiMesa">
+
+			<p:messages for="messagesFormulario" id="messagesFormulario" showDetail="true" closable="true">
+				<p:autoUpdate />
+			</p:messages>
+			
+			<p:panel >
+				<f:facet name="header">
+					<h:outputText id="tituloPanelMesa" value="#{tareasBean.tituloMiMesa}" />
+				</f:facet>
+				<p:fieldset legend="#{mensaje['filtros.busqueda']}" id="bloqueFiltroBusqueda" toggleable="true" toggleSpeed="250">
+
+					<p:outputPanel id="filtroTareas">
+					<div>
+						<div class="celda-form">
+							<p:outputLabel value="#{mensaje['tipo.expedientes']}" for="tipoExpedientes_filtro" />
+							<p:selectOneMenu id="tipoExpedientes_filtro"
+								value="#{tareasBean.selectedTipoExpIdFiltro}"
+								style="min-width: 150px;">
+								<f:selectItem itemLabel="#{mensaje['todos']}" itemValue="" /> 
+								<f:selectItems value="#{tareasBean.tiposExpFiltro}" var="t"
+									itemLabel="#{fu:ptoSusp(t.descripcion)}" itemValue="#{t.id}" />
+							</p:selectOneMenu>
+						</div>
+						<div class="celda-form">
+							<p:outputLabel for="numeroExpediente_filtro"
+								value="#{mensaje['numero.expediente']}" />
+							<p:inputText id="numeroExpediente_filtro" maxlength="255"
+								value="#{tareasBean.numeroExpedienteFiltro}" />
+						</div>
+						<div class="celda-form">
+							<p:outputLabel for="nombreExpediente_filtro"
+								value="#{mensaje['nombre.expediente']}" />
+							<p:inputText id="nombreExpediente_filtro" maxlength="255"
+								value="#{tareasBean.nombreExpedienteFiltro}" />
+						</div>
+						<div class="celda-form">
+							<p:outputLabel value="#{mensaje['tipo.tarea']}" for="tipoTarea_filtro" />
+							<p:selectOneMenu id="tipoTarea_filtro"
+								value="#{tareasBean.selectedTipoTareaIdFiltro}"
+								style="min-width: 150px;">
+								<f:selectItem itemLabel="#{mensaje['todos']}" itemValue="" /> 
+								<f:selectItems value="#{tareasBean.tiposTareaFiltro}" var="t"
+									itemLabel="#{fu:ptoSusp(t.descripcion)}" itemValue="#{t.id}" />
+							</p:selectOneMenu>
+						</div>
+						<div class="celda-form">
+							<p:outputLabel value="#{mensaje['mesa']}" for="responsables_filtro" />
+							<p:selectOneMenu id="responsables_filtro"
+								value="#{tareasBean.selectedResponsableIdFiltro}"
+								style="min-width: 150px;">
+								<f:selectItem itemLabel="#{mensaje['todos']}" itemValue="" /> 
+								<f:selectItems value="#{tareasBean.responsablesFiltro}" var="r"
+									itemLabel="#{fu:ptoSusp(r.responsable.descripcion)}" itemValue="#{r.responsable.id}" />
+								<p:ajax update="equipo_filtro" />
+							</p:selectOneMenu>
+						</div>
+					</div>
+						
+					<div>
+						<p:outputPanel styleClass="celda-form" rendered="#{tareasBean.permisoEquipo}">
+							<p:outputLabel for="equipo_filtro" value="#{mensaje['equipo']}"    />
+							<p:selectBooleanCheckbox id="equipo_filtro"    value="#{tareasBean.equipoFiltro}"     itemLabel="#{mensaje['si']}" />
+						</p:outputPanel>
+						
+						<p:outputPanel styleClass="celda-form" rendered="#{tareasBean.permisoFiltroActivas}">
+							<p:outputLabel for="activa_filtro" value="#{mensaje['activa']}"    />
+							<p:selectBooleanCheckbox id="activa_filtro"    value="#{tareasBean.activasFiltro}"    itemLabel="#{mensaje['si']}" />
+						</p:outputPanel>
+						
+						<p:outputPanel styleClass="celda-form" rendered="#{tareasBean.permisoFiltroPendientes}">
+							<p:outputLabel for="pendiente_filtro" value="#{mensaje['pendiente']}" />
+							<p:selectBooleanCheckbox id="pendiente_filtro" value="#{tareasBean.pendientesFiltro}" itemLabel="#{mensaje['si']}" />
+						</p:outputPanel>
+						
+						<p:outputPanel styleClass="celda-form" >
+							<p:outputLabel for="urgente_filtro" value="#{mensaje['urgente']}" />
+							<p:selectBooleanCheckbox id="urgente_filtro" value="#{tareasBean.urgentesFiltro}" itemLabel="#{mensaje['si']}" />
+						</p:outputPanel>
+						
+						<div class="celda-form">
+							<p:outputLabel for="aviso_filtro" value="#{mensaje['tarea.aviso']}" />
+							<p:selectOneRadio id="aviso_filtro" value="#{tareasBean.avisoFiltro}" >
+								<f:selectItem itemLabel="#{mensaje['todos']}" itemValue="" />
+								<f:selectItem itemLabel="#{mensaje['sin.avisos']}" itemValue="false" />
+								<f:selectItem itemLabel="#{mensaje['solo.avisos']}" itemValue="true" />
+							</p:selectOneRadio>
+						</div>
+					</div>
+										
+					</p:outputPanel>
+
+					<div class="botonera-form">
+						<p:commandButton id="filtrar" icon="pi pi-filter"
+							value="#{mensaje['filtrar']}"
+							actionListener="#{tareasBean.onBuscarTareas}"
+							update="@(filtro), listadoMiMesa, tituloPanelMesa"
+							onstart="PF('listadoMiMesa').paginator.setPage(0);" /> 
+						<p:commandButton id="limpiarFiltro" value="#{mensaje['limpiar.filtro']}" icon="pi pi-filter-slash"
+							actionListener="#{tareasBean.limpiarFiltro()}"
+							update="filtroTareas, listadoMiMesa" process="@this"
+							onstart="PF('listadoMiMesa').paginator.setPage(0);" />  
+					</div>
+				</p:fieldset>
+				
+				<div class="botonera-form" align="right">
+				 	<p:commandButton id="botonExportarCSV" value="#{mensaje['csv']}" icon="pi pi-file-excel" title="Exportar a CSV">
+	                    <p:dataExporter type="xlsxstream" target="listadoMiMesa" fileName="#{utilsComun.getNombreCsvExportar('TAREAS')}"/>
+	                </p:commandButton>
+				</div>
+				
+				<p:outputPanel id="panelListadoTareas">
+					<p:dataTable var="t" id="listadoMiMesa" widgetVar="listadoMiMesa"
+						styleClass="listado_tareas"
+						value="#{tareasBean.lazyModel}" paginator="true"
+						paginatorTemplate=" {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+						rowsPerPageTemplate="10,20,50,100" rows="10"
+						currentPageReportTemplate="#{mensaje['paginador.template']}"
+						selectionMode="single"
+						sortBy="#{tareasBean.defaultOrden}"
+						sortOrder="ascending"
+						rowKey="#{t.id}" paginatorPosition="bottom">
+
+						<p:ajax event="rowDblselect" listener="#{tareasBean.accesoRapido}" 
+							update="@form:dialogTarea" global="false" oncomplete="PF('dialogTarea').show()" />
+						
+						<p:column sortBy="#{t.urgente}" width="35" styleClass="texto-centrado" exportable="false">
+							<f:facet name="header">
+								<p:outputPanel id="hdrUrg" style="display:inline" class="pi pi-bell" />
+								<p:tooltip for="hdrUrg" value="#{mensaje['tarea.urgente']}"
+									showEffect="fade" hideEffect="fade" position="top" showDelay="500" />
+							</f:facet>
+							<span class="#{t.urgente? 'marca-tarea-urgente' : ''}" />
+						</p:column>
+
+						<p:column width="50" exportable="false">
+							<f:facet name="header">
+								<h:outputText id="hdrAviso" value="#{mensaje['av']}" />
+								<p:tooltip for="hdrAviso" value="#{mensaje['tarea.aviso']}"
+									showEffect="fade" hideEffect="fade" position="top" showDelay="500" />
+							</f:facet>
+							<span class="#{t.aviso? 'pi pi-check' : ''}" />
+						</p:column>
+						<p:column width="45" exportable="false">
+							<f:facet name="header">
+								<h:outputText id="hdrDep" value="#{mensaje['dep']}" />
+								<p:tooltip for="hdrDep" value="#{mensaje['tarea.dependiente']}"
+									showEffect="fade" hideEffect="fade" position="top" showDelay="500" />
+							</f:facet>
+							<span class="#{tareasBean.cssSemaforoDependiente(t)}" />
+						</p:column>
+						
+						<p:column width="35" visible="false" headerText="#{mensaje['tarea.urgente']}">
+							<h:outputText rendered="#{t.urgente}" value="#{mensaje['si']}" />
+							<h:outputText rendered="#{!t.urgente}" value="#{mensaje['no']}" />
+						</p:column>
+
+						<p:column width="50" visible="false" headerText="#{mensaje['tarea.aviso']}">
+							<h:outputText rendered="#{t.aviso}" value="#{mensaje['si']}" />
+							<h:outputText rendered="#{!t.aviso}" value="#{mensaje['no']}" />
+						</p:column>
+						
+						<p:column width="45" visible="false" headerText="#{mensaje['tarea.dependiente']}">
+							<h:outputText value="#{tareasBean.isEsTareaRealizable(t)}" />
+						</p:column>
+
+						<p:column headerText="#{mensaje['tipo.tarea']}" sortBy="#{t.descripcion}">
+							<h:outputText value="#{t.descripcion}" />
+						</p:column>
+												
+						<p:column headerText="#{mensaje['fecha.limite']}" sortBy="#{t.fechaLimite}" width="110">
+							<h:outputText value="#{t.fechaLimite}" >
+								<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+							</h:outputText>
+						</p:column>
+						<p:column headerText="#{mensaje['fecha.inicio']}" sortBy="#{t.fechaInicio}" width="120">
+							<h:outputText value="#{t.fechaInicio}" >
+				            	<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+				            </h:outputText>
+						</p:column>
+						<p:column headerText="#{mensaje['fecha.cierre.tarea']}" sortBy="#{t.fechaCierre}" width="120" rendered="#{!tareasBean.pendientesFiltro}">
+							<h:outputText value="#{t.fechaCierre}" >
+				            	<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+				            </h:outputText>
+						</p:column>
+							
+						<p:column headerText="#{mensaje['num.exp']}" sortBy="#{t.expediente.numExpediente}" width="110">
+							<h:outputText value="#{t.expediente.numExpediente}" />
+						</p:column>
+						<p:column headerText="#{mensaje['nombre.expediente']}" sortBy="#{t.expediente.nombreExpediente}">
+							<h:outputText value="#{t.expediente.nombreExpediente}" />
+						</p:column>
+						<p:column headerText="#{mensaje['tramite']}" sortBy="#{t.tramiteExpediente.tipoTramite.descripcion}">
+							<h:outputText value="#{t.tramiteExpediente.tipoTramite.descripcion}" />
+						</p:column>
+						<p:column headerText="#{mensaje['situacion']}" sortBy="#{t.expediente.valorSituacionExpediente.descripcion}">
+							<h:outputText value="#{t.expediente.valorSituacionExpediente.descripcion}" />
+						</p:column>
+						<p:column headerText="#{mensaje['subsituacion']}" sortBy="#{t.expediente.situacionAdicional}">
+							<h:outputText value="#{t.expediente.situacionAdicional}" />
+						</p:column>
+						
+						<p:column headerText="#{mensaje['mesa']}" sortBy="#{t.responsableTramitacion.descripcion}" rendered="#{tareasBean.equipoFiltro}">
+							<h:outputText value="#{t.responsableTramitacion.descripcion}" />
+						</p:column>
+						<p:column headerText="#{mensaje['ultimo.responsable']}">
+							<h:outputText
+								value="#{tareasBean.getResponsableUltimo(t).descripcion}" />
+						</p:column>
+						<p:column width="30" exportable="false">
+							<f:facet name="header">
+								<h:outputText id="hdrObs" value="#{mensaje['obs']}" />
+								<p:tooltip for="hdrObs" value="#{mensaje['observaciones']}"
+									showEffect="fade" hideEffect="fade" position="top" showDelay="500" />
+							</f:facet>
+							<h:outputText  id="checkObs" 
+								value="#{empty t.observaciones.texto? '' : 'X'}" />
+							<p:tooltip for="checkObs" value="#{t.observaciones.texto.length() lt 1400? t.observaciones.texto : t.observaciones.texto.substring(0,1399)}" showDelay="500" />	
+							
+						</p:column>
+						<p:column width="35" visible="false" headerText="#{mensaje['observaciones']}">
+							<h:outputText value="#{t.observaciones.texto}" />
+						</p:column>
+
+						<p:column headerText="#{mensaje['acciones']}" width="175" exportable="false">
+						
+							<p:commandButton id="consultaExpediente" icon="pi pi-book" rendered="#{true or tareasBean.permisoTramitarExpediente}"
+							action="#{tareasBean.onConsultarExpediente(t.id)}" />
+							<p:tooltip for="consultaExpediente" value="#{mensaje['tramitar.tarea']}" rendered="#{true or tareasBean.permisoTramitarExpediente}" 
+									showEffect="fade" hideEffect="fade" position="top" showDelay="500" />
+							
+							<p:commandButton id="editarDoc" icon="pi pi-file" rendered="#{not empty t.documentoExpedienteTramite}"
+								actionListener="#{tareasBean.registrarAccesoDoc(t)}"
+								onclick="abrirEditorDoc(#{t.documentoExpedienteTramite.documentoExpediente.id}, 'edit')">
+							</p:commandButton>
+							<p:tooltip for="editarDoc" value="#{mensaje['editar.documento']}" rendered="#{tareasBean.permisoEditarTarea and not empty t.documentoExpedienteTramite}"
+									showEffect="fade" hideEffect="fade" position="top" showDelay="500" />
+
+							<p:commandButton id="consultarTarea"
+								widgetVar="consultarTarea" icon="pi pi-eye"
+								action="#{tareasBean.consultarTarea(t.id)}"
+								update="@form:dialogTarea">
+							</p:commandButton>
+							<p:tooltip for="consultarTarea" value="#{mensaje['consultar.tarea']}"
+									showEffect="fade" hideEffect="fade" position="top" showDelay="500" />
+																
+							<p:commandButton id="eliminarTarea" icon="pi pi-times" rendered="#{tareasBean.permisoEliminarTarea and t.activa and not t.esTareaCerrada}"
+								actionListener="#{tareasBean.eliminarTarea(t.id)}"
+								update="listadoMiMesa">
+								<p:confirm header="#{mensaje['confirmar.operacion']}" message="#{mensaje['pregunta.confirma.eliminar']}" icon="pi pi-info-circle" />
+							</p:commandButton>
+							<p:tooltip for="eliminarTarea" value="#{mensaje['eliminar.tarea']}" rendered="#{tareasBean.permisoEliminarTarea and t.activa and not t.esTareaCerrada}"
+									showEffect="fade" hideEffect="fade" position="top" showDelay="500" />
+							
+							<p:commandButton id="activarTarea" icon="pi pi-check" rendered="#{tareasBean.permisoReactivarTarea and not t.activa}"
+								actionListener="#{tareasBean.reactivarTarea(t.id)}"
+								update="listadoMiMesa">
+								<p:confirm header="#{mensaje['confirmar.operacion']}" message="#{mensaje['pregunta.confirma.activar']}" icon="pi pi-info-circle" />
+							</p:commandButton>
+							<p:tooltip for="activarTarea" value="#{mensaje['reactivar.tarea']}"  rendered="#{tareasBean.permisoReactivarTarea and not t.activa}"
+									showEffect="fade" hideEffect="fade" position="top" showDelay="500" />
+							
+							<p:commandButton id="rehabilitarTarea" icon="pi pi-replay" rendered="#{tareasBean.permisoRehabilitarTarea and t.activa and t.esTareaCerrada}"
+								actionListener="#{tareasBean.rehabilitarTarea(t.id)}"
+								update="listadoMiMesa">
+								<p:confirm header="#{mensaje['confirmar.operacion']}" message="#{mensaje['pregunta.confirma.rehabilitar.tarea']}" icon="pi pi-info-circle" />
+							</p:commandButton>
+							<p:tooltip for="rehabilitarTarea" value="#{mensaje['rehabilitar.tarea']}" rendered="#{tareasBean.permisoRehabilitarTarea and t.activa and t.esTareaCerrada}" 
+									showEffect="fade" hideEffect="fade" position="top" showDelay="500" />
+							<p:commandButton icon="pi pi-check-square"
+								id="btnFinalizarTareaListado" rendered="#{t.activa and not t.esTareaCerrada}" 
+								action="#{datosExpedientesTareasBean.cargarTareaListado(t)}"
+								oncomplete="PF('confirmFinalizarTareaListado').show()"
+								update="@form:confirmFinalizarTareaListado">
+							</p:commandButton>
+							<p:tooltip for="btnFinalizarTareaListado" value="#{mensaje['finalizar.tarea']}" rendered="#{t.activa and not t.esTareaCerrada}" 
+									showEffect="fade" hideEffect="fade" position="top" showDelay="500" />
+				
+						</p:column>
+					</p:dataTable>
+				</p:outputPanel>
+				
+			</p:panel>
+			
+			<br />
+			
+			<p:commandButton id="volver" value="#{mensaje['volver']}" actionListener="#{volverBean.migaPanVolver()}"
+				oncomplete="document.location.href='#{request.contextPath}/aplicacion/bienvenido.xhtml'" />
+
+			<ui:include src="dialogTarea.xhtml" />
+
+			<p:confirmDialog id="confirmFinalizarTareaListado"
+			                 widgetVar="confirmFinalizarTareaListado"
+			                 message="#{datosExpedientesTareasBean.textoConfirmarFinalizar()}"
+			                 header="#{mensaje['confirmar.operacion']}"
+			                 closable="true">
+			
+				<div class="botonera-form" align="right">
+					<p:commandButton value="#{mensaje['si']}"
+			                     process="@this"
+			                     update="listadoMiMesa" 
+			                     oncomplete="PF('confirmFinalizarTareaListado').hide()"
+			                     actionListener="#{datosExpedientesTareasBean.cerrarTareaListado()}" />
+			
+			   		<p:commandButton value="#{mensaje['no']}"
+			                     onclick="PF('confirmFinalizarTareaListado').hide()"
+			                     type="button" />
+				</div>
+			    
+			</p:confirmDialog>
+		</h:form>
+		
+		<ui:include src="../expedientes/abrirEditorDoc.xhtml" />
+		
+	</ui:define>
+
+</ui:composition>
+
+</html>

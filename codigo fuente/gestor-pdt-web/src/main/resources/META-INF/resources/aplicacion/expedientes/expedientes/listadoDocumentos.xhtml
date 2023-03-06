@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:c="http://java.sun.com/jstl/core"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:sec="https://joinfaces.org/security"
+	xmlns:fu="http://joinfaces.org/functions">
+
+<ui:composition>
+
+	<!--  Parámetos de entrada -->
+	<!-- editable -->
+	<!--  tipo_tramite: string con el código del tipo de trámite, si es listado de trámite -->
+	
+	<c:set var="ancho_sn" value="22" />	
+	<c:set var="es_listado_evolucion" value="#{true eq es_listado_evolucion}" />
+	<c:set var="abreviado" value="#{true eq abreviado}" />
+	<c:set var="idTablaDoc" value="#{idTablaDoc}" />
+	<c:set var="bean" value="#{datosExpedientesDocumentosBean}" />
+
+			<p:dataTable var="docExp" id="#{idTablaDoc}" widgetVar="#{idTablaDoc}" styleClass="#{css_class} listado-documentos"
+				value="#{value}" paginator="true"
+				paginatorTemplate=" {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+				rowsPerPageTemplate="5,10,20,50,100" rows="#{es_listado_tramite? '10' : '20'}"
+				currentPageReportTemplate="#{mensaje['paginador.template']}"
+				paginatorAlwaysVisible="false" paginatorPosition="bottom" 
+				draggableRows="#{not es_listado_evolucion}"
+				sortBy="#{sortBy}" sortOrder="ascending"
+				rowKey="#{docExp.id}" >
+
+            	<p:ajax event="rowReorder" listener="#{bean.onDocsTramRowReorder}" 
+            		update="@(.panel-documentos), @(.panel-actualizado-cabecera)" 
+            		disabled="#{es_listado_evolucion}" />
+
+				<p:column sortBy="#{docExp.orden}" width="30" style="display:none; text-align: right">
+					<h:outputText id="hdrDocOrden" value="#{docExp.orden}" />
+					<p:tooltip for="hdrDocOrden" value="#{mensaje['orden']}" showEffect="fade" hideEffect="fade" position="top" showDelay="500" />
+				</p:column>
+				<p:column>
+					<h:outputText id="iconoVinc" styleClass="#{docExp.vinculado? 'pi pi-link icono-vinculado' : ''}" />
+					<p:tooltip for="iconoVinc" value="#{mensaje['texto.documento.vinculado']}" showEffect="fade" hideEffect="fade" position="top" showDelay="500" />
+					<h:outputText value="#{docExp.descripcion}" />
+				</p:column>
+				<p:column width="30">
+					<h:outputText id="extensionFichero" value="#{docExp.extensionFichero}" />
+					<p:tooltip for="extensionFichero" value="#{mensaje['extension.fichero']}" showEffect="fade" hideEffect="fade" position="top" showDelay="500" />
+				</p:column>
+				<p:column width="140">
+					<h:outputText id="tipoDocumento" value="#{docExp.descripcionTipo}" />
+					<p:tooltip for="tipoDocumento" value="#{mensaje['tipo.documento']}" showEffect="fade" hideEffect="fade" position="top" showDelay="500" />
+				</p:column>
+				
+				<p:column width="120" rendered="#{!es_listado_tramite and !abreviado}">
+					<h:outputText id="hdrDocUsrUltMod" value="#{docExp.usuarioAcceso}" />
+					<p:tooltip for="hdrDocUsrUltMod" value="#{mensaje['usuario.ultima.modificacion']}" showEffect="fade" hideEffect="fade" position="top" showDelay="500" />
+				</p:column>
+				<p:column width="130" rendered="#{!es_listado_tramite and !abreviado}">
+					<h:outputText id="hdrDocFHUltMod" value="#{docExp.fechaHoraAcceso}">
+						<f:convertDateTime locale="es" pattern="dd/MM/yyyy HH:mm" />
+					</h:outputText>
+					<p:tooltip for="hdrDocFHUltMod" value="#{mensaje['fecha.hora.ultima.modificacion']}" showEffect="fade" hideEffect="fade" position="top" showDelay="500" />
+				</p:column>				
+				
+				<p:column width="${ancho_sn}" styleClass="texto-centrado" rendered="#{es_listado_tramite and !abreviado}" >
+					<h:outputText id="descOrigen" value="#{docExp.origen}" />
+					<p:tooltip for="descOrigen" value="#{docExp.descOrigen()}"
+							showEffect="fade" hideEffect="fade" position="top" showDelay="500" />
+				</p:column>
+				
+				<p:column width="${ancho_sn}" styleClass="texto-centrado" rendered="#{!abreviado}">
+					<p:outputPanel id="marcaSellado"><span class="pastilla-verde" >#{docExp.sellado? 'E' : 'I'}</span></p:outputPanel>
+					<p:tooltip for="marcaSellado" value="#{mensaje[(docExp.sellado? 'origen.externo' : 'origen.interno')]}"
+						showEffect="fade" hideEffect="fade" position="top" showDelay="500" />
+				</p:column>
+				<p:column width="${ancho_sn}" styleClass="texto-centrado" rendered="#{!abreviado}">
+					<p:outputPanel id="marcaFirmado"><span class="pastilla-#{docExp.firmado? 'verde' : 'neutra'}" >F</span></p:outputPanel>
+					<p:tooltip for="marcaFirmado" value="#{mensaje['firmado']}"
+						showEffect="fade" hideEffect="fade" position="top" showDelay="500" />
+				</p:column>
+				<p:column width="${ancho_sn}" styleClass="texto-centrado" rendered="#{!abreviado and (es_listado_tramite or es_listado_evolucion) and tipo_tramite == 'PWEB'}">
+					<p:outputPanel id="marcaAnonimizado"><span class="pastilla-#{docExp.anonimizado? 'verde' : 'neutra'}" >P</span></p:outputPanel>
+					<p:tooltip for="marcaAnonimizado" value="#{mensaje['anonimizado']}"
+						showEffect="fade" hideEffect="fade" position="top" showDelay="500" />
+				</p:column>
+				<p:column width="${ancho_sn}" styleClass="texto-centrado" rendered="#{!abreviado}">
+					<h:outputText id="marcaAnonimizadoParcial" class="pastilla-roja" value="X" rendered="#{docExp.anonimizadoParcial}" />
+					<p:tooltip for="marcaAnonimizadoParcial" value="#{mensaje['documento.sensible']}" rendered="#{docExp.anonimizadoParcial}"
+						showEffect="fade" hideEffect="fade" position="top" showDelay="500" />
+				</p:column>
+				<p:column width="${ancho_sn}" styleClass="texto-centrado" rendered="#{!abreviado}">
+					<p:outputPanel id="marcaEditable"><span class="pastilla-#{docExp.editable? 'verde' : 'neutra'}" >E</span></p:outputPanel>
+					<p:tooltip for="marcaEditable" value="#{mensaje['editable']}"
+						showEffect="fade" hideEffect="fade" position="top" showDelay="500" />
+				</p:column>
+
+
+				<p:column width="#{es_listado_evolucion or not editable? 55 : (es_listado_tramite? 191 : 150) }" style="text-align: left">
+
+				<p:outputPanel deferred="true" style="display: inline">
+				
+					<!-- La descarga de PF por ajax no soporta ViewScoped. Debe ponerse a false -->
+					<p:commandButton id="descargarDoc" icon="pi pi-download" ajax="false" process="@this"
+						rendered="#{editable and bean.permisoDescargarDoc and !es_listado_evolucion}"
+						actionListener="#{bean.registrarAccesoDescarga(docExp)}">
+						<p:fileDownload value="#{bean.descargar(docExp.id)}" />
+					</p:commandButton>
+					<p:tooltip for="descargarDoc" value="#{mensaje['descargar.documento']}"
+							showEffect="fade" hideEffect="fade" position="top" showDelay="500" />
+					
+					<p:commandButton id="editarDoc" 
+						icon="#{((bean.esDocumentoEditable(docExp)) and (editable))? 'pi pi-file':'fab fa-readme'}" process="@this"
+						actionListener="#{bean.registrarAcceso(docExp, es_listado_evolucion)}"
+						rendered="#{bean.esExtensionEditor(docExp) and bean.permisoEditarDoc}"
+						oncomplete="actualizar_documentos()"
+						onclick="abrirEditorDoc(#{docExp.id}, '#{ (editable and !es_listado_evolucion)? 'edit' : 'view'}')">
+					</p:commandButton>
+					<p:tooltip for="editarDoc" value="#{mensaje['editar.documento']}" 
+							rendered="#{editable and !es_listado_evolucion and bean.esDocumentoEditable(docExp)}"
+							showEffect="fade" hideEffect="fade" position="top" showDelay="500" />
+					<p:tooltip for="editarDoc" value="#{mensaje['ver.documento']}" 
+							rendered="#{(editable and es_listado_evolucion) or (!editable) or (!bean.esDocumentoEditable(docExp))}"
+							showEffect="fade" hideEffect="fade" position="top" showDelay="500" />
+
+
+					<!-- 
+						El refresco del listado evolución se hace desde aquí, no se puede invocar desde servidor
+						- PrimeFaces.ajax.update no admite selector css
+						- El listado está dentro de otro, por lo que el id jsf contiene el índice de fila
+						- Se debe usar aquí el selector @(.<clase>)
+					-->
+					<p:commandButton id="eliminarDocTr" icon="pi pi-times" 
+						rendered="#{editable and es_listado_tramite and !es_listado_evolucion and !docExp.tieneTareaPendiente}"
+						action="#{bean.iniciarEliminarDocumentoTramite(docExp)}"
+						oncomplete="var name = (args.eliminarSimple)? 'confirmEliminarDocTrSimple' : 'confirmEliminarDocTrSimpleOCompleto'; 
+									PF(name).show(); " />
+					<p:tooltip for="eliminarDocTr" value="#{mensaje['eliminar.asociacion.tramite']}"
+							rendered="#{editable and es_listado_tramite}"
+							showEffect="fade" hideEffect="fade" position="top" showDelay="500" />
+
+					
+					<p:commandButton id="editarPropsDoc" icon="pi pi-pencil" 
+						rendered="#{editable and bean.permisoEditarPropsDoc and !es_listado_evolucion}"
+						action="#{bean.editarPropiedades(docExp)}"
+						update="@form:dialogDocumento, @(.panel-actualizado-cabecera)"
+						oncomplete="PF('dialogDocumento').show()">
+					</p:commandButton>
+					<p:tooltip for="editarPropsDoc" value="#{mensaje['editar.props.documento']}"
+							rendered="#{editable and bean.permisoEditarPropsDoc and !es_listado_evolucion}"
+							showEffect="fade" hideEffect="fade" position="top" showDelay="500" />
+					
+					<p:commandButton id="convertirOdtAPdf" icon="pi pi-file-pdf" 
+						rendered="#{editable and !es_listado_evolucion and bean.esDocumentoODT(docExp)}"
+						action="#{bean.convertirOdtAPdf(docExp)}"
+						oncomplete="if(args.ok) actualizar_documentos()">
+					</p:commandButton>
+					<p:tooltip for="convertirOdtAPdf" value="#{mensaje['convertir.doc.pdf']}"
+						rendered="#{editable and !es_listado_evolucion and bean.esDocumentoODT(docExp)}"
+							showEffect="fade" hideEffect="fade" position="top" showDelay="500" />
+					
+					
+					<p:commandButton id="abrirCrearTareaDoc" icon="pi pi-th-large"
+						rendered="#{editable and es_listado_tramite and datosExpedientesTareasBean.permisoCrearTareaDocExp and !es_listado_evolucion and not docExp.tieneTareaPendiente and datosExpedientesTareasBean.existeTareaREV(docExp)}"
+						action="#{datosExpedientesTareasBean.altaTareaDocumento(docExp)}"
+						process="@this" update="@form:dialogTarea" immediate="true" oncomplete="actualizar_documentos()">
+					</p:commandButton>					
+					<p:tooltip for="abrirCrearTareaDoc" value="#{mensaje['crear.tarea.documento']}"
+							rendered="#{editable and es_listado_tramite and datosExpedientesTareasBean.permisoCrearTareaDocExp}"
+							showEffect="fade" hideEffect="fade" position="top" showDelay="500" />
+							
+					<p:commandButton id="verCrearTareaDoc" icon="pi pi-check-circle"
+						rendered="#{editable and es_listado_tramite and !es_listado_evolucion and docExp.tieneTareaPendiente}"
+						action="#{datosExpedientesTareasBean.consultarTareaDocumento(docExp)}"
+						process="@this" update="@form:dialogTarea" immediate="true" oncomplete="actualizar_documentos()">
+					</p:commandButton>					
+					<p:tooltip for="verCrearTareaDoc" value="#{mensaje['ver.tarea.documento']}"
+							rendered="#{editable and es_listado_tramite and datosExpedientesTareasBean.permisoCrearTareaDocExp and docExp.tieneTareaPendiente}"
+							showEffect="fade" hideEffect="fade" position="top" showDelay="500" />
+					
+					
+					<p:commandButton id="vincularDocTramiteSup" icon="pi pi-arrow-up"
+						rendered="#{editable and es_listado_tramite and bean.permisoVincularDoc and not empty docExp.idTramiteExpedienteSup and !bean.documentoEnTramiteSup(docExp) and !es_listado_evolucion}"
+						action="#{bean.vincularDocumentoEnTramiteSup(docExp)}"
+						process="@this" immediate="true" oncomplete="actualizar_documentos()">
+						<p:confirm header="#{mensaje['confirmar.operacion']}"
+							message="#{mensaje['pregunta.confirma.vincularDocTrSup']}"
+							icon="pi pi-info-circle" />
+					</p:commandButton>
+					<p:tooltip for="vincularDocTramiteSup" value="#{mensaje['vincular.documento.sup']}"
+						rendered="#{editable and es_listado_tramite and bean.permisoVincularDoc and not empty docExp.idTramiteExpedienteSup and !bean.documentoEnTramiteSup(docExp) and !es_listado_evolucion}"
+							showEffect="fade" hideEffect="fade" position="top" showDelay="500" />
+
+					<p:commandButton id="vincularDocResolucion" icon="pi pi-link"
+						rendered="#{(editable and es_listado_tramite and bean.permisoVincularDoc and !es_listado_evolucion and docExp.firmado) and (docExp.tipoTramite=='RESOL' or docExp.tipoTramite=='RESREC') and (docExp.numResolucion != null) and (!bean.documentoEnResolucion(docExp, docExp.numResolucion))}"
+						action="#{bean.vincularDocumentoResolucion(docExp.numResolucion, docExp)}"
+						process="@this" immediate="true" oncomplete="actualizar_documentos()">
+						<p:confirm header="#{mensaje['confirmar.operacion']}"
+							message="#{mensaje['pregunta.confirma.vincularDocResol']}"
+							icon="pi pi-info-circle" />
+					</p:commandButton>
+					<p:tooltip for="vincularDocResolucion" value="#{mensaje['vincular.documento.resol']}"
+							showEffect="fade" hideEffect="fade" position="top" showDelay="500" />						
+
+					<p:commandButton id="vincularDocResolucionWeb" icon="pi pi-link"
+						rendered="#{(editable and es_listado_tramite and bean.permisoVincularDoc and !es_listado_evolucion and docExp.anonimizado) and (docExp.tipoTramite=='PWEB') and (!bean.documentoEnResolucionWeb(docExp))}"
+						action="#{bean.vincularDocumentoResolucionWeb(docExp)}"
+						process="@this" immediate="true" oncomplete="actualizar_documentos()">
+						<p:confirm header="#{mensaje['confirmar.operacion']}"
+							message="#{mensaje['pregunta.confirma.vincularDocResol']}"
+							icon="pi pi-info-circle" />
+					</p:commandButton>
+					<p:tooltip for="vincularDocResolucionWeb" value="#{mensaje['vincular.documento.resol']}"
+							showEffect="fade" hideEffect="fade" position="top" showDelay="500" />
+
+					<p:commandButton id="verRegistroAccesosDoc" icon="pi pi-calendar-times"
+						actionListener="#{bean.verRegistroAccesosDocumento(docExp)}"
+						update="@form:dialogAccesosDocumento"
+						oncomplete="PF('dialogAccesosDocumento').show()" >
+					</p:commandButton>
+					<p:tooltip for="verRegistroAccesosDoc" value="#{mensaje['ver.registro.accesos']}"
+							showEffect="fade" hideEffect="fade" position="top" showDelay="500" />
+							
+				</p:outputPanel>
+				
+				</p:column>
+				
+			</p:dataTable>
+		
+</ui:composition>
+</html>

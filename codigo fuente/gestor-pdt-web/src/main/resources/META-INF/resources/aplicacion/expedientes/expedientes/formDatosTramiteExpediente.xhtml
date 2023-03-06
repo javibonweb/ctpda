@@ -1,0 +1,311 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:sec="https://joinfaces.org/security"
+	xmlns:fu="http://joinfaces.org/functions">
+
+<ui:composition>
+	
+	<p:messages for="messagesFormTramiteExpediente"
+		id="messagesFormTramiteExpediente" showDetail="true"
+		closable="true">
+		<p:autoUpdate />
+	</p:messages>
+
+		<!-- PANEL TRAMITACIÓN EXPEDIENTE -->
+	
+		<div class="botonera-form" align="right">
+			<p:commandButton id="iniciarEntrada" value="#{mensaje['nueva.entr']}"
+				action="#{datosTramiteExpedienteBean.iniciarTramite('sinevento')}"
+				rendered="#{editable and datosTramiteExpedienteBean.permisoNewExpTram == true and datosTramiteExpedienteBean.hayTramite() and !datosTramiteExpedienteBean.vistaEspecialEntradas()}"
+				update="formFormularioExpedientes:tabViewPestanasExpediente:dialogListadoTramites" />
+			<p:commandButton id="iniciarTramite" value="#{mensaje['iniciar.tramite']}"
+				action="#{datosTramiteExpedienteBean.iniciarTramite('sinevento')}"
+				rendered="#{editable and datosTramiteExpedienteBean.permisoNewExpTram == true and datosTramiteExpedienteBean.hayTramite() and datosTramiteExpedienteBean.vistaEspecialEntradas()}"
+				update="formFormularioExpedientes:tabViewPestanasExpediente:dialogListadoTramites" />
+			<p:commandButton id="iniciarEvento" value="#{mensaje['iniciar.evento']}"
+				action="#{datosTramiteExpedienteBean.iniciarTramite('evento')}"
+				rendered="#{editable and datosTramiteExpedienteBean.permisoNewExpTram == true and datosTramiteExpedienteBean.hayEvento() and datosTramiteExpedienteBean.vistaEspecialEntradas()}"
+				update="formFormularioExpedientes:tabViewPestanasExpediente:dialogListadoTramites" />
+			<p:commandButton id="iniciarTramiteLibre" value="#{mensaje['iniciar.tramite.libre']}"
+				action="#{datosTramiteExpedienteBean.iniciarTramite('tramiteLibre')}"
+				rendered="#{editable and datosTramiteExpedienteBean.permisoNewExpTramLib == true and datosTramiteExpedienteBean.vistaEspecialEntradas()}"/>	
+			<p:commandButton id="anyadirTareaExpediente" value="#{mensaje['anyadir.tarea']}" 
+				rendered="#{editable and datosTramiteExpedienteBean.permisoNewExpTarea == true and datosTramiteExpedienteBean.vistaEspecialEntradas()}"
+				action="#{datosExpedientesTareasBean.altaTareaExpediente}"
+				process="@this" update="@form:dialogTarea" immediate="true" />		
+			<p:commandButton id="anyadirPlazoTramite" value="#{mensaje['anyadir.plazo']}"
+				rendered="#{editable and datosTramiteExpedienteBean.permisoNewPlazoExp == true and datosTramiteExpedienteBean.vistaEspecialEntradas()}"
+				actionListener="#{datosTramiteExpedienteBean.abrirModalAltaPlazo()}"
+				update="formFormularioExpedientes:tabViewPestanasExpediente:tipoPlazoAnyadirPlazo,formFormularioExpedientes:tabViewPestanasExpediente:fechaLimiteAnyadirPlazo,formFormularioExpedientes:tabViewPestanasExpediente:observacionesAnyadirPlazo,
+				formFormularioExpedientes:tabViewPestanasExpediente:dialogAnyadirPlazo"/>								
+		</div>
+	
+	
+	   <c:forEach items="#{datosTramiteExpedienteBean.listaTramTramitesExp}" var="tramExp">
+          <ui:include src="formDatosTramite.xhtml" />
+       </c:forEach> 
+       
+       <!-- Diálogos para eliminar documentos-trámite -->
+       <!-- No hay más trámites con el documento ¿borrar también el doc-exp? si -> completo -->
+       <p:confirmDialog id="confirmEliminarDocTrSimpleOCompleto" widgetVar="confirmEliminarDocTrSimpleOCompleto"
+       		header="#{mensaje['confirmar.operacion']}" message="#{mensaje['pregunta.eliminarDocTr']}"
+       		showEffect="fade" hideEffect="fade" responsive="true" styleClass="confirm-eliminar-doctram">
+           <div class="botonera-form" align="right">
+           		<p:commandButton value="Si" onclick="PF('confirmEliminarDocTrSimpleOCompleto').hide(); PF('confirmEliminarDocTrCompleto').show()" process="@this" immediate="true" type="button" />
+           	 	<p:commandButton value="No" onclick="PF('confirmEliminarDocTrSimpleOCompleto').hide();" process="@this" immediate="true" type="button" styleClass="ui-button-flat"  />
+           </div>
+            
+        </p:confirmDialog>
+
+       <!-- ¿Seguro que desea eliminar el documento del trámite? -->
+       <p:confirmDialog id="confirmEliminarDocTrSimple" widgetVar="confirmEliminarDocTrSimple"
+       		header="#{mensaje['confirmar.operacion']}" message="#{mensaje['pregunta.confirma.eliminarDocTr']}"
+       		showEffect="fade" hideEffect="fade" responsive="true" styleClass="confirm-eliminar-doctram">
+            <div class="botonera-form" align="right">
+            	<p:commandButton value="Si"
+	            	process="@this" immediate="true" 
+					action="#{datosExpedientesDocumentosBean.eliminarDocumentoTramite()}"
+					oncomplete="if(args.ok){ PF('confirmEliminarDocTrSimple').hide(); actualizar_documentos(); }" />
+            	<p:commandButton value="No" onclick="PF('confirmEliminarDocTrSimple').hide()" process="@this" immediate="true" type="button" styleClass="ui-button-flat" />
+            </div>
+       </p:confirmDialog>
+        
+        <!-- ¿Seguro que desea eliminar el documento del trámite y del expediente? -->
+        <p:confirmDialog id="confirmEliminarDocTrCompleto" widgetVar="confirmEliminarDocTrCompleto"
+       		header="#{mensaje['confirmar.operacion']}" message="#{mensaje['pregunta.confirma.eliminarDocTr.completo']}"
+			showEffect="fade" hideEffect="fade" responsive="true" styleClass="confirm-eliminar-doctram">
+            <div class="botonera-form" align="right">
+            	<p:commandButton value="Si"
+					action="#{datosExpedientesDocumentosBean.eliminarDocumentoTramiteCompleto()}"
+					oncomplete="if(args.ok){ PF('confirmEliminarDocTrCompleto').hide(); actualizar_documentos(); }" />
+	            <p:commandButton value="No" onclick="PF('confirmEliminarDocTrCompleto').hide();" 
+	            	process="@this" immediate="true" type="button" styleClass="ui-button-flat"  />
+            </div>
+        </p:confirmDialog>
+        
+        <script>
+        //El atributo icon existe para p:confirm pero no para p:confirmDialog.
+        //Lo cambiamos con jQuery
+        $(function(){
+        	//A los diálogos de eliminar se les ha dado un class
+        	$(".confirm-eliminar-doctram .ui-icon.ui-confirm-dialog-severity")
+        		.removeClass("ui-icon-alert")
+        		.addClass("pi pi-info-circle")
+        })
+        </script>
+         
+        <!-- fin eliminar documentos-trámite -->
+	       									           	
+		<ui:include src="dialogIncorporarDoc.xhtml" />
+		<ui:include src="dialogGenerarDocs.xhtml" />
+		<ui:include src="dialogVincularDocs.xhtml" />
+		<ui:include src="dialogEmpujarDocs.xhtml" />
+		
+		<ui:include src="dialogDescripcionDocDefecto.xhtml">
+			<ui:param name="bean"      value="#{incorporarDocumentosBean}" />
+			<ui:param name="operacion" value="incorporar" />
+		</ui:include>
+
+		<ui:include src="dialogDescripcionDocDefecto.xhtml">
+			<ui:param name="bean"      value="#{generarDocumentosBean}" />
+			<ui:param name="operacion" value="generar" />
+		</ui:include>
+
+		<ui:include src="dialogDescripcionDocDefecto.xhtml">
+			<ui:param name="bean"      value="#{vincularDocumentosBean}" />
+			<ui:param name="operacion" value="vincular" />
+		</ui:include>
+
+ 		<ui:include src="dialogDescripcionDocDefecto.xhtml">
+			<ui:param name="bean"      value="#{empujarDocumentosBean}" />
+			<ui:param name="operacion" value="empujar" />
+		</ui:include>
+		
+		
+		<!-- DIALOGO LISTADO TRAMITES -->
+		<p:dialog id="dialogListadoTramites" header="#{datosTramiteExpedienteBean.cabeceraDialog}" widgetVar="dialogListadoTramites" position="center center" resizable="false" modal="true">
+			<p:messages for="messagesDialogTramiteExp" id="messagesDialogTramiteExp" showDetail="true" closable="true">
+				<p:autoUpdate/> 
+	        </p:messages>	
+	        
+			<div class="ui-fluid">		
+			<div> 
+				<div class="celda-form">
+					<p:outputLabel for="comboListadoTramites"
+						value="#{mensaje['tipo.tramite']}: *" />
+					<p:selectOneMenu id="comboListadoTramites"
+						value="#{datosTramiteExpedienteBean.selectedNuevoTramiteId}"
+						effect="fade">
+						<f:selectItem itemLabel="#{mensaje['seleccione.una.opcion']}" itemValue="" />
+						<f:selectItems
+							value="#{datosTramiteExpedienteBean.listaTramites}"
+							var="tipTramExpList" itemLabel="#{tipTramExpList.descripcion}"
+							widgetVar="comboListadoTramites" itemValue="#{tipTramExpList.id}" />
+								<p:ajax event="change" listener="#{datosTramiteExpedienteBean.obtenerResponsableTramite(datosTramiteExpedienteBean.selectedNuevoTramiteId)}" process="@this"
+									update="formFormularioExpedientes:tabViewPestanasExpediente:responsablesTram" />
+						<f:validateBean disabled="true"/>
+					</p:selectOneMenu>
+				
+				</div>
+			</div>
+			<div>
+				<div class="celda-form">
+					<p:outputLabel for="fechaInicioTramite"
+						value="#{mensaje['fecha.inicio']} *"/>
+					<p:datePicker id="fechaInicioTramite"
+						value="#{datosTramiteExpedienteBean.fechaInicioTramite}"
+						locale="es" pattern="dd/MM/yyyy"
+						disabled="true" />
+						<p:message for="fechaInicioTramite"/>
+				</div>
+			</div>
+			<div>	
+				<div class="celda-form">
+					<p:outputLabel for="responsablesTram" value="#{mensaje['responsable']} *"/>
+					<p:selectOneMenu id="responsablesTram" disabled="#{!editable}"
+						value="#{datosTramiteExpedienteBean.selectedNuevoResponsableTramId}">
+						<f:selectItem
+							itemLabel="#{mensaje['seleccione.una.opcion']}"
+							itemValue="#{null}" />
+						<f:selectItems
+							value="#{datosTramiteExpedienteBean.listaResponsablesTram}"
+							var="resp" itemLabel="#{fu:ptoSusp(resp.descripcion)}"
+							widgetVar="responsablesTram" itemValue="#{resp.id}" />
+					</p:selectOneMenu>
+				</div>
+			</div>								
+			</div>					
+
+			<div class="botonera-form ui-g-12 ui-md-12" align="right">
+				<p:commandButton  id="altaTramite" actionListener="#{datosTramiteExpedienteBean.altaTramite('tramite', 'pestanyaTramites', null)}"  value="#{mensaje['aceptar']}"
+					update="formFormularioExpedientes:tabViewPestanasExpediente:tipoTramite_filtro,formFormularioExpedientes:tabViewPestanasExpediente:listadoTramitesExpediente,formFormularioExpedientes:tabViewPestanasExpediente:listatipoTramite_filtro"> 
+				</p:commandButton>				
+				<p:commandButton icon="pi pi-times" process="@this"
+					id="cancelarAltaTramite" value="#{mensaje['cancelar']}"
+					oncomplete="PF('dialogListadoTramites').hide()" >
+					<p:confirm header="#{mensaje['confirmar.operacion']}"
+						message="#{mensaje['pregunta.confirma.cancelar']}"
+						icon="pi pi-info-circle" />
+				</p:commandButton>
+			</div>	
+		</p:dialog>	
+ 		<!-- DIALOGO LISTADO SUBTRAMITES -->
+		<p:dialog id="dialogListadoSubTramites" header="#{datosTramiteExpedienteBean.cabeceraDialog}" widgetVar="dialogListadoSubTramites" position="center center" resizable="false" modal="true">
+			<p:messages for="messagesDialogSubTramiteExp" id="messagesSubDialogTramiteExp" showDetail="true" closable="true">
+				<p:autoUpdate/> 
+	        </p:messages>	
+	        
+			<div class="ui-fluid">	
+			<div>	 
+				<div class="celda-form">
+					<p:outputLabel for="comboListadoSubTramites"
+						value="#{mensaje['tipo.tramite']}: *" />
+					<p:selectOneMenu id="comboListadoSubTramites"
+						value="#{datosTramiteExpedienteBean.selectedNuevoSubTramiteId}"
+						effect="fade">
+						<f:selectItem itemLabel="#{mensaje['seleccione.una.opcion']}" itemValue="" />
+						<f:selectItems
+							value="#{datosTramiteExpedienteBean.listaSubTramites}"
+							var="tipSubTramExpList" itemLabel="#{tipSubTramExpList.descripcion}"
+							widgetVar="comboListadoSubTramites" itemValue="#{tipSubTramExpList.id}" />
+							<p:ajax event="change" listener="#{datosTramiteExpedienteBean.obtenerResponsableSubTramite(datosTramiteExpedienteBean.selectedNuevoSubTramiteId)}" process="@this"
+									update="formFormularioExpedientes:tabViewPestanasExpediente:responsablesSubTram" />
+						<f:validateBean disabled="true"/>
+					</p:selectOneMenu>
+				</div>
+			</div>
+			<div>
+				<div class="celda-form">
+					<p:outputLabel for="fechaInicioSubTramite"
+						value="#{mensaje['fecha.inicio']} *" />
+					<p:datePicker id="fechaInicioSubTramite"
+						value="#{datosTramiteExpedienteBean.fechaInicioSubTramite}"
+						locale="es" pattern="dd/MM/yyyy"
+						disabled="true"/>
+						<p:message for="fechaInicioSubTramite"/>
+				</div>
+			</div>
+			<div>	
+				<div class="celda-form">
+					<p:outputLabel for="responsablesSubTram"
+						value="#{mensaje['responsable']} *" />
+					<p:selectOneMenu id="responsablesSubTram" disabled="#{!editable}"
+						value="#{datosTramiteExpedienteBean.selectedNuevoResponsableSubTramId}">
+						<f:selectItem
+							itemLabel="#{mensaje['seleccione.una.opcion']}"
+							itemValue="#{null}" />
+						<f:selectItems
+							value="#{datosTramiteExpedienteBean.listaResponsablesTram}"
+							var="resp" itemLabel="#{fu:ptoSusp(resp.descripcion)}"
+							widgetVar="responsablesSubTram" itemValue="#{resp.id}" />
+					</p:selectOneMenu>
+				</div>
+			</div>										
+			</div>					
+
+			<div class="botonera-form ui-g-12 ui-md-12" align="right">
+				<p:commandButton  id="altaSubTramite" actionListener="#{datosTramiteExpedienteBean.altaTramite('actividad', null, null)}"  value="#{mensaje['aceptar']}"
+					update="formFormularioExpedientes:tabViewPestanasExpediente:tipoTramite_filtro,formFormularioExpedientes:tabViewPestanasExpediente:listadoTramitesExpediente,formFormularioExpedientes:tabViewPestanasExpediente:listatipoTramite_filtro"> 
+				</p:commandButton>		
+			</div>	
+		</p:dialog>
+
+		<!-- DIALOGO ANYADIR PLAZO -->
+	<p:dialog id="dialogAnyadirPlazo" header="#{datosTramiteExpedienteBean.cabeceraDialog}" widgetVar="dialogAnyadirPlazo"
+		closable="true" resizable="false" draggable="true" modal="true" responsive="true">
+		
+		<p:messages for="messagesFormularioAnyadirPlazo" id="messagesFormularioAnyadirPlazo" showDetail="true" closable="true">
+			<p:autoUpdate />
+		</p:messages>
+
+		<div>
+			<div class="celda-form">
+				<p:outputLabel for="numeroExpedienteAnyadirPlazo" value="#{mensaje['numero.expediente']}" />
+				<p:inputText id="numeroExpedienteAnyadirPlazo" value="#{datosTramiteExpedienteBean.expedientes.numExpediente}" disabled="true" size="25" />
+			</div>
+			<div class="celda-form">			
+				<p:outputLabel for="nombreExpedienteAnyadirPlazo" value="#{mensaje['nombre.expediente']}" />
+				<p:inputText id="nombreExpedienteAnyadirPlazo" value="#{datosTramiteExpedienteBean.expedientes.nombreExpediente}" disabled="true" size="25" />
+			</div>
+		</div>
+		<div>
+			<div class="celda-form">
+				<p:outputLabel for="tipoPlazoAnyadirPlazo" value="#{mensaje['tipo.plazo']} *" />
+				<p:selectOneMenu id="tipoPlazoAnyadirPlazo" filter="true" value="#{datosTramiteExpedienteBean.selectedTipoPlazoId}">
+					<f:selectItem itemLabel="#{mensaje['seleccione.una.opcion']}" itemValue=""/> 
+					<f:selectItems 
+						var="tipoPlazoList" widgetVar="tipoPlazoAnyadirPlazo" 
+						itemLabel="#{tipoPlazoList.descripcionTipPlazo}" itemValue="#{tipoPlazoList.id}" 
+						value="#{datosTramiteExpedienteBean.listaTiposPlazosByTipoExpediente}"/> 						
+				</p:selectOneMenu>
+			</div>
+			<div class="celda-form">
+				<p:outputLabel for="fechaLimiteAnyadirPlazo" value="#{mensaje['fecha.limite']} *" />
+				<p:datePicker id="fechaLimiteAnyadirPlazo" value="#{datosTramiteExpedienteBean.fechaLimiteAnyadirPlazo}"
+					locale="es" monthNavigator="true" pattern="dd/MM/yyyy" converterMessage="#{mensaje['formato.fecha.invalido']}" mask="true"/>
+					<p:message for="fechaLimiteAnyadirPlazo"/>
+			</div>
+		</div>			
+		<div>	
+			<div class="celda-form">
+				<p:outputLabel for="observacionesAnyadirPlazo" styleClass="p-d-block" value="#{mensaje['observaciones']}" />
+				<p:inputTextarea rows="6" cols="100" id="observacionesAnyadirPlazo" maxlength="4000" value="#{datosTramiteExpedienteBean.observacionesAnyadirPlazo}"/>
+			</div>	
+		</div>		
+		<div class="botonera-form" align="right">
+			<p:commandButton icon="pi pi-save" id="guardarPlazo"
+				value="#{mensaje['guardar']}" rendered="#{datosTramiteExpedienteBean.permisoSavePlazoExp == true}"
+				actionListener="#{datosTramiteExpedienteBean.guardarPlazo()}"
+				update="formFormularioExpedientes:panelPlazosCabecera,formFormularioExpedientes:panelActualizadoCabecera" />
+		</div>
+	</p:dialog>	
+
+</ui:composition>
+</html>

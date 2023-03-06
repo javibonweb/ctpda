@@ -1,0 +1,14 @@
+rem Comprobación UTF8: Esto aparece en árabe: أنا تظهر في اللغة العربية
+
+SPOOL logs/010_UNDO_04_CONSTRAINTS.LOG
+ALTER SESSION SET "_ORACLE_SCRIPT"= TRUE;
+
+--------------------
+-- VERSION 0.10.0 --
+--------------------
+
+ALTER TABLE GE_PLAZOS_EXPDTE ADD CONSTRAINT GE_PLAEXP_CFGPLAEXP_FK FOREIGN KEY (PLAEXP_CFGPLAEXP_ID) REFERENCES GE_CFG_PLAZOS_EXPDTE;
+
+
+
+SPOOL OFF;

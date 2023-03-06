@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<facelet-taglib xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-facelettaglibary_2_2.xsd">
+    <namespace>http://joinfaces.org/tags</namespace>
+    <tag>
+        <tag-name>mytag</tag-name>
+        <source>mytag.xhtml</source>
+    </tag>    
+   	<tag>
+        <tag-name>pastilla</tag-name>
+        <source>pastilla.xhtml</source>
+    </tag>
+	<tag>
+        <tag-name>pastilla-si-no</tag-name>
+        <source>pastilla-si-no.xhtml</source>
+    </tag>
+</facelet-taglib>

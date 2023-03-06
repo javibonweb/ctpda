@@ -1,0 +1,72 @@
+@import '../abstracts/variables';
+
+
+.ui-panel-title, .ui-widget-header {
+  font-family: $header-font-stack;
+}
+
+.ui-state-default, 
+.ui-widget-content .ui-state-default, 
+.ui-widget-header .ui-state-default, 
+.ui-button, 
+html .ui-button.ui-state-disabled:hover, 
+html .ui-button.ui-state-disabled:active {
+	font-weight: normal;
+	//color: #ffffff;
+}
+
+.ui-widget-header .ui-inputfield,
+.ui-widget-content .ui-inputfield,
+.ui-widget-content .ui-chkbox-box .ui-icon-blank {
+  /*font-weight: normal;*/
+  background: #ffffff;
+}
+
+/* Quitamos el borde que nos pone por defecto JQuery-UI */
+.ui-widget.ui-widget-content {
+	border: 1px solid #bad1c5;
+}
+
+//#
+.ui-state-disabled,
+.ui-widget-content .ui-state-disabled,
+.ui-widget-header .ui-state-disabled
+ {
+  opacity: 1;
+  background-color: $color-fondo-campo-disabled !important;
+}
+
+.ui-state-default .ui-widget-content {
+  color: green !important;
+}
+
+.ui-panelgrid-cell .ui-outputlabel {
+  display: block;
+}
+
+
+
+/* Listados de documentos mostrados en acordeón */
+
+.panel-documentos .ui-accordion .ui-accordion-content {
+	padding-left: 1.5em;
+	padding-right: 0;
+	padding-top: 0px;
+	padding-bottom: 5px;
+}
+
+.panel-documentos .ui-datatable {
+	margin-top: -31px;
+}
+
+//Estilo específico para el acordón de agrupaciones exp.
+.panel-documentos .ui-accordion.panel-agrupaciones-exp .ui-accordion-header {
+	border: 1px solid rgb(121, 143, 162);
+	background-color: rgb(121, 143, 162);
+}
+
+.panel-documentos .ui-accordion.panel-agrupaciones-exp .ui-accordion-header.ui-state-active {
+border: 1px solid rgb(115, 183, 142);
+background: rgb(115, 183, 142);
+}
+

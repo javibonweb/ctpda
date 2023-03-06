@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:pe="http://primefaces.org/ui/extensions"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+	  lang="#{localeSwitcher.language}">
+	  
+<f:view locale="#{localeSwitcher.locale}">
+    <h:head>
+        <title>.:: JoinFaces Example ::.</title>
+        <meta content='text/html; charset=UTF-8' http-equiv="Content-Type" />
+        <link href="#{resource['images/favicon.ico']}" rel="shortcut icon"/>
+        <h:outputStylesheet library="css" name="example.css" />
+        <h:outputScript library="js" name="example.js" />
+    </h:head>
+
+    <h:body>
+        <pe:layout fullPage="true" >
+            <pe:layoutPane id="mainLayoutPane" position="center">
+                <h:form id="contentForm" prependId="false" enctype="multipart/form-data">
+                    <p:ajaxStatus onstart="PF('statusDialog').show();"
+                                  onsuccess="PF('statusDialog').hide();" />
+                    <p:dialog widgetVar="statusDialog" position="right top"
+                              draggable="false" resizable="false" closable="false"
+                              showHeader="false" modal="false">
+                        <p:graphicImage value="#{resource['images/ajaxloading.gif']}" />
+                    </p:dialog>
+                    <div id="mainDiv" class="ui-fluid center">
+                    <p:panelGrid  styleClass="sinBorderGrid" style="width:100%">
+                    <p:row>
+                    	<p:column colspan="16">
+                        <p:menubar styleClass="sinBorderGrid">
+                            <p:menuitem value="#{mensaje['gci.starter']}" url="../demo/starter.jsf" />
+                            <p:menuitem value="#{mensaje['gci.data-table']}" url="../demo/dataTable.jsf" />
+                            <p:menuitem value="#{mensaje['gci.custom-input']}" url="../demo/customInput.jsf" />
+                            <p:menuitem value="#{mensaje['gci.my-tag']}" url="../demo/helloTag.jsf" />
+                            <p:menuitem value="#{mensaje['gci.hi-cc']}" url="../demo/hiCC.jsf" />
+                            <p:menuitem value="#{mensaje['layout.generico']}" url="../pages/bienvenido.jsf" />
+                            <p:menuitem value="#{mensaje['gci.idioma.es']}" action="#{localeSwitcher.forceLanguageChange('es')}" ajax="false"/>
+                            <p:menuitem value="#{mensaje['gci.idioma.en']}" action="#{localeSwitcher.forceLanguageChange('en')}" ajax="false"/>
+                        </p:menubar>
+                        </p:column>
+                        <p:column>
+					<h:selectOneMenu value="#{localeSwitcher.language}"
+						onchange="submit()" style="margin-left:5px;"
+						valueChangeListener="#{localeSwitcher.onLanguageChange}">
+						<f:selectItem itemValue="en" itemLabel="English" />
+						<f:selectItem itemValue="es" itemLabel="Español" />
+					</h:selectOneMenu>
+					</p:column>
+					</p:row>
+					</p:panelGrid>
+                        <p:spacer height="10" />
+
+                        <ui:insert name="content" />
+                    </div>
+                </h:form>
+            </pe:layoutPane>
+        </pe:layout>
+    </h:body>
+</f:view>
+</html>

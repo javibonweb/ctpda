@@ -1,0 +1,390 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:c="http://java.sun.com/jstl/core"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:sec="https://joinfaces.org/security">
+<ui:composition
+	template="#{navegacionBean.get('TEMPLATE_LAYOUT_GENERICO')}">
+
+	<ui:define name="content">
+
+		<c:set var="editable"
+			value="#{datosSujetosObligadosBean.formEditable}" />
+
+		<h:form id="formFormularioSujetosObligados">
+
+			<p:messages for="messagesFormulario" id="messagesFormulario"
+				showDetail="true" closable="true">
+				<p:autoUpdate />
+			</p:messages>
+
+			
+			<p:panel id="panelSujeto">
+			<f:facet name="header">
+				<h:outputText value="#{mensaje['formulario.sujetos.obligados']}" style="font-weight:bold" />
+			</f:facet>
+			
+			<p:outputPanel id="panelEditarSujetoByForm" rendered="#{datosSujetosObligadosBean.sujetosObligados.activa and datosSujetosObligadosBean.permisoEditSujObl == true and !editable and datosSujetosObligadosBean.numerosSaltos!=2}">
+				<div class="botonera-form" align="right">
+					<p:commandButton id="editarSujetoByForm" widgetVar="editarSujetoByForm" icon="pi pi-pencil"
+						action="#{datosSujetosObligadosBean.onEditarByForm(datosSujetosObligadosBean.sujetosObligados.id)}">
+						<f:param name="id" value="#{datosSujetosObligadosBean.sujetosObligados.id}" />
+					</p:commandButton>
+				</div>				
+			</p:outputPanel>
+
+			<!-- PANEL DIALOG SUJETOS OBLIGADOS -->
+	   		<p:fieldset id="bloqueDatosSujeto" legend="#{mensaje['datos.sujeto']}" styleClass="ui-g" toggleable="true" toggleSpeed="250" >
+					<div>
+						<div class="celda-form">
+							<p:outputLabel rendered="#{editable}" for="descripcion"
+								value="#{mensaje['sujeto.obligado']} * " />
+							<p:outputLabel rendered="#{!editable}" for="descripcion"
+								value="#{mensaje['sujeto.obligado']}" />
+							<p:inputText id="descripcion"
+								maxlength="100" size="80"
+								value="#{datosSujetosObligadosBean.sujetosObligados.descripcion}"
+								disabled="#{!editable}" />
+						</div>						
+						<div class="celda-form">
+							<p:outputLabel rendered="#{editable}" for="ordenVisualizacion"
+								styleClass="p-d-block"
+								value="#{mensaje['orden.visualizacion']} *" />
+							<p:outputLabel rendered="#{!editable}" for="ordenVisualizacion"
+								value="#{mensaje['orden.visualizacion']}" />
+
+							<p:inputText id="ordenVisualizacion"
+								maxlength="3" size="4"
+								value="#{datosSujetosObligadosBean.sujetosObligados.ordenVisualizacion}"
+								disabled="#{!editable}" />
+
+						</div>
+					</div>
+					<div>
+						<div class="celda-form">
+							<p:outputLabel for="comboSujetosObligados"
+								value="#{mensaje['sujeto.obligado.superior']}" />
+							<p:selectOneMenu id="comboSujetosObligados"
+								value="#{datosSujetosObligadosBean.selectedNuevoSujetoObligadoId}"
+								disabled="#{!editable or (editable and !(datosSujetosObligadosBean.sujetosObligados.id == null))}"
+								filter="true">
+								<f:selectItem
+									itemLabel="#{mensaje['seleccione.sujeto.obligado.superior']}"
+									itemValue="#{datosSujetosObligadosBean.sujetosObligados.sujetosObligadosPadre.id}" />
+								<f:selectItems
+									value="#{datosSujetosObligadosBean.listaSujetosObligadosSup}"
+									var="sujObliList" itemLabel="#{sujObliList.descripcion}"
+									widgetVar="comboSujetosObligados" itemValue="#{sujObliList.id}" />
+								<p:ajax
+									listener="#{datosSujetosObligadosBean.calcularNivelAnidamiento}"
+									event="change" />
+								<p:ajax
+									listener="#{datosSujetosObligadosBean.controlTipoAgrupaciones}"
+									event="change" />
+							</p:selectOneMenu>
+						</div>
+						
+						<div class="celda-form">
+							<p:outputLabel for="nivelAnidamiento" styleClass="p-d-block"
+								value="#{mensaje['nivel.anidamiento']}" />
+							<p:inputText id="nivelAnidamiento"
+								size="10"
+								value="#{datosSujetosObligadosBean.sujetosObligados.nivelAnidamiento}"
+								disabled="true" />
+						</div>
+
+						<div class="celda-form">
+							<p:outputLabel rendered="#{editable}" for="comboTipoAgrupacion" value="#{mensaje['tipo.agrupacion']} * " />
+							<p:outputLabel rendered="#{!editable}" for="comboTipoAgrupacion" value="#{mensaje['tipo.agrupacion']}" />
+							<p:selectOneMenu id="comboTipoAgrupacion"
+								value="#{datosSujetosObligadosBean.selectedNuevoTipAgrupId}"
+								disabled="#{!editable or (editable and !(datosSujetosObligadosBean.sujetosObligados.tipoAgrupacion.id == null))}">
+
+								<f:selectItem
+									itemLabel="#{mensaje['seleccione.una.opcion']}"
+									itemValue="#{datosSujetosObligadosBean.sujetosObligados.tipoAgrupacion.id}" />
+								<f:selectItems
+									value="#{datosSujetosObligadosBean.listaTipoAgrupacion}"
+									var="listTipAgrup" itemLabel="#{listTipAgrup.descripcion}"
+									widgetVar="comboTipoAgrupacion" itemValue="#{listTipAgrup.id}" />
+
+							</p:selectOneMenu>
+						</div>						
+					</div>
+					<div>
+						<div class="celda-form">
+							<p:outputLabel rendered="#{editable}" for="abreviatura1" value="#{mensaje['abreviatura1']} *" />
+							<p:outputLabel rendered="#{!editable}" for="abreviatura1" value="#{mensaje['abreviatura1']}" />
+							<p:inputText id="abreviatura1"
+								maxlength="20" size="20" 
+								counter="abreviatura1cuenta" counterTemplate="#{mensaje['counter.template']}"
+								value="#{datosSujetosObligadosBean.sujetosObligados.abreviatura1}"
+								disabled="#{!editable}" />
+							<div class="contador-char"><h:outputText id="abreviatura1cuenta" /></div>
+						</div>
+						<div class="celda-form">
+							<p:outputLabel rendered="#{editable}" for="abreviatura2" value="#{mensaje['abreviatura2']} *" />
+							<p:outputLabel rendered="#{!editable}" for="abreviatura2" value="#{mensaje['abreviatura2']}" />
+							<p:inputText id="abreviatura2"
+								maxlength="12" size="12"
+								counter="abreviatura2cuenta" counterTemplate="#{mensaje['counter.template']}"
+								value="#{datosSujetosObligadosBean.sujetosObligados.abreviatura2}"
+								disabled="#{!editable}" />
+							<div class="contador-char"><h:outputText id="abreviatura2cuenta" /></div>
+						</div>
+						<div class="celda-form">
+							<p:outputLabel rendered="#{editable}" for="abreviatura3" value="#{mensaje['abreviatura3']} *" />
+							<p:outputLabel rendered="#{!editable}" for="abreviatura3" value="#{mensaje['abreviatura3']}" />
+							<p:inputText id="abreviatura3"
+								maxlength="5" size="5"
+								counter="abreviatura3cuenta" counterTemplate="#{mensaje['counter.template']}"
+								value="#{datosSujetosObligadosBean.sujetosObligados.abreviatura3}"
+								disabled="#{!editable}" />
+							<div class="contador-char"><h:outputText id="abreviatura3cuenta" /></div>
+						</div>					
+					</div>
+					<div>
+						<div class="celda-form">
+				   			<p:outputLabel for="comboValorIdentificador" styleClass="p-d-block" value="#{mensaje['tipo.identificador']}" />		
+			   				<p:selectOneMenu id="comboValorIdentificador" value="#{datosSujetosObligadosBean.selectedTipoIdentificadorId}" disabled="#{!editable}">
+	               				<f:selectItem itemLabel="Seleccione una opción" itemValue="#{null}" noSelectionOption="true" />
+								<f:selectItems value="#{datosSujetosObligadosBean.listaValoresDominioTipoIdentificador}" var="t" 
+									itemLabel="#{t.descripcion}"
+									itemValue="#{t.id}" />
+								<p:ajax event="change" process="@this, nif" listener="#{datosSujetosObligadosBean.onChangeTipoIdentificador}"  update="nif" />
+							</p:selectOneMenu>
+				        </div>
+							
+						<div class="celda-form">
+							<p:outputLabel for="nif"
+								value="#{mensaje['identificador']}" />
+							<p:inputText id="nif" maxlength="9"
+								size="10"
+								value="#{datosSujetosObligadosBean.sujetosObligados.nif}"
+								disabled="#{!editable or null==datosSujetosObligadosBean.selectedTipoIdentificadorId}" />
+						</div>					
+
+						<div class="celda-form">
+							<p:outputLabel for="emailContacto"
+								value="#{mensaje['email.contacto']}" />
+							<p:inputText id="emailContacto"
+								maxlength="100" size="40"
+								value="#{datosSujetosObligadosBean.sujetosObligados.emailContacto}"
+								disabled="#{!editable}" />
+
+						</div>
+
+						<div class="celda-form">
+				   			<p:outputLabel for="comboValorViaCom" styleClass="p-d-block" value="#{mensaje['via.comunicacion']}" />		
+			   				<p:selectOneMenu id="comboValorViaCom" value="#{datosSujetosObligadosBean.selectedViaComunicacionId}" disabled="#{!editable}">
+	               				<f:selectItem itemLabel="Seleccione una opción" itemValue="#{null}" noSelectionOption="true" />
+								<f:selectItems value="#{datosSujetosObligadosBean.listaValoresDominioViaComunicacion}" var="v" 
+									itemLabel="#{v.descripcion}"
+									itemValue="#{v.id}" />
+							</p:selectOneMenu>
+				        </div>
+				        
+						<div class="celda-form">
+							<p:outputLabel for="codigoDir3"
+								value="#{mensaje['codigo.dir3']}" />
+							<p:inputText id="codigoDir3"
+								maxlength="50" size="30"
+								value="#{datosSujetosObligadosBean.sujetosObligados.codigoDir3}"
+								disabled="#{!editable}" />
+
+						</div>
+
+						<div class="celda-form">
+				   			<p:outputLabel for="comboValorTipologia" styleClass="p-d-block" value="#{mensaje['tipologia']}" />		
+			   				<p:selectOneMenu id="comboValorTipologia" value="#{datosSujetosObligadosBean.selectedTipologiaId}" disabled="#{!editable}">
+	               				<f:selectItem itemLabel="Seleccione una opción" itemValue="#{null}" noSelectionOption="true" />
+								<f:selectItems value="#{datosSujetosObligadosBean.listaValoresDominioTipologia}" var="t" 
+									itemLabel="#{t.descripcion}"
+									itemValue="#{t.id}" />
+							</p:selectOneMenu>
+				        </div>
+
+					</div>
+					
+					<div>
+					
+						<div class="celda-form">
+							<p:outputLabel for="puestoTitular"
+								value="#{mensaje['puesto.titular']}" />
+							<p:inputText id="puestoTitular"
+								maxlength="255" size="30"
+								value="#{datosSujetosObligadosBean.sujetosObligados.puestoTitular}" disabled="#{!editable}"/>
+
+						</div>
+						
+						<p:outputPanel styleClass="celda-form">
+							<p:outputLabel for="unidadTransparencia" value="#{mensaje['unidad.transparencia']}"/>
+							<p:selectBooleanCheckbox id="unidadTransparencia" value="#{datosSujetosObligadosBean.sujetosObligados.unidadTransparencia}" itemLabel="#{mensaje['si']}" disabled="#{!editable}"/>
+						</p:outputPanel>
+						
+						<div class="celda-form">
+							<p:outputLabel for="contactoUnidadTransparencia"
+								value="#{mensaje['contacto.unidad.transparencia']}" />
+							<p:inputText id="contactoUnidadTransparencia"
+								maxlength="255" size="30"
+								value="#{datosSujetosObligadosBean.sujetosObligados.contactoUnidadTransparencia}" disabled="#{!editable}"/>
+
+						</div>
+						
+						<p:outputPanel styleClass="celda-form">
+							<p:outputLabel for="dpd" value="#{mensaje['dpd']}" rendered="false"/> 
+							<p:selectBooleanCheckbox id="dpd" rendered="false" value="#{datosSujetosObligadosBean.sujetosObligados.dpd}" itemLabel="#{mensaje['si']}" disabled="#{!editable}"/>
+						</p:outputPanel>
+						
+						<div class="celda-form">
+							<p:outputLabel for="contactoDpd" rendered="false"
+								value="#{mensaje['contacto.dpd']}" />
+							<p:inputText id="contactoDpd" rendered="false"
+								maxlength="255" size="30"
+								value="#{datosSujetosObligadosBean.sujetosObligados.contactoDpd}" disabled="#{!editable}"/>
+
+						</div>
+					
+					
+					
+					
+					</div>					
+					
+				</p:fieldset>	
+			<p:fieldset id="bloqueDomicilio" legend="#{mensaje['domicilio']}" toggleable="true" toggleSpeed="250">    		
+				
+					<div>
+						<div class="celda-form">
+							<p:outputLabel for="direccion"
+								value="#{mensaje['direccion']}" />
+							<p:inputText id="direccion"
+								maxlength="255" size="60"
+								value="#{datosSujetosObligadosBean.sujetosObligados.direccion}"
+								disabled="#{!editable}" />
+						</div>
+
+						<div class="celda-form">
+			   				<p:outputLabel for="pais" styleClass="p-d-block">#{mensaje['pais']}</p:outputLabel>
+							<p:selectOneMenu id="pais" value="#{datosSujetosObligadosBean.selectedNuevoPaisId}" disabled="#{not editable}">
+	               					<f:selectItem itemLabel="Seleccione una opción" itemValue="#{null}" noSelectionOption="true" />
+								<f:selectItems value="#{datosSujetosObligadosBean.listaPaises}" var="p" 
+									itemLabel="#{p.descripcion}"
+									itemValue="#{p.id}" />
+							</p:selectOneMenu>
+						</div>
+					</div>
+					
+					<div>
+						<div class="celda-form">
+							<p:outputLabel for="codigo_postal" styleClass="p-d-block">#{mensaje['codigo.postal']}</p:outputLabel>
+							<p:inputMask id="codigo_postal" styleClass="p-d-block"  
+								maxlength="5" size="5" pattern="" mask="9[9999]"
+								disabled="#{not editable}"        
+								value="#{datosSujetosObligadosBean.sujetosObligados.codigoPostal}">
+								<p:ajax event="change" listener="#{datosSujetosObligadosBean.onChangeCodigoPostal}" process="@this"
+									update="comboProvincia, comboLocalidad" />
+							</p:inputMask>  
+						</div>  
+												
+						<div class="celda-form">
+							<p:outputLabel value="#{mensaje['provincia']}"
+								for="comboProvincia" />
+
+							<p:selectOneMenu id="comboProvincia" widgetVar="comboProvincia" 
+								value="#{datosSujetosObligadosBean.selectedNuevaProvinciaId}"
+								disabled="#{!editable or empty datosSujetosObligadosBean.listaProvincias}"
+								style="min-width: auto;">
+								<f:selectItem itemLabel="#{mensaje['seleccione.una.opcion']}"
+									itemValue="#{datosSujetosObligadosBean.sujetosObligados.provincia.id}" />
+								<f:selectItems
+									value="#{datosSujetosObligadosBean.listaProvincias}" var="provList" 
+									itemLabel="#{provList.descripcion}"
+									itemValue="#{provList.id}" />
+								<p:ajax event="change" listener="#{datosSujetosObligadosBean.onChangeProvincia}" process="@this"
+									update="comboLocalidad" />
+							</p:selectOneMenu>
+						</div>
+						
+						<div class="celda-form">
+							<p:outputLabel for="comboLocalidad" styleClass="p-d-block">#{mensaje['localidad']}</p:outputLabel>
+							<p:selectOneMenu id="comboLocalidad" value="#{datosSujetosObligadosBean.selectedNuevaLocalidadId}" disabled="#{not editable or empty datosSujetosObligadosBean.listaLocalidades}">
+	               				<f:selectItem itemLabel="Seleccione una opción" itemValue="#{null}" noSelectionOption="true" />
+								<f:selectItems value="#{datosSujetosObligadosBean.listaLocalidades}" var="localidades" 
+									itemLabel="#{localidades.descripcion}"
+									itemValue="#{localidades.id}" />
+							</p:selectOneMenu>	
+						</div>
+					</div>	
+					<div>
+						<div class="celda-form">
+							<p:outputLabel for="descMunicipio" styleClass="p-d-block">#{mensaje['municipio']}</p:outputLabel>
+							<p:inputText id="descMunicipio" styleClass="p-d-block" maxlength="100" size="60" disabled="#{not editable}"
+								value="#{datosSujetosObligadosBean.sujetosObligados.descripcionMunicipio}"/>
+						</div>
+						
+				</div>
+
+			</p:fieldset>
+
+			<p:spacer height="10px" />
+			
+			<!-- TABLA DESCENDIENTES -->
+	   		<p:fieldset id="bloqueAnidamientos" legend="#{mensaje['anidamientos']}" styleClass="ui-g" toggleable="true" toggleSpeed="250" >
+				<p:dataTable var="sujetosObligadosAscendente" id="tablaAcendentes"
+					value="#{datosSujetosObligadosBean.listaSujetosObligadosAscendentes}"
+					paginator="true"
+					paginatorTemplate=" {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+					rowsPerPageTemplate="10,20,50,100" paginatorPosition="bottom"
+					rows="10"
+					currentPageReportTemplate="#{mensaje['paginador.template']}"
+					selectionMode="single"
+					sortBy="#{sujetosObligadosAscendente.descripcion}"
+					sortOrder="ascending" rowKey="#{sujetosObligadosAscendente.id}">
+
+					<p:column headerText="#{mensaje['anidamientos']}"
+						sortBy="#{sujetosObligadosAscendente.descripcion}">
+						<h:outputText value="#{sujetosObligadosAscendente.descripcion}" />
+					</p:column>
+					<p:column headerText="#{mensaje['tipo.agrupacion']}"
+						sortBy="#{sujetosObligadosAscendente.descripcion}">
+						<h:outputText
+							value="#{sujetosObligadosAscendente.tipoAgrupacion.descripcion}" />
+					</p:column>
+				</p:dataTable>
+				<br></br>
+				<p:outputLabel value="#{mensaje['anidamientos.orden.sujeto']}" />
+			</p:fieldset>
+			
+				<div class="botonera-form" align="right">
+					<p:commandButton rendered="#{editable and datosSujetosObligadosBean.permisoSaveSujObl == true}" icon="pi pi-save"
+						id="saveSujetosObligados" value="#{mensaje['guardar']}"
+						actionListener="#{datosSujetosObligadosBean.saveSujetosObligados()}"
+						update="formFormularioSujetosObligados" />
+					<p:commandButton rendered="#{editable}" icon="pi pi-times"
+						id="cancelarSujetosObligados" value="#{mensaje['cancelar']}"
+						actionListener="#{volverBean.cancelar()}"
+						oncomplete="document.location.href='#{request.contextPath}/aplicacion/admonfuncional/sujetosobligados/listadoSujetosObligados.jsf'">
+						<p:confirm header="#{mensaje['confirmar.operacion']}" message="#{mensaje['pregunta.confirma.cancelar']}" icon="pi pi-info-circle" />
+					</p:commandButton>
+					<p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true" >
+						<div class="botonera-form" align="right">
+							<p:commandButton value="#{mensaje['si']}" type="button" styleClass="ui-confirmdialog-yes" />
+							<p:commandButton value="#{mensaje['no']}" type="button" styleClass="ui-confirmdialog-no ui-button-flat" />
+						</div>									
+					</p:confirmDialog>
+				</div>
+			
+			</p:panel>
+
+			<br/>
+			<p:commandButton id="volver" value="#{mensaje['volver']}" action="#{datosSujetosObligadosBean.ejecutarVolver}" />
+			
+		</h:form>
+	</ui:define>
+</ui:composition>
+</html>

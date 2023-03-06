@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:c="http://java.sun.com/jstl/core"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:sec="https://joinfaces.org/security"
+	xmlns:fu="http://joinfaces.org/functions">
+
+<ui:composition>
+	<p:messages for="messagesListadoObservaciones" id="messagesListadoObservaciones"
+		showDetail="true" closable="true">
+		<p:autoUpdate />
+	</p:messages>
+
+
+	<p:fieldset legend="#{mensaje['filtros.busqueda']}"
+		id="bloqueFiltroBusquedaObsExp" toggleable="true" toggleSpeed="250">
+
+		<div>
+				<div class="celda-form">
+					<p:outputLabel for="tipoObservacion_filtro" value="#{mensaje['tipo.observacion']}"/>
+					<p:selectCheckboxMenu id="tipoObservacion_filtro"
+						value="#{datosExpedientesDatosObservacionesBean.selectedTipoObservaciones}"
+						var="valDomTipObsSelected" 
+						itemLabel="#{valDomTipObsSelected.descripcion}"
+						itemValue="#{valDomTipObsSelected}"
+						label="#{mensaje['seleccione.opciones']}" 
+						multiple="true"
+						filter="true"
+						style="width: 15rem"
+						disabled="#{!editable}" >
+						<p:ajax event="itemUnselect" listener="#{datosExpedientesDatosObservacionesBean.onItemUnselect}" />	
+						<f:selectItems value="#{datosExpedientesDatosObservacionesBean.listaValoresTiposObservaciones}"
+							var="tipoObsExpList" 
+							itemLabel="#{tipoObsExpList.descripcion}"
+							itemValue="#{tipoObsExpList.id}" />
+					</p:selectCheckboxMenu>
+				</div>				
+
+		</div>
+
+		<div class="botonera-form">
+			<p:commandButton id="filtrarObservacionesExp" icon="pi pi-filter"
+				value="#{mensaje['filtrar']}"
+				update="formFormularioExpedientes:tabViewPestanasExpediente:tablaObsExp"
+				onstart="PF('observacionesExpedientesWV').paginator.setPage(0);" />
+
+			<p:commandButton id="limpiarObservacionesExp"
+				value="#{mensaje['limpiar.filtro']}" icon="pi pi-filter-slash"
+				actionListener="#{datosExpedientesDatosObservacionesBean.limpiarFiltro()}"
+				update="formFormularioExpedientes:tabViewPestanasExpediente:bloqueFiltroBusquedaObsExp,formFormularioExpedientes:tabViewPestanasExpediente:tablaObsExp"
+				onstart="PF('observacionesExpedientesWV').paginator.setPage(0);" />
+				
+			<!-- BOTÓN PARA CREAR NUEVA OBSERVACIÓN -->
+			<p:commandButton id="nuevaObservacionExp" icon="pi pi-plus"
+				value="#{mensaje['nueva.observacion']}" 
+				actionListener="#{datosExpedientesDatosObservacionesBean.accesoFormularioAlta()}"
+				update="formFormularioExpedientes:tabViewPestanasExpediente:dialogObservacionExp" 
+				rendered="#{editable and datosExpedientesDatosObservacionesBean.permisoNewExpObs == true}"/>  				
+		</div>
+				
+	</p:fieldset>
+
+	<!-- TABLA DATOS OBSERVACIONES EXPEDIENTES -->
+	<p:outputPanel id="panelResultadosBusquedaObservacionesExpedientes">
+		<p:dataTable var="observacionExp" id="tablaObsExp"
+					value="#{datosExpedientesDatosObservacionesBean.lazyModelObservacionesExpedientesMaestra}" paginator="true"
+					paginatorTemplate=" {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+					rowsPerPageTemplate="10,20,50,100" rows="10"
+					currentPageReportTemplate="#{mensaje['paginador.template']}"
+					selectionMode="single" sortBy="#{datosExpedientesDatosObservacionesBean.sortDefaultLazyObsExp}"
+					sortOrder="descending"
+					selection="#{datosExpedientesDatosObservacionesBean.selectedObservacionesExpedientesMaestra}"
+					rowKey="#{observacionExp.id}"
+					paginatorPosition="bottom"
+					paginatorAlwaysVisible="false"
+					widgetVar="observacionesExpedientesWV"> 
+					
+					<p:ajax event="rowDblselect" listener="#{datosExpedientesDatosObservacionesBean.accesoRapido}" 
+				        update="formFormularioExpedientes:tabViewPestanasExpediente:dialogObservacionExp"
+				        global="false" oncomplete="PF('dialogObservacionExp').show()" />
+									
+					<p:column headerText="#{mensaje['fecha']}" sortBy="#{observacionExp.fechaEntrada}">
+               			<h:outputText value="#{observacionExp.fechaEntrada}">
+               			<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+               			</h:outputText>
+					</p:column>
+
+					<p:column headerText="#{mensaje['tipo.observacion']}"
+						sortBy="#{observacionExp.valorTipoObservacion.descripcion}">
+						<h:outputText value="#{observacionExp.valorTipoObservacion.descripcion}" />
+					</p:column>
+
+					<p:column headerText="#{mensaje['origen']}">
+						<h:outputText value="#{observacionExp.getOrigen()}" />
+					</p:column>
+
+					<p:column headerText="#{mensaje['situacion']}">
+						<span class="#{datosExpedientesDatosObservacionesBean.cssSemaforoSituacion(observacionExp)}" />
+					</p:column>
+					
+					<p:column headerText="#{mensaje['fecha.fin.tramite']}">
+               			<h:outputText value="#{datosExpedientesDatosObservacionesBean.fechaFinalizacionSegunOrigen(observacionExp)}">
+               			<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+               			</h:outputText>
+					</p:column>
+	
+					<p:column headerText="#{mensaje['observacion']}" width="20%">
+						<h:outputText value="#{fu:ptoSusp(observacionExp.texto)}" id="textoObs"/>
+						<p:tooltip for="textoObs" value="#{observacionExp.texto.length() lt 1400? observacionExp.texto : observacionExp.texto.substring(0,1399)}" rendered="#{observacionExp.texto.length() gt 50}" showDelay="500" />	
+
+					</p:column>
+					
+					<p:column headerText="#{mensaje['observacion.usu.alta']}">
+						<h:outputText value="#{observacionExp.usuCreacion}" />
+					</p:column>
+										
+					
+					<p:column>
+						<f:facet name="header">
+							<h:outputText id="usuMod" value="#{mensaje['observacion.usu.mod']}" />
+							<p:tooltip for="usuMod" value="#{mensaje['observacion.usu.modif']}"
+								showEffect="fade" hideEffect="fade" position="top" showDelay="500" />
+						</f:facet>
+	
+						<h:outputText value="#{observacionExp.usuModificacion}"/>						
+					</p:column>	
+					
+					<p:column>
+						<f:facet name="header">
+							<h:outputText id="fecMod" value="#{mensaje['observacion.fecha.mod']}" />
+							<p:tooltip for="fecMod" value="#{mensaje['observacion.fecha.modif']}"
+								showEffect="fade" hideEffect="fade" position="top" showDelay="500" />
+						</f:facet>
+	
+
+               			<h:outputText value="#{observacionExp.fechaModificacion}">
+               			<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+               			</h:outputText>
+					</p:column>										
+					
+
+					<p:column headerText="#{mensaje['acciones']}" width="85">
+						<p:commandButton id="consultarObservacionesExp" icon="pi pi-eye"
+							actionListener="#{datosExpedientesDatosObservacionesBean.modoAccesoFormulario(observacionExp,'consulta')}"
+							update="formFormularioExpedientes:tabViewPestanasExpediente:dialogObservacionExp" />
+							<p:tooltip for="consultarObservacionesExp" value="#{mensaje['ver.observacion']}"
+							showEffect="fade" hideEffect="fade" position="top" showDelay="500" />
+						<p:commandButton id="editarObservacionesExp" icon="pi pi-pencil" rendered="#{empty observacionExp.getOrigen()}"
+							actionListener="#{datosExpedientesDatosObservacionesBean.modoAccesoFormulario(observacionExp,'editar')}"
+							update="formFormularioExpedientes:tabViewPestanasExpediente:dialogObservacionExp" />
+							<p:tooltip for="editarObservacionesExp" value="#{mensaje['editar.observacion']}"
+							showEffect="fade" hideEffect="fade" position="top" showDelay="500" />
+							
+					</p:column>
+				</p:dataTable>
+	</p:outputPanel>
+	
+ 		<!-- DIALOGO OBSERVACIONES -->
+		<p:dialog id="dialogObservacionExp" header="#{datosExpedientesDatosObservacionesBean.cabeceraDialogo}" widgetVar="dialogObservacionExp" position="center center" resizable="false">
+			<p:messages for="messagesDialogObservacionesExp" id="messagesDialogObservacionesExp" showDetail="true" closable="true" >
+				<p:autoUpdate/> 
+	        </p:messages>	
+
+	        
+			<div class="ui-fluid">		 
+				<div class="ui-g-12 ui-md-8">
+					<p:outputLabel for="comboTipoObsExp"
+						value="#{mensaje['tipo.observacion']} *" />
+					<p:selectOneMenu id="comboTipoObsExp"
+						value="#{datosExpedientesDatosObservacionesBean.observacionesExpedientes.valorTipoObservacion.id}"
+						effect="fade"
+						filter="true" disabled="true">
+						<f:selectItem itemLabel="#{mensaje['seleccione.una.opcion']}" itemValue="" />
+						<f:selectItems
+							value="#{datosExpedientesDatosObservacionesBean.listaValoresTiposObservaciones}"
+							var="tipoObsExpList" itemLabel="#{tipoObsExpList.descripcion}"
+							widgetVar="tipoObsExpList" itemValue="#{tipoObsExpList.id}" />
+						<f:validateBean disabled="true"/>
+					</p:selectOneMenu>
+				</div>
+           		<div class="ui-g-12 ui-md-4">
+					<p:outputLabel for="fechaEntradaObservacionesExp" value="#{mensaje['fecha']} *" />
+					<p:datePicker id="fechaEntradaObservacionesExp" value="#{datosExpedientesDatosObservacionesBean.observacionesExpedientes.fechaEntrada}" 
+								locale="es" monthNavigator="true" pattern="dd/MM/yyyy" 
+								disabled="true">
+							<f:validateBean disabled="true"/>
+					</p:datePicker>
+					<p:message for="fechaEntradaObservacionesExp"/>
+				</div>
+				<div class="celda-form">
+					<p:outputLabel for="origenObsExp"
+						value="#{mensaje['origen']}" rendered="#{datosExpedientesDatosObservacionesBean.modoAccesoConsulta and not empty datosExpedientesDatosObservacionesBean.origenObsExp}"/>
+					<p:inputText id="origenObsExp"
+						disabled="true"
+						maxlength="20" size="20"
+						value="#{datosExpedientesDatosObservacionesBean.origenObsExp}" rendered="#{datosExpedientesDatosObservacionesBean.modoAccesoConsulta and not empty datosExpedientesDatosObservacionesBean.origenObsExp}"/>
+
+				</div>
+			
+           		<div class="ui-g-12 ui-md-12 celda-form">
+					<p:outputLabel for="textoObsExp" value="#{mensaje['texto']} *" />			
+			        <p:inputTextarea id="textoObsExp" rows="6" counter="textoObservacionExpArea" maxlength="4000" counterTemplate="#{mensaje['counter.template']}" autoResize="false" 
+			        	value="#{datosExpedientesDatosObservacionesBean.observacionesExpedientes.texto}" readonly="#{datosExpedientesDatosObservacionesBean.modoAccesoConsulta}"/>
+			         <div class="contador-char"><h:outputText id="textoObservacionExpArea" /></div>
+		        </div>
+			</div>
+			
+	    <div class="botonera-form" align="right">
+			<p:commandButton 
+				id="btnGuardarObservacionesExp" value="#{mensaje['guardar']}" rendered="#{!datosExpedientesDatosObservacionesBean.modoAccesoConsulta and datosExpedientesDatosObservacionesBean.permisoNewExpObs == true}"
+				actionListener="#{datosExpedientesDatosObservacionesBean.guardarObservacionesExp(datosExpedientesDatosObservacionesBean.observacionesExpedientes.texto, datosExpedientesDatosObservacionesBean.observacionesExpedientes)}"
+				update="formFormularioExpedientes:tabViewPestanasExpediente:panelResultadosBusquedaObservacionesExpedientes"
+				oncomplete="if(args.saved) PF('dialogObservacionExp').hide()">
+			</p:commandButton>
+			
+			<p:commandButton process="@this"
+				id="btnCancelarObservacionesExp" value="#{mensaje['cancelar']}" rendered="#{!datosExpedientesDatosObservacionesBean.modoAccesoConsulta}"
+				oncomplete="PF('dialogObservacionExp').hide()" >
+				<p:confirm header="#{mensaje['confirmar.operacion']}"
+					message="#{mensaje['pregunta.confirma.cancelar']}"
+					icon="pi pi-info-circle" />
+			</p:commandButton>
+			
+			<p:commandButton process="@this"
+				id="btnSalirObservacionesExp" value="#{mensaje['volver']}" rendered="#{datosExpedientesDatosObservacionesBean.modoAccesoConsulta}"
+				oncomplete="PF('dialogObservacionExp').hide()" >
+			</p:commandButton>
+
+		</div>
+		</p:dialog>
+	
+
+</ui:composition>
+
+</html>
+

@@ -1,0 +1,30 @@
+// -----------------------------------------------------------------------------
+// This file contains all @font-face declarations, if any.
+// -----------------------------------------------------------------------------
+@import '../abstracts/functions';
+
+/* Fuente Eras Bk*/
+@font-face {
+	font-family: ErasBkBt;
+	src: font_jsf("Eras Bk BT-demi.ttf");
+}
+
+/* Fuente Eras Md*/
+@font-face {
+	font-family: ErasMdBt;
+	src: font_jsf("Eras Md BT.ttf");
+}
+
+/* Fuente NewsGotT */
+@font-face {
+	font-family: NewsGotT;
+	src: font_jsf("NewsGotT-regular.ttf");
+}
+
+@font-face {
+	font-family: NewsGotT;
+	src: font_jsf("NewsGotT-bold.ttf");
+	font-weight: bold;
+}
+
+

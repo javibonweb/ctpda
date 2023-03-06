@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:c="http://java.sun.com/jstl/core"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:sec="https://joinfaces.org/security"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+    xmlns:fu="http://joinfaces.org/functions">
+
+<ui:composition>
+
+	<c:set var="bean" value="#{empujarDocumentosBean}" />
+
+	<p:dialog id="dialogEmpujarDocs" widgetVar="dialogEmpujarDocs" modal="false" header="#{bean.cabeceraDialog}">
+	 	
+		<p:outputPanel id="controlesBusquedaEmpujar">
+		
+			<p:fieldset legend="Datos de destino">
+		    <div class="celda-form">
+				<p:outputLabel for="filtroNumExpDocEmp"
+					value="#{mensaje['numero.expediente']} *" />
+				<div class="ui-inputgroup">
+					<p:inputText id="filtroNumExpDocEmp" widgetVar="filtroNumExpDocEmp"
+						value="#{bean.filtroNumExpediente}" size="15" maxlength="30"
+						disabled="true" 
+						>
+<!-- 						disabled="#{bean.deshabilitarBusqueda}" > -->
+<!-- 						<p:ajax listener="#{bean.consultarNumExpediente}" process="@this" update="comboFiltroTramitesEmp" /> -->
+					</p:inputText>
+<!-- 					<p:commandButton icon="pi pi-pencil" -->
+<!-- 						id="btnConsultarNumExpActualFiltroEmp" -->
+<!-- 						rendered="#{not bean.deshabilitarBusqueda}" -->
+<!-- 						action="#{bean.aplicarNumExpActual}" -->
+<!-- 						process="@this" immediate="true" update="filtroNumExpDocEmp" -->
+<!-- 						> -->
+<!-- 						<f:setPropertyActionListener target="#{bean.filtroNumExpediente}"  -->
+<!-- 							value="#{bean.expedienteFormulario.numExpediente}" /> -->
+<!-- 					</p:commandButton> -->
+<!-- 					<p:tooltip for="btnConsultarNumExpActualFiltroEmp" value="#{mensaje['aplicar.numexp.actual']}" -->
+<!-- 						showEffect="fade" hideEffect="fade" position="top" showDelay="500" /> -->
+				</div>
+			</div>
+			
+			<div class="celda-form">
+				<p:outputLabel
+					for="comboFiltroTramitesEmp"	
+					value="#{mensaje['tramite']} *" />
+				<p:selectOneMenu id="comboFiltroTramitesEmp"
+					disabled="#{bean.deshabilitarBusqueda}"
+					value="#{bean.selectedTramiteExpedienteId}">
+					<f:selectItem
+						itemLabel="#{mensaje['seleccione.una.opcion']}"
+						itemValue="#{null}" />
+					<f:selectItems
+						value="#{bean.listaTramitesExpediente}"
+						var="t" itemLabel="#{t.descripcion}" itemValue="#{t.id}" />
+				</p:selectOneMenu>
+			</div>
+			
+			<p:outputPanel rendered="#{not empty bean.listaDocumentosEmpujar}" styleClass="celda-form">
+				<h:outputText value="(Documentos en lista: #{fn:length(bean.listaDocumentosEmpujar)})" />
+			</p:outputPanel>
+			
+			</p:fieldset>
+			
+		    <p:outputPanel styleClass="celda-form" rendered="#{not bean.deshabilitarBusqueda}">
+				<p:commandButton icon="pi pi-search"
+					id="btnConsultarNumExpFiltroEmp" value="#{mensaje['ver.documentos']}"
+					actionListener="#{bean.consultarDocumentos}"					
+					oncomplete="if(PF('listaDocumentosEmpujar')) PF('listaDocumentosEmpujar').unselectAllRows()">
+				</p:commandButton>
+			</p:outputPanel>
+			
+		
+		</p:outputPanel>		
+<!-- 		<p:spacer height="20" /> -->
+		
+		<p:outputPanel id="panelResultadosEmpujar" rendered="#{empty bean.listaDocumentosEmpujar}">
+			<p:outputPanel rendered="#{not empty bean.tramiteDestino}" style="width: 800px" >
+				<p:staticMessage rendered="#{0 == bean.expedienteDestino.id}"
+					severity="warn"  detail="#{mensaje['expediente.no.encontrado']}" />
+	
+				<div style="max-height: 700px; overflow-y:scroll">
+				<p:dataTable id="listaDocumentosEmpujar" widgetVar="listaDocumentosEmpujar"
+					var="docExp" value="#{bean.lazyModelDocumentos}" paginator="true"
+					paginatorTemplate=" {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+					currentPageReportTemplate="#{mensaje['paginador.template']}" emptyMessage="#{mensaje['tramite.origen.sin.documentos']}"
+					rowsPerPageTemplate="5,10,20,50,100" rows="10"
+					selection="#{bean.documentosSeleccionados}" selectionPageOnly="true"
+					rowKey="#{docExp.id}" paginatorPosition="bottom" >
+					
+				    <f:facet name="header">
+				        <h:outputText value="#{mensaje['documentos.tramite']} '#{bean.tramiteOrigen.descripcion}'" />
+				    </f:facet>
+	
+					<p:column width="20%" headerText="#{mensaje['tipo.documento']}">
+						<h:outputText value="#{docExp.descripcionTipo}" />
+					</p:column>
+	
+					<p:column headerText="#{mensaje['descripcion']}">
+						<h:outputText value="#{docExp.descripcion}" />
+					</p:column>
+	
+					<p:column width="30px">
+						<f:facet name="header">
+							<h:outputText id="hdrDocEmpExt" value="#{mensaje['ext']}" />
+							<p:tooltip for="hdrDocEmpExt" value="#{mensaje['extension']}"
+								showEffect="fade" hideEffect="fade" position="top" showDelay="500" />
+						</f:facet>
+						<h:outputText value="#{docExp.extensionFichero}" />
+					</p:column>
+	
+            		<p:column selectionMode="multiple" style="width:16px;text-align:center"/>
+       			</p:dataTable>
+				</div>
+			</p:outputPanel>
+		</p:outputPanel>
+		
+		<p:outputPanel id="listadoSeleccionEmpujar" rendered="#{not empty bean.listaDocumentosEmpujar}" >
+			<ui:include src="listaDocumentosIncorporar.xhtml">
+				<ui:param name="dialog" value="dialogEmpujarDocs" />
+				<ui:param name="operacion" value="empujar" />
+<!-- 				<ui:param name="bean" value="#{bean}" /> -->
+				<ui:param name="listaDocumentos" value="#{bean.listaDocumentosEmpujar}" />
+				<ui:param name="listaTiposDocumentos" value="#{bean.listaTiposDocumentos}" />
+			</ui:include>
+		
+		</p:outputPanel>
+		
+		
+	    <div class="botonera-form" align="right">
+			<p:commandButton icon="pi pi-check"
+				rendered="#{bean.deshabilitarBusqueda and empty bean.listaDocumentosEmpujar and bean.lazyModelDocumentos.rowCount gt 0 }"
+				id="btnAplicarDocEmp" value="#{mensaje['aceptar.seleccion']}"
+				actionListener="#{bean.recogerDocumentosSeleccionados}"
+				oncomplete="if(args.valid) PF('dialogEmpujarDocs').show()"
+				>
+<!-- 				update="@form:panelActualizadoCabecera"> -->
+			</p:commandButton>
+			<p:commandButton icon="pi pi-check"
+				id="btnAceptarDocEmp" value="#{mensaje['aceptar']}"
+				rendered="#{bean.deshabilitarBusqueda and not empty bean.listaDocumentosEmpujar}"
+				actionListener="#{bean.finalizarEmpuje}"
+				oncomplete="if(args.saved){ PF('dialogEmpujarDocs').hide(); actualizar_documentos(); }" >
+			</p:commandButton>
+			<p:commandButton icon="pi pi-times" process="@this"
+				id="btnCancelarDocEmp" value="#{mensaje['cancelar']}"
+				oncomplete="PF('dialogEmpujarDocs').hide()" >
+				<p:confirm header="#{mensaje['confirmar.operacion']}"
+					message="#{mensaje['pregunta.confirma.cancelar']}"
+					icon="pi pi-info-circle" />
+			</p:commandButton>
+		</div>
+		
+			
+	</p:dialog>
+	
+</ui:composition>
+</html>

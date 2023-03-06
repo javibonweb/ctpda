@@ -1,0 +1,21 @@
+/**
+ * Basic typography style for copy text
+ */
+body {
+  color: $ui-fc-default;
+  /*font: normal 125% / 1.4 $text-font-stack;*/
+  font: normal 100% $ui-ff-default;
+}
+
+
+.texto-centrado {
+  text-align: center;
+}
+
+.texto-izquierda {
+  text-align: left;
+}
+
+.texto-derecha {
+  text-align: right;
+}

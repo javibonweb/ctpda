@@ -1,0 +1,211 @@
+@import '../abstracts/variables';
+
+// Para que el growl esté siempre encima y no lo tape la capa gris 
+//   del fondo al mostrar diálogos
+.ui-growl {
+    z-index: 9999 !important;
+}
+
+.status-div {
+	height: 49px; 
+	overflow: hidden;
+}
+
+// Para que al navegar por los meses el datepicker no cambie de tamaño 
+// y se muevan sus botones
+.ui-datepicker {
+	height: 16em;
+}
+
+
+/* 
+Para eliminar los bordes de los panelGrid. 
+Cuando la página se vuelve compleja salen muchos.
+Así queda la vista más limpia
+*/
+.ui-panelgrid {
+	/* valor que no sea 'collapse' */
+	border-collapse: unset;
+}
+
+.ui-panelgrid .ui-panelgrid-cell {
+	border-style: none;
+}
+
+//#
+.aviso {
+  background-color: #FFFBA1;
+  border: 1px solid tan;
+  border-radius: 3px;
+  padding: 15px;
+  margin: 0px;
+  color: brown;
+}
+
+.aviso span {
+  font-weight: bold;
+}
+
+.fila-reclamante-principal, .fila-reclamado-principal {
+	font-weight: bold;
+}
+
+
+// Iconos menu lateral
+
+@-webkit-keyframes efecto-menu-lateral {
+  to {
+    -webkit-transform: scale(1.3);
+    transform: scale(1.3);
+  }
+}
+@keyframes efecto-menu-lateral {
+  to {
+    -webkit-transform: scale(1.3);
+    transform: scale(1.3);
+  }
+}
+
+.efecto-menu-lateral {
+  display: inline-block;
+  vertical-align: middle;
+  /*-webkit-transform: perspective(1px) translateZ(0);
+  transform: perspective(1px) translateZ(0);*/
+  box-shadow: 0 0 1px transparent;
+  position: relative;
+}
+
+/*.efecto-menu-lateral:before {
+  position: absolute;
+  padding: 0 1px;
+  right: 0.5em;
+  font-family: FontAwesome;
+  / *-webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-transition-timing-function: ease-out;
+  transition-timing-function: ease-out;* /
+  font-weight: normal;
+  color: #2779aa;
+}*/
+
+/*.efecto-menu-lateral:hover:before {
+  -webkit-animation-name: efecto-menu-lateral;
+  animation-name: efecto-menu-lateral;
+  -webkit-animation-duration: 0.3s;
+  animation-duration: 0.3s;
+  -webkit-animation-timing-function: linear;
+  animation-timing-function: linear;
+  -webkit-animation-iteration-count: infinite;
+  animation-iteration-count: infinite;
+  -webkit-animation-direction: alternate;
+  animation-direction: alternate;
+}*/
+
+.menu-item-activo {
+	background-color: #87B09A; // #2779aa;
+}
+
+.icono-vinculado {
+	margin-right: .45em;
+	font-size: 1em; // como en .pi
+	/*font-weight: bold; */
+}
+
+//***********************************************************
+// Pastillas marcadoras
+
+@mixin pastilla-estado {
+	font-size: 80%;
+	font-weight: bold;
+	text-align:center;
+	
+	border-radius: 3px;
+	box-shadow: 0 0 1px transparent;
+	display: inline-block;
+	padding: 0.1em 0.4em;
+	margin-bottom: 0.15em;
+	width: 1em;
+}
+
+.pastilla-verde {
+	@include pastilla-estado;
+	background-color: lightgreen;
+}
+
+.pastilla-si {
+	@extend .pastilla-verde;
+	width: 2em;	
+}
+
+.pastilla-si:before {
+	content: 'Si';
+}
+
+.pastilla-roja {
+	@include pastilla-estado;
+	background-color: #ff7777;
+}
+
+.pastilla-no {
+	@extend .pastilla-roja;
+	width: 2em;	
+}
+
+.pastilla-no:before {
+	content: 'No';
+}
+
+/* Versión en negativo, cuando 'Si' es algo malo */
+
+.pastilla-si-neg {
+	@extend .pastilla-roja;
+	width: 2em;	
+}
+
+.pastilla-si-neg:before {
+	content: 'Si';
+}
+
+.pastilla-no-neg {
+	@extend .pastilla-verde;
+	width: 2em;	
+}
+
+.pastilla-no-neg:before {
+	content: 'No';
+}
+
+.pastilla-neutra {
+	@include pastilla-estado;
+	background-color: inherit;
+}
+
+
+//*********************************************
+
+
+@mixin marca-color {
+	height: 20px;
+	width: 20px;
+	border-radius: 50%;
+	display: inline-block;
+}
+
+.marca-tarea-urgente {
+	@include marca-color;
+	background-color: darkorange;
+}
+
+.marca-roja {
+	@include marca-color;
+	background-color: #ff7777;
+}
+
+.marca-verde {
+	@include marca-color;
+	background-color: lightgreen;
+}
+
+
+
+

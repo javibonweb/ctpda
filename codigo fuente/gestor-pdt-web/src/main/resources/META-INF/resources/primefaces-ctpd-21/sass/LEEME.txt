@@ -1,0 +1,61 @@
+PARA INCORPORAR LOS ESTILOS GENERADOS CON LA HERRAMIENTA DE JQUERY-UI:
+
+https://jqueryui.com/themeroller/
+------------------------------------------------------------------------
+
+Copiar los ficheros
+	jquery-ui.css
+	jquery-ui.structure.css
+	jquery-ui.theme.css
+
+pegarlos en /themes.
+
+
+IMPORTANTE:
+-------------
+Aunque se podrían parametrizar los _jquery-ui para utilizar las variables de la
+carpeta /abstracts es mejor evitar cambios en estos ficheros, a no ser que se sepa 
+seguro que no se va a volver a usar el generador de jquery-ui. En ese caso todos los
+cambios que hagamos se perderán al volver a incorporarlos. La alternativa es incorporar
+los cambios generados a mano, lo cual no es práctico.
+
+TODA LA PERSONALIZACIÓN QUE NO SE PUEDA HACER CON EL GENERADOR DE JQUERY-UI 
+SE DEBE HACER EN LOS .SCSS MANEJADOS POR _CUSTOM.
+
+
+Herramienta ui2sass
+-----------------------
+El generador de jquery-ui guarda los temas en una URL que se puede pegar en el navegador 
+cada vez que se necesite hacer algún cambio. El fichero UI2Sass.java contiene una utilidad
+para parsear esta URL y generar un conjunto de variables SASS que se pueden utilizar en
+los estilos custom. Estas variables se guardan en el fichero /abstracts/_ui-variables.scss.
+
+Para generar el fichero:
+
+Editar el fichero /ui2sass/ui2sass.properties con los datos que correspondan. La URL de 
+jquery-ui se puede tomar de la cabecera de los ficheros jquery-ui copiados.
+
+Abrir un cmd en la carpeta /ui2sass y ejecutar 
+
+ui2sass.bat
+
+Lo primero que hace es tomar los css antes copiados y renombrarlos como includes scss 
+(con el formato _jquery-ui.*.scss).
+
+Después, el script ejecuta "java UI2Sass.java", por lo que espera ser ejecutado siempre en su carpeta.
+Desde ahí el java usa la ruta "..\abstract\_ui-variables.scss" como destimo para volcar las 
+variables parseadas.
+
+Inicialmente se hace un split de la URL de jquery-ui por el carácter "&". Todo lo que entra en el primer 
+tramo encontrado (http://...?...) se desecha. Esto incluye una de las variables, "scope", 
+que no se usa aquí.
+
+Por último, se cargan los _jquery-ui antes renombrados y se sustituyen las referencias a las 
+imágenes del tema por urls a resources jsf. 
+
+NOTA: Las expresiones #{resource[...]} de jsf no funcionan desde el themes.css del tema jsf (sí lo hacen desde un css fuera del tema), 
+por eso aplicamos la url resuelta.
+
+
+
+

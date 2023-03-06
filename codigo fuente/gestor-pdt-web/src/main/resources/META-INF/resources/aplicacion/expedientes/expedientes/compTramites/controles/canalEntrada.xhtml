@@ -1,0 +1,34 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:c="http://java.sun.com/jstl/core"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:sec="https://joinfaces.org/security"
+    xmlns:fu="http://joinfaces.org/functions">
+<ui:composition>
+
+					<div class="celda-form">
+						<p:outputLabel rendered="#{tramExp.cfgMetadatosTram != null}" for="comboCanalEntrada" value="#{tramExp.cfgMetadatosTram.canalEntrada}" />
+						<p:outputLabel rendered="#{tramExp.cfgMetadatosTram == null}" for="comboCanalEntrada" value="#{mensaje['etiqueta.pendiente.definir']}" />
+						<p:selectOneMenu id="comboCanalEntrada" disabled="#{!editable}"
+							value="#{tramExp.selectedNuevoCanalEntradaId}">
+							<f:selectItem itemLabel="#{mensaje['seleccione.una.opcion']}"
+							itemValue="#{null}"/>
+							<f:selectItems
+								value="#{datosTramiteExpedienteBean.listaValoresDominioCanalEntrada}"
+								var="canalEntradaList" itemLabel="#{canalEntradaList.descripcion}"
+								widgetVar="comboCanalEntrada" itemValue="#{canalEntradaList.id}" />
+						</p:selectOneMenu>
+					</div>
+					<div class="celda-form">
+						<p:outputLabel rendered="#{tramExp.cfgMetadatosTram != null}" for="datosCanalEntrada" value="#{tramExp.cfgMetadatosTram.identificacionEntrada}" />
+						<p:outputLabel rendered="#{tramExp.cfgMetadatosTram == null}" for="datosCanalEntrada" value="#{mensaje['etiqueta.pendiente.definir']}" />
+						<p:inputText id="datosCanalEntrada" maxlength="40" size="40"
+							value="#{tramExp.detalleExpdteTram.identifEntrada}"
+							disabled="#{!editable}" />
+					</div>
+
+</ui:composition>
+</html>

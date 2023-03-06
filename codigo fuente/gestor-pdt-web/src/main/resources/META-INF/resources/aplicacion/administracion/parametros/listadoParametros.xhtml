@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:sec="https://joinfaces.org/security">
+
+<ui:composition
+	template="#{navegacionBean.get('TEMPLATE_LAYOUT_GENERICO')}">
+
+	<ui:define name="content">
+		<h:form id="formListadoParametros">
+
+			<p:messages for="messagesListado" id="messagesListado"
+				showDetail="true" closable="true">
+				<p:autoUpdate />
+			</p:messages>
+
+			<p:panel header="#{mensaje['gestion.parametros']}">
+			<!-- PANEL FILTRO DE BUSQUEDA DE PARAMETROS -->
+			<p:fieldset legend="#{mensaje['filtros.busqueda']}" id="bloqueFiltroBusqueda" toggleable="true" toggleSpeed="250">       		
+				<div>
+						<div class="celda-form">
+							<p:outputLabel for="campo_filtro" value="#{mensaje['campo']}" />
+							<p:inputText id="campo_filtro" maxlength="50" size="30"
+								value="#{parametroBean.campoFiltro}" />
+						</div>
+						<div class="celda-form">
+							<p:outputLabel for="valor_filtro" value="#{mensaje['valor']}" />
+							<p:inputText id="valor_filtro" maxlength="250" size="30"
+								value="#{parametroBean.valorFiltro}" />
+						</div>
+						<div class="celda-form">
+							<p:outputLabel for="descripcion_filtro"
+								value="#{mensaje['descripcion']}" />
+							<p:inputText id="descripcion_filtro" maxlength="250" size="30"
+								value="#{parametroBean.descripcionFiltro}" />
+						</div>
+						<div class="celda-form">
+							<p:outputLabel for="activo_filtro" value="#{mensaje['activo']}" />
+							<p:selectBooleanCheckbox id="activo_filtro" value="#{parametroBean.activoFiltro}" itemLabel="#{mensaje['si']}" />
+						</div>
+					</div>
+
+					<div class="botonera-form">
+							<p:commandButton id="nuevoParametro" icon="pi pi-plus"
+								value="#{mensaje['nuevo.parametro']}"
+								rendered="#{parametroBean.permisoNewParam == true}"
+								actionListener="#{parametroBean.accesoFormularioAlta()}"
+								update="formListadoParametros:tablaParametros,formDialogParametros,dialogParametro" />
+							<p:commandButton id="filtrar" value="#{mensaje['filtrar']}" icon="pi pi-filter"
+								update="formListadoParametros:campo_filtro,formListadoParametros:valor_filtro,formListadoParametros:descripcion_filtro,formListadoParametros:activo_filtro,formListadoParametros:tablaParametros" 
+								onstart="PF('parametroWV').paginator.setPage(0);"/>
+							<p:commandButton id="limpiarFiltro" icon="pi pi-filter-slash"
+								value="#{mensaje['limpiar.filtro']}"
+								actionListener="#{parametroBean.limpiarFiltro()}"
+								update="formListadoParametros:campo_filtro,formListadoParametros:valor_filtro,formListadoParametros:descripcion_filtro,formListadoParametros:activo_filtro,formListadoParametros:tablaParametros" 
+								onstart="PF('parametroWV').paginator.setPage(0);"/>
+					</div>
+			</p:fieldset>
+
+			<!-- PANEL CON LOS RESULTADOS DE BUSQUEDA -->
+			<p:outputPanel id="panelResultadosBusqueda">
+				<p:dataTable var="parametro" id="tablaParametros"
+					value="#{parametroBean.lazyModel}" paginator="true"
+					paginatorTemplate=" {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+					rowsPerPageTemplate="10,20,50,100" rows="10"
+					currentPageReportTemplate="#{mensaje['paginador.template']}"
+					selectionMode="single" sortBy="#{parametro.campo}"
+					sortOrder="ascending"
+					selection="#{parametroBean.selectedParametro}"
+					rowKey="#{parametro.id}"
+					paginatorPosition="bottom"
+					widgetVar="parametroWV"> 
+					
+					<p:ajax event="rowDblselect" listener="#{parametroBean.accesoRapido}" 
+				        update="formDialogParametros,dialogParametro"
+				        global="false" oncomplete="PF('dialogParametro').show()" />
+					
+					<p:column headerText="#{mensaje['campo']}" sortBy="#{parametro.campo}">
+               			<h:outputText value="#{parametro.campo}"/>
+					</p:column>
+
+					<p:column headerText="#{mensaje['valor']}"
+						sortBy="#{parametro.valor}">
+						<h:outputText value="#{parametro.valor}" />
+					</p:column>
+
+					<p:column headerText="#{mensaje['descripcion']}"
+						sortBy="#{parametro.descripcion}">
+						<h:outputText value="#{parametro.descripcion}" />
+					</p:column>
+
+					<p:column headerText="#{mensaje['activo']}" width="65" styleClass="texto-centrado"
+						sortBy="#{parametro.activa}">
+						<span class="pastilla-#{parametro.activa? 'si':'no'}" />
+					</p:column>
+
+					<p:column headerText="#{mensaje['acciones']}" width="85">
+						<p:commandButton id="consultarParametro" icon="pi pi-eye"
+							rendered="#{parametroBean.permisoConsParam == true}"
+							actionListener="#{parametroBean.modoAccesoFormulario(parametro,'consulta')}"
+							update="formDialogParametros,dialogParametro" />
+						<p:commandButton id="editarParametro" icon="pi pi-pencil"
+							actionListener="#{parametroBean.modoAccesoFormulario(parametro,'editar')}"
+							rendered="#{parametro.activa and parametroBean.permisoEditParam == true}"
+							update="formDialogParametros,dialogParametro" />
+						<p:commandButton id="eliminarParametro" icon="pi pi-times"
+							rendered="#{parametro.activa and parametroBean.permisoDesacParam == true}"
+							actionListener="#{parametroBean.eliminarParametro(parametro)}"
+							update="formListadoParametros:tablaParametros,formListadoParametros">
+							<p:confirm header="#{mensaje['confirmar.operacion']}"
+								message="#{mensaje['pregunta.confirma.eliminar']}"
+								icon="pi pi-info-circle" />
+						</p:commandButton>
+						<p:commandButton id="activarParametro" icon="pi pi-check"
+							rendered="#{!parametro.activa  and parametroBean.permisoActParam == true}"
+							actionListener="#{parametroBean.activarParametro(parametro)}"
+							update="formListadoParametros:tablaParametros,formListadoParametros">
+							<p:confirm header="#{mensaje['confirmar.operacion']}"
+								message="#{mensaje['pregunta.confirma.activar']}"
+								icon="pi pi-info-circle" />
+						</p:commandButton>
+
+						<p:confirmDialog global="true" showEffect="fade" hideEffect="fade"
+							responsive="true">
+							<div class="botonera-form" align="right">
+								<p:commandButton value="#{mensaje['si']}" type="button" styleClass="ui-confirmdialog-yes" />
+								<p:commandButton value="#{mensaje['no']}" type="button" styleClass="ui-confirmdialog-no ui-button-flat" />
+							</div>							
+						</p:confirmDialog>
+					</p:column>
+				</p:dataTable>
+			</p:outputPanel>
+		</p:panel>
+
+    <br/>
+		<p:commandButton id="volver" value="#{mensaje['volver']}"
+			actionListener="#{volverBean.migaPanVolver()}"
+			oncomplete="document.location.href='#{request.contextPath}/aplicacion/bienvenido.xhtml'">
+		</p:commandButton>    
+        
+		</h:form>
+
+
+		<!-- dialogo parametros -->
+		<p:dialog id="dialogParametro"
+			header="#{parametroBean.cabeceraDialogo}" widgetVar="dialogParametro">
+			<h:form id="formDialogParametros">
+
+				<p:messages for="messagesFormulario" id="messagesFormulario"
+					showDetail="true" closable="true">
+					<p:autoUpdate />
+				</p:messages>
+				
+				<p:outputPanel id="panelEditarParametroByForm" rendered="#{parametroBean.parametro.activa and parametroBean.permisoEditParam == true and parametroBean.modoAccesoConsulta}">
+					<div class="botonera-form" align="right">
+						<p:commandButton id="editarParametroByForm" widgetVar="editarParametroByForm" icon="pi pi-pencil"
+							actionListener="#{parametroBean.modoAccesoFormulario(parametroBean.parametro,'editar')}"
+							update="formDialogParametros,dialogParametro">
+						</p:commandButton>
+					</div>				
+				</p:outputPanel>	
+
+				<div>
+						<div class="celda-form">
+							<p:outputLabel rendered="#{!parametroBean.modoAccesoConsulta}"
+								for="campo" value="#{mensaje['campo']} *" />
+							<p:outputLabel rendered="#{parametroBean.modoAccesoConsulta or parametroBean.modoAccesoEditar}"
+								for="campo" value="#{mensaje['campo']}" />
+							<p:inputText id="campo" maxlength="50" size="30"
+								value="#{parametroBean.parametro.campo}"
+								disabled="#{parametroBean.modoAccesoConsulta or parametroBean.modoAccesoEditar}" />
+						</div>
+						<div class="celda-form">
+							<p:outputLabel rendered="#{!parametroBean.modoAccesoConsulta}"
+								for="valor" value="#{mensaje['valor']} *" />
+							<p:outputLabel rendered="#{parametroBean.modoAccesoConsulta}"
+								for="valor" value="#{mensaje['valor']} " />
+							<p:inputText id="valor" maxlength="250" size="30"
+								value="#{parametroBean.parametro.valor}"
+								disabled="#{parametroBean.modoAccesoConsulta}" />
+						</div>
+				</div>
+				<div>
+						<div class="celda-form">
+							<p:outputLabel rendered="#{!parametroBean.modoAccesoConsulta}"
+								for="descripcion" value="#{mensaje['descripcion']} *" />
+							<p:outputLabel rendered="#{parametroBean.modoAccesoConsulta}"
+								for="descripcion" value="#{mensaje['descripcion']}" />
+							<p:inputText id="descripcion" maxlength="250" size="69"
+								value="#{parametroBean.parametro.descripcion}"
+								disabled="#{parametroBean.modoAccesoConsulta}" />
+						</div>
+				</div>
+
+				<div class="botonera-form" align="right">
+						<p:commandButton rendered="#{!parametroBean.modoAccesoConsulta and parametroBean.permisoSaveParam == true}" icon="pi pi-save"
+							id="guardarParametro" value="#{mensaje['guardar']}"
+							actionListener="#{parametroBean.guardarParametro()}"
+							update="formListadoParametros:tablaParametros,formDialogParametros" />
+						<p:commandButton id="cancelarTipoAgrupacion"
+							value="#{mensaje['cancelar']}" icon="pi pi-times"
+							onclick="document.location.href='#{request.contextPath}/aplicacion/administracion/parametros/listadoParametros.jsf'"
+              				rendered="#{!parametroBean.modoAccesoConsulta}" > 
+							<p:confirm header="#{mensaje['confirmar.operacion']}" 
+								message="#{mensaje['pregunta.confirma.cancelar']}"
+								icon="pi pi-info-circle" />
+						</p:commandButton>
+						<p:confirmDialog global="true" showEffect="fade"
+							hideEffect="fade" responsive="true" >
+							<div class="botonera-form" align="right">
+								<p:commandButton value="#{mensaje['si']}" type="button"
+								styleClass="ui-confirmdialog-yes" />
+								<p:commandButton value="#{mensaje['no']}" type="button"
+								styleClass="ui-confirmdialog-no ui-button-flat" />
+							</div>									
+						</p:confirmDialog>
+				</div>
+
+			</h:form>
+		</p:dialog>
+
+	</ui:define>
+
+</ui:composition>
+
+</html>

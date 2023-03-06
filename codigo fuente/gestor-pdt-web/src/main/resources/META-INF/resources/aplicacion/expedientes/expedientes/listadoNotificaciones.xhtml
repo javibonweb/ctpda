@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:c="http://java.sun.com/jstl/core"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:sec="https://joinfaces.org/security"
+	xmlns:fu="http://joinfaces.org/functions">
+
+<ui:composition>
+
+	<c:set var="ancho_sn" value="25" />
+	
+			<p:dataTable var="notifExp" id="#{id}" widgetVar="#{id}" styleClass="#{css_class}"
+				value="#{value}" paginator="true" 
+				paginatorTemplate=" {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+				rowsPerPageTemplate="5,10,20,50,100" rows="#{es_listado_tramite? '10' : '20'}"
+				currentPageReportTemplate="#{mensaje['paginador.template']}"
+				draggableRows="#{not es_listado_tramite}"
+				paginatorAlwaysVisible="false"
+				sortBy="#{sortBy}" sortOrder="ascending"
+				rowKey="#{notifExp.id}" paginatorPosition="bottom" >
+
+				<p:column headerText="#{mensaje['fecha.inicio']}">
+					<h:outputText value="#{notifExp.fechaIni}" >
+						<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+					</h:outputText>
+				</p:column>
+				<p:column headerText="#{mensaje['tipo']}">
+					<h:outputText value="#{fu:ptoSusp(notifExp.descTramExp)}" />
+				</p:column>
+				<p:column headerText="#{mensaje['tipo.interv']}">
+					<h:outputText value="#{fu:ptoSusp(notifExp.detExpTram.valorTipoInteresado.descripcion)}" />
+				</p:column>
+				<p:column headerText="#{mensaje['interviniente']}" width="10%">
+					<h:outputText value="#{notifExp.detExpTram.getInterviniente()}" />
+				</p:column>
+				<p:column headerText="#{mensaje['medio.remision']}">
+					<h:outputText value="#{fu:ptoSusp(notifExp.detExpTram.valorCanalSalida.descripcion)}" />
+				</p:column>
+				<p:column headerText="#{mensaje['fecha.envio']}">
+					<h:outputText value="#{notifExp.detExpTram.fechaEnvio}" >
+						<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+					</h:outputText>
+				</p:column>
+				<p:column headerText="#{mensaje['fecha.notif']}">
+					<h:outputText value="#{notifExp.detExpTram.fechaNotificacion}" >
+						<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+					</h:outputText>
+				</p:column>	
+				<p:column headerText="#{mensaje['resultado']}">
+					<h:outputText value="#{fu:ptoSusp(notifExp.detExpTram.valorResultadoNotificacion.descripcion)}" />
+				</p:column>
+				<p:column headerText="#{mensaje['situacion']}">
+					<h:outputText value="#{notifExp.getSituacionNotCom()}" />
+				</p:column>				
+							
+				<p:column headerText="#{mensaje['acuse.recibo']}"
+						sortBy="#{notifExp.detExpTram.acuseRecibo}">
+						<h:outputText value="#{mensaje['no']}"
+							rendered="#{notifExp.detExpTram.acuseRecibo == false}" />
+						<h:outputText value="#{mensaje['si']}"
+							rendered="#{notifExp.detExpTram.acuseRecibo == true}" />
+					</p:column>								
+				
+			</p:dataTable>
+		
+</ui:composition>
+</html>

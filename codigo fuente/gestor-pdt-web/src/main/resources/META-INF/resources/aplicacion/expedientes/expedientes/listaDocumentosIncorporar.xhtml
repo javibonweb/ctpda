@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:c="http://java.sun.com/jstl/core"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:sec="https://joinfaces.org/security"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:of="http://omnifaces.org/ui"
+    xmlns:fu="http://joinfaces.org/functions">
+
+<ui:composition>
+
+
+				<p:outputPanel id="panelListaNuevosDocs_#{operacion}" style="max-height:700px; width: 1315px; overflow-y:scroll; position: sticky">
+
+					<ui:repeat value="#{listaDocumentos}" var="doc" varStatus="estado">
+					
+			            <p:fieldset legend="Documento #{estado.index + 1}: #{doc.nombreFichero}"
+			            	toggleable="true" toggleSpeed="250" >
+			            	<div style="float:left">
+			            	<!-- 
+			            	Para obtener la ruta padre:			            	
+				            	form:tab:comp
+				            	@namingcontainer -> form:tab
+				            	form:tab:0:comp
+				            	@namingcontainer:@namingcontainer -> form:tab
+				            	
+				            @parent da el componente padre, no el contenedor jsf
+			            	-->
+								<p:commandButton icon="pi pi-times"
+									id="btnRetirarDocumento" 
+									actionListener="#{bean.retirarDocumento(estado.index)}"
+									update="@namingcontainer:@namingcontainer:#{dialog}"
+									oncomplete="PF('#{dialog}').show()" >
+								</p:commandButton>
+			            	</div>
+			            	
+			            	<div style="float:right; width: 93%">
+				            	<div class="celda-form">
+									<p:outputLabel for="comboTipoDocumento"
+										value="#{mensaje['tipo.documento']} *" />
+									<p:selectOneMenu id="comboTipoDocumento" disabled="#{operacion != 'incorporar'}"
+										value="#{doc.cfgDocExpTramitacionId}" >
+										<f:selectItem itemLabel="Seleccione un tipo de documento"
+											itemValue="#{null}" />
+										<f:selectItems
+											value="#{listaTiposDocumentos}"
+											var="t" itemLabel="#{t.descripcionTipoDoc}" itemValue="#{t.id}" />
+										<p:ajax process="@namingcontainer:@namingcontainer:panelListaNuevosDocs_#{operacion}" 
+											listener="#{bean.onSelectTipoDoc(doc)}" update="@(.controles-descripcion-#{operacion})" />
+									</p:selectOneMenu>
+								</div>
+								
+
+				             	<p:outputPanel class="celda-form controles-descripcion-#{operacion}">
+									<p:outputLabel for="descDocumento"
+										value="#{mensaje['descripcion']} *" />
+									<p:outputPanel class="#{ (operacion == 'vincular' or empty doc.listaCfgDescripcionesTipoDoc)? '' : 'ui-inputgroup' }">
+										<p:inputText id="descDocumento" value="#{doc.descripcion}" size="70" maxlength="255"  disabled="#{operacion != 'incorporar'}"/>
+										<p:commandButton id="btnSelectDesc_#{operacion}" icon="pi pi-search" rendered="#{operacion != 'vincular'}"
+											style="#{not empty doc.listaCfgDescripcionesTipoDoc? 'visibility:visible;margin-right:0px' : 'visibility:hidden;margin-right:3px'}"
+											action="#{bean.onAbrirDialogoDescripcion(doc)}"
+											update="@namingcontainer:@namingcontainer:dialogDescripcionDocDefecto_#{operacion}" 
+											process="@namingcontainer:@namingcontainer:panelListaNuevosDocs_#{operacion}"
+											oncomplete="PF('dialogDescripcionDocDefecto_#{operacion}').show()" >
+										</p:commandButton>
+										<p:tooltip for="btnSelectDesc_#{operacion}" value="#{mensaje['elegir.descripcion.defecto']}"
+											showEffect="fade" hideEffect="fade" position="top" showDelay="500" />
+				 					</p:outputPanel>
+				 				</p:outputPanel>
+				 				
+				            	<p:outputPanel class="celda-form controles-descripcion-#{operacion}">
+									<p:outputLabel for="descAbrevDocumento"
+										value="#{mensaje['descripcion.abreviada']}" />
+										<p:inputText id="descAbrevDocumento" disabled="#{operacion != 'incorporar'}"
+											value="#{doc.descripcionAbrev}" size="25" maxlength="100" />
+				 				</p:outputPanel>
+
+								
+								<div>
+									
+				             	<p:outputPanel class="celda-form controles-descripcion-#{operacion}">
+									<p:outputLabel for="comboCategoriaDocumento"
+										value="#{mensaje['categoria']} *" />
+									<p:selectOneMenu id="comboCategoriaDocumento" value="#{doc.categoriaId}" style="width: 20em" disabled="#{operacion != 'incorporar'}">
+										<f:selectItem itemLabel="Seleccione una categoría de documento"
+											itemValue="#{null}" />
+										<f:selectItems value="#{bean.listaCategoriasDocumentos}"
+											var="c" itemLabel="#{c.descripcion}" itemValue="#{c.id}" />
+									</p:selectOneMenu>
+								</p:outputPanel>
+								
+								<div class="celda-form">
+									<p:commandButton id="verDocGen" icon="pi pi-eye" style="margin-bottom: 2px"
+										ajax="true" process="@this"
+										action="#{bean.vistaPreviaFichero(doc)}"
+										oncomplete="if(args.ok) PF_mostrar_visor_pdf_#{operacion}_#{estado.index}() ">
+									</p:commandButton>
+							
+									<p:remoteCommand name="PF_mostrar_visor_pdf_#{operacion}_#{estado.index}" action="#{vistaPreviaDocumentosBean.cargarUrl(doc)}"
+										process="@this" />
+					
+								</div>
+								</div>
+
+				 				<p:outputPanel class="controles-descripcion-#{operacion}">
+				 				<div class="celda-form">
+				 					<p:selectBooleanCheckbox id="docSellado"            value="#{doc.sellado}"            itemLabel="#{mensaje['origen.externo']}"      disabled="#{operacion != 'incorporar'}" />
+				 					<p:selectBooleanCheckbox id="docFirmado"            value="#{doc.firmado}"            itemLabel="#{mensaje['firmado']}"             disabled="#{operacion != 'incorporar'}" />
+				 					<p:selectBooleanCheckbox id="docAnonimizado"        value="#{doc.anonimizado}"        itemLabel="#{mensaje['anonimizado']}"         disabled="#{operacion != 'incorporar'}" />
+				 					<p:selectBooleanCheckbox id="docAnonimizadoParcial" value="#{doc.anonimizadoParcial}" itemLabel="#{mensaje['documento.sensible']}" 	disabled="#{operacion != 'incorporar'}" />
+				 					<p:selectBooleanCheckbox id="docEditable"           value="#{doc.editable}"           itemLabel="#{mensaje['editable']}"            disabled="#{operacion != 'incorporar'}" />
+								</div>
+				 				</p:outputPanel>
+				 			</div>
+		 			      
+			    
+						</p:fieldset>
+					</ui:repeat>
+				</p:outputPanel>
+
+</ui:composition>
+</html>

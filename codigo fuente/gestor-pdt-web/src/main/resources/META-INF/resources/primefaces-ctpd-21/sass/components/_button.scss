@@ -1,0 +1,32 @@
+// -----------------------------------------------------------------------------
+// This file contains all styles related to the button component.
+// -----------------------------------------------------------------------------
+
+/*.ui-button-text-only .ui-button-text {
+    padding: 0.25em 1em;
+}*/
+
+//Para centrar un poco mejor el icono
+.ui-button-icon-only .ui-icon, 
+.ui-button-text-icon-left .ui-icon, 
+.ui-button-text-icon-right .ui-icon {
+	margin-top: -8px !important;
+}
+
+.ui-button-icon-only {
+	width:  1.6em !important;
+	height: 1.6em;
+	
+}
+
+.pi {
+	line-height: 1.2em !important;
+}
+
+.botonera-form {
+	margin-top: 10px;
+}
+
+.pi {
+	font-size: 85%;
+}

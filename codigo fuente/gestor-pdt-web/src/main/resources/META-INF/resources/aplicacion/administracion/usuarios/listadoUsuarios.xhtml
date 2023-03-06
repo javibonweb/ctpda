@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:sec="https://joinfaces.org/security">
+
+<ui:composition
+	template="#{navegacionBean.get('TEMPLATE_LAYOUT_GENERICO')}">
+
+	<ui:define name="content">
+		
+		<script>
+			function clickBotonFila(tablaId, id , elemId){
+				$("div[id='" + tablaId+"'] "       //tabla (id jsf completo)
+					+ "tr[data-rk='" + id + "'] "  //fila (id = rowkey del datatable)
+					+ "[id$=':" + elemId+ "']")    //botón (solo la terminación del id jsf)
+					.click();
+			}
+		</script>  
+	
+		<h:form id="formListadoUsuarios">
+
+			<p:messages for="messagesListado" id="messagesListado"
+				showDetail="true" closable="true">
+				<p:autoUpdate />
+			</p:messages>
+
+			<p:panel header="#{mensaje['gestion.usuarios']}">
+
+				<!-- PANEL FILTRO DE BUSQUEDA DE USUARIOS -->
+				<p:fieldset legend="#{mensaje['filtros.busqueda']}"
+					id="bloqueFiltroBusqueda" toggleable="true" toggleSpeed="250">
+					<div>
+						<div class="celda-form">
+							<p:outputLabel for="nombre_filtro" value="#{mensaje['nombre']}" />
+							<p:inputText id="nombre_filtro" maxlength="100" size="30"
+								value="#{usuariosBean.nombreFiltro}" />
+						</div>
+						<div class="celda-form">
+							<p:outputLabel for="primerApellido_filtro"
+								value="#{mensaje['primer.apellido']}" />
+							<p:inputText id="primerApellido_filtro" maxlength="100" size="30"
+								value="#{usuariosBean.primerApellidoFiltro}" />
+						</div>
+						<div class="celda-form">
+							<p:outputLabel for="segundoApellido_filtro"
+								value="#{mensaje['segundo.apellido']}" />
+							<p:inputText id="segundoApellido_filtro" maxlength="100"
+								size="30" value="#{usuariosBean.segundoApellidoFiltro}" />
+						</div>
+						<div class="celda-form">
+							<p:outputLabel for="identificador_filtro"
+								value="#{mensaje['identificador']}" />
+							<p:inputText id="identificador_filtro" maxlength="9" size="15"
+								value="#{usuariosBean.identificadorFiltro}" />
+						</div>
+						<div class="celda-form">
+							<p:outputLabel for="login_filtro" value="#{mensaje['login']}" />
+							<p:inputText id="login_filtro" maxlength="9" size="15"
+								value="#{usuariosBean.loginFiltro}" />
+						</div>
+
+						<div class="celda-form">
+
+							<p:outputPanel styleClass="celda-form">
+								<p:outputLabel for="activo_filtro" value="#{mensaje['activo']}" />
+								<p:selectBooleanCheckbox id="activo_filtro"
+									value="#{usuariosBean.activoFiltro}"
+									itemLabel="#{mensaje['si']}" />
+							</p:outputPanel>
+						</div>
+
+						<div class="botonera-form">
+							<p:commandButton id="nuevoUsuario" icon="pi pi-plus"
+								value="#{mensaje['nuevo.usuario']}"
+								action="#{usuariosBean.onCrear}"
+								rendered="#{usuariosBean.permisoNewUsu == true}" />
+							<p:commandButton id="filtrar" value="#{mensaje['filtrar']}"
+								icon="pi pi-filter"
+								update="formListadoUsuarios:nombre_filtro,formListadoUsuarios:primerApellido_filtro,formListadoUsuarios:segundoApellido_filtro,formListadoUsuarios:identificador_filtro,formListadoUsuarios:login_filtro,formListadoUsuarios:activo_filtro,formListadoUsuarios:tablaUsuario"
+								onstart="PF('usuarioWV').paginator.setPage(0);" />
+							<p:commandButton id="limpiarFiltro" icon="pi pi-filter-slash"
+								value="#{mensaje['limpiar.filtro']}"
+								actionListener="#{usuariosBean.limpiarFiltro()}"
+								update="formListadoUsuarios:nombre_filtro,formListadoUsuarios:primerApellido_filtro,formListadoUsuarios:segundoApellido_filtro,formListadoUsuarios:identificador_filtro,formListadoUsuarios:login_filtro,formListadoUsuarios:activo_filtro,formListadoUsuarios:tablaUsuario"
+								onstart="PF('usuarioWV').paginator.setPage(0);" />
+						</div>
+					</div>
+				</p:fieldset>
+
+				<!-- PANEL CON LOS RESULTADOS DE BUSQUEDA -->
+				<p:outputPanel id="panelResultadosBusqueda">
+					<p:dataTable var="usuario" id="tablaUsuario"
+						value="#{usuariosBean.lazyModel}" paginator="true"
+						paginatorTemplate=" {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+						rowsPerPageTemplate="10,20,50,100" rows="10"
+						currentPageReportTemplate="#{mensaje['paginador.template']}"
+						selectionMode="single" sortBy="#{usuariosBean.defaultOrden}"
+						sortOrder="ascending" selection="#{usuariosBean.selectedUsuario}"
+						rowKey="#{usuario.id}" paginatorPosition="bottom"
+						widgetVar="usuarioWV">
+
+						<p:ajax event="rowDblselect" listener="#{usuariosBean.onUserRowDblClkSelect}" global="false" 
+							oncomplete="clickBotonFila(this.source, args.id, 'consultarUsuario');" />
+
+						<p:column headerText="#{mensaje['nombre']}"
+							sortBy="#{usuario.nombre}">
+							<h:outputText value="#{usuario.nombre}" />
+						</p:column>
+
+						<p:column headerText="#{mensaje['primer.apellido']}"
+							sortBy="#{usuario.primerApellido}">
+							<h:outputText value="#{usuario.primerApellido}" />
+						</p:column>
+
+						<p:column headerText="#{mensaje['segundo.apellido']}"
+							sortBy="#{usuario.segundoApellido}">
+							<h:outputText value="#{usuario.segundoApellido}" />
+						</p:column>
+
+						<p:column headerText="#{mensaje['identificador']}"
+							sortBy="#{usuario.identificador}">
+							<h:outputText value="#{usuario.identificador}" />
+						</p:column>
+
+						<p:column headerText="#{mensaje['login']}"
+							sortBy="#{usuario.login}">
+							<h:outputText value="#{usuario.login}" />
+						</p:column>
+
+
+						<p:column headerText="#{mensaje['acciones']}">
+							<p:commandButton id="consultarUsuario" icon="pi pi-eye"
+								action="#{usuariosBean.onConsulta(usuario.id)}" immediate="true"
+								rendered="#{usuariosBean.permisoConsUsu == true}">
+							</p:commandButton>
+
+							<p:commandButton id="edicionUsuario" widgetVar="edicionUsuario"
+								icon="pi pi-pencil" action="#{usuariosBean.onEdita(usuario.id)}"
+								immediate="true"
+								rendered="#{usuariosBean.permisoEditUsu == true}">
+							</p:commandButton>
+
+
+							<p:commandButton id="eliminarUsuario" icon="pi pi-times"
+								rendered="#{usuario.activa and usuariosBean.permisoDesacUsu == true}"
+								actionListener="#{usuariosBean.eliminarUsuario(usuario)}"
+								update="formListadoUsuarios:tablaUsuario,formListadoUsuarios">
+								<p:confirm header="#{mensaje['confirmar.operacion']}"
+									message="#{mensaje['pregunta.confirma.eliminar']}"
+									icon="pi pi-info-circle" />
+							</p:commandButton>
+							<p:commandButton id="activarUsuario" icon="pi pi-check"
+								rendered="#{!usuario.activa and usuariosBean.permisoActUsu == true}"
+								actionListener="#{usuariosBean.activarUsuario(usuario)}"
+								update="formListadoUsuarios:tablaUsuario,formListadoUsuarios">
+								<p:confirm header="#{mensaje['confirmar.operacion']}"
+									message="#{mensaje['pregunta.confirma.activar']}"
+									icon="pi pi-info-circle" />
+							</p:commandButton>
+							<p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true">
+								<div class="botonera-form" align="right">
+									<p:commandButton value="#{mensaje['si']}" type="button" styleClass="ui-confirmdialog-yes" />
+									<p:commandButton value="#{mensaje['no']}" type="button" styleClass="ui-confirmdialog-no ui-button-flat" />
+								</div>								
+							</p:confirmDialog>
+						</p:column>
+					</p:dataTable>
+				</p:outputPanel>
+
+			</p:panel>
+			
+			<br/>
+			<p:commandButton id="volver" value="#{mensaje['volver']}"
+				actionListener="#{volverBean.migaPanVolver()}"
+				oncomplete="document.location.href='#{request.contextPath}/aplicacion/bienvenido.xhtml'">
+			</p:commandButton>
+
+		</h:form>
+
+
+	</ui:define>
+
+
+</ui:composition>
+</html>

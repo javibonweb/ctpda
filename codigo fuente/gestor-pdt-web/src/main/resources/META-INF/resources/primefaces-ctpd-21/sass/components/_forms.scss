@@ -1,0 +1,133 @@
+@import '../abstracts/variables';
+@import '../abstracts/functions';
+
+
+
+.celda-form {
+	display: inline-block;
+	vertical-align: bottom;
+	padding: 0.3em;
+	margin-right: 10px;
+}
+
+.celda-form:last-child {
+	margin-right: 0px;
+}
+
+.celda-form .ui-outputlabel {
+	display: block;
+	margin-bottom: 0.1em;
+}
+
+.celda-form-block {
+	@extend .celda-form;
+	display: block;
+}
+
+.celda-form-block .ui-outputlabel{
+	display: block;
+	margin-bottom: 0.1em;
+}
+
+.celda-form-inline {
+	@extend .celda-form;
+}
+
+.celda-form-inline .ui-outputlabel{
+	display: inline-block;
+	margin-top: 0.4em;
+	margin-right: 0.25em;
+}
+
+
+
+.nota-campo-form {
+	margin-left: 0.1em;
+	margin-top: 0.1em;
+	font-size: 90%;
+	font-style: italic;
+}
+
+.contador-char {
+	@extend .nota-campo-form
+}
+
+
+//------------------
+
+body .ui-fieldset .ui-fieldset-legend {
+    padding: 0.2em 1em; // !important;
+	font-weight: normal;
+}
+
+body .ui-fieldset {
+	padding-top: .5em; // !important;
+	margin-bottom: 10px; // !important;
+	border: 1px solid #87B09A;
+	//background: rgb(177,206,191);
+	/*background: linear-gradient(180deg,
+		rgba(192,223,207,1) 0%, 
+		rgba(177,206,191,1) 10%, 
+		rgba(177,206,191,1) 90%, 
+		rgba(192,223,207,1) 100%);*/
+	-webkit-box-shadow: 2px 2px 5px 0px rgba(0,0,0,0.5); 
+	box-shadow: 2px 2px 5px 0px rgba(0,0,0,0.5); 
+	
+}
+
+/* -------- Estilos para campos activos        ------ */
+
+.ui-inputfield.ui-state-default,
+.ui-selectonemenu-label {
+	color: $ui-fc-content;
+}
+
+/* -------- Estilos para campos deshabilitados ------ */
+.ui-state-disabled, .ui-widget-content .ui-state-disabled, .ui-widget-header .ui-state-disabled {
+    color: $color-texto-campo-disabled;
+}
+
+/* Estilo select deshabilitados */
+.ui-state-disabled .ui-selectonemenu-label {
+	background-color: $color-fondo-campo-disabled;
+}
+
+/* Estilo checkbox deshabilitados */
+.ui-selectbooleancheckbox .ui-state-disabled .ui-icon-blank {
+	background-color: $color-fondo-campo-disabled;
+}
+
+.ui-selectbooleancheckbox .ui-state-disabled .ui-icon-check {
+	background-color: $color-fondo-campo-disabled;
+	//El icono que aplica el tema es blanco. Lo sobreescribimos.
+	//background-image: url("/javax.faces.resource/images/ui-icons_444444_256x240.png.xhtml?ln=primefaces-ctpd");
+	background-image: image_jsf("ui-icons_444444_256x240.png");
+}
+
+/* Estilo radio deshabilitados */
+.ui-radiobutton .ui-state-disabled .ui-icon-blank {
+	background-color: $color-fondo-campo-disabled;
+    border-radius: 7px;
+    left: -1px;
+}
+
+.ui-radiobutton .ui-state-disabled .ui-icon-bullet {
+	background-color: $color-fondo-campo-disabled;
+	//El icono que aplica el tema es blanco. Lo sobreescribimos.
+	background-image: image_jsf("ui-icons_444444_256x240.png");
+	background-position-x: -79px; //Centramos un poco el icono (definido a -80px)
+    border-radius: 7px;
+    left: -1px;
+}
+
+
+/* Los radiobutton no se alinean bien con el resto de elementos. */				
+.celda-form .ui-selectoneradio {
+	margin-top: -6px
+}
+
+.celda-form .ui-selectoneradio td {
+	margin: 0; padding:0;
+}
+									
+

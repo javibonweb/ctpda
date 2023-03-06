@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:c="http://java.sun.com/jstl/core"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:sec="https://joinfaces.org/security">
+	
+<ui:composition template="#{navegacionBean.get('TEMPLATE_LAYOUT_CABECERA')}">
+
+	<ui:define name="content">
+	
+		<h:form id="formLogin">
+
+			<p:messages for="messagesFormulario" id="messagesFormulario"
+				showDetail="true" closable="true">
+				<p:autoUpdate />
+			</p:messages>
+
+			<div class="ui-g-12">
+					<div class="ui-g-12 ui-md-4"/>
+					<div class="ui-g-12 ui-md-4">
+			<p:panel id="panelLogin">
+				<f:facet name="header">
+					<h:outputText value="#{mensaje['bienvenido']}" style="font-weight:bold" />
+				</f:facet>			
+        
+	    	<div class="ui-fluid">
+	            <div class="p-field">
+	                <p:outputLabel for="loginUsuario" value="#{mensaje['usuario']}: *" rendered="#{!loginBean.mostrarPerfiles}"/>
+	                <p:inputText id="loginUsuario" value="#{loginBean.loginUsuario}" maxlength="50" rendered="#{!loginBean.mostrarPerfiles}"/>
+	            </div>
+	            <br />
+	            <div class="p-field">
+	                <p:outputLabel for="contrasenyaUsuario" value="#{mensaje['contrasenya']}: *" rendered="#{!loginBean.mostrarPerfiles}"/>
+	                <p:password id="contrasenyaUsuario" value="#{loginBean.contrasenyaUsuario}" maxlength="50" rendered="#{!loginBean.mostrarPerfiles}"/>
+	            </div>
+				<div class="p-field">
+					<p:outputLabel value="#{mensaje['perfiles.asociados']}: *" for="perfilesAsociados" rendered="#{loginBean.mostrarPerfiles}"/>
+					<p:selectOneMenu id="perfilesAsociados"
+						rendered="#{loginBean.mostrarPerfiles}"
+						value="#{loginBean.selectedPerfilAsociado}"
+						style="min-width: 150px;">
+						<f:selectItem itemLabel="#{mensaje['seleccione.perfil']}" itemValue="" />
+						<f:selectItems
+							value="#{loginBean.listaPerfilesAsociados}"
+							var="perfil" itemLabel="#{perfil.descripcion}"
+							widgetVar="comboPerfilesAsociados" itemValue="#{perfil.id}" />
+					</p:selectOneMenu>
+				</div>	            
+	            
+	        </div>    
+		
+			<div class="botonera-form" align="right">
+				<p:commandButton id="acceder" value="#{mensaje['acceder']}"
+					action="#{loginBean.login}"/>
+			</div>
+					
+			</p:panel>	
+			</div>			
+			<div class="ui-g-12 ui-md-4"/>
+			</div>		
+						
+		</h:form>		
+		
+
+	</ui:define>
+</ui:composition>
+</html>

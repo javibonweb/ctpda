@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:sec="https://joinfaces.org/security"
+	xmlns:c="http://java.sun.com/jstl/core"
+	xmlns:fu="http://joinfaces.org/functions">
+	
+<ui:composition template="#{navegacionBean.get('TEMPLATE_LAYOUT_GENERICO')}">
+
+	<ui:define name="content">
+	
+		<script type="text/javascript">
+			function clickBotonFila(tablaId, id, elemId) {
+				$("div[id='" + tablaId + "'] " //tabla (id jsf completo)
+						+ "tr[data-rk='" + id + "'] " //fila (id = rowkey del datatable)
+						+ "[id$=':" + elemId + "']") //botón (solo la terminación del id jsf)
+				.click();
+			}
+		</script>
+
+		<c:set var="editable" value="#{controlPlazosBean.formEditable}" />
+
+		<h:form id="formListadoControlPlazos">
+
+			<p:messages for="messagesListado" id="messagesListado" showDetail="true" closable="true">
+				<p:autoUpdate />
+			</p:messages>
+			
+			<p:panel header="#{mensaje['gestion.control.plazos']}">
+				
+				<p:fieldset legend="#{mensaje['filtros.busqueda']}" id="bloqueFiltroBusqueda" toggleable="true" toggleSpeed="250">
+
+					<div>
+						<div class="celda-form">
+							<p:outputLabel value="#{mensaje['tipo.expedientes']}" for="tipoExpedientes_filtro" />
+							<p:selectOneMenu id="tipoExpedientes_filtro"
+								value="#{controlPlazosBean.selectedTipoExpedienteIdFiltro}"
+								style="min-width: 150px;">
+								<f:selectItem itemLabel="#{mensaje['todos']}" itemValue="" /> 
+								<f:selectItems value="#{controlPlazosBean.listaValoresDominioTipoExp}" var="tipExpList" widgetVar="comboFiltroTipoExpedientes"
+									itemLabel="#{fu:ptoSusp(tipExpList.descripcion)}" itemValue="#{tipExpList.id}" />
+							</p:selectOneMenu>
+						</div>
+						<div class="celda-form">
+							<p:outputLabel value="#{mensaje['tipo.plazo']}" for="tipoPlazo_filtro" />
+							<p:selectOneMenu id="tipoPlazo_filtro"
+								value="#{controlPlazosBean.selectedTipoPlazoIdFiltro}"
+								style="min-width: 150px;">
+								<f:selectItem itemLabel="#{mensaje['todos']}" itemValue="" /> 
+								<f:selectItems value="#{controlPlazosBean.listaValoresDominioTipoPlazo}" var="tipPlazoList" widgetVar="comboFiltroTipoPlazos"
+									itemLabel="#{fu:ptoSusp(tipPlazoList.descripcion)}" itemValue="#{tipPlazoList.id}" />
+							</p:selectOneMenu>
+						</div>
+						<div class="celda-form">
+							<p:outputLabel for="fechaLimite_filtro" value="#{mensaje['fecha.limite']}" />
+							<p:datePicker id="fechaLimite_filtro" value="#{controlPlazosBean.fechaLimiteFiltro}" 
+								locale="es" monthNavigator="true" pattern="dd/MM/yyyy"
+								converterMessage="#{mensaje['formato.fecha.invalido']}" mask="true"/>
+							<p:message for="fechaLimite_filtro"/>
+						</div>
+						<div class="celda-form">
+							<p:outputLabel value="#{mensaje['responsable']}" for="responsable_filtro" />
+							<p:selectOneMenu id="responsable_filtro"
+								value="#{controlPlazosBean.selectedResponsableIdFiltro}"
+								style="min-width: 150px;" filter="true" filterMatchMode="contains">
+								<f:selectItem itemLabel="#{mensaje['todos']}" itemValue="" />
+								<f:selectItems
+									value="#{expedientesBean.listaResponsablesTramitacion}"
+									var="respList" itemLabel="#{respList.descripcion}"
+									widgetVar="comboFiltroResponsable" itemValue="#{respList.id}" />
+							</p:selectOneMenu>
+						</div>
+		
+						<div class="celda-form">
+							<p:outputLabel for="activo_filtro" value="#{mensaje['activo']}" />
+							<p:selectBooleanCheckbox id="activo_filtro" value="#{controlPlazosBean.activoFiltro}" itemLabel="#{mensaje['si']}"/>
+						</div>
+						<div class="celda-form">
+							<p:outputLabel for="pendiente_filtro" value="#{mensaje['pendiente']}" />
+							<p:selectBooleanCheckbox id="pendiente_filtro" value="#{controlPlazosBean.pendienteFiltro}" itemLabel="#{mensaje['si']}"/>
+						</div>
+					</div>
+
+					<div class="botonera-form">
+						<p:commandButton id="filtrar" icon="pi pi-filter"
+							value="#{mensaje['filtrar']}"
+							update="formListadoControlPlazos:tipoExpedientes_filtro,formListadoControlPlazos:tipoPlazo_filtro,formListadoControlPlazos:fechaLimite_filtro,
+								formListadoControlPlazos:listadoPlazosExpediente,formListadoControlPlazos:activo_filtro,formListadoControlPlazos:pendiente_filtro"
+							onstart="PF('plazosExpedienteWV').paginator.setPage(0);" /> 
+						<p:commandButton id="limpiarFiltro" value="#{mensaje['limpiar.filtro']}" icon="pi pi-filter-slash"
+							actionListener="#{controlPlazosBean.limpiarFiltro()}"
+							update="formListadoControlPlazos:tipoExpedientes_filtro,formListadoControlPlazos:tipoPlazo_filtro,formListadoControlPlazos:fechaLimite_filtro,
+								formListadoControlPlazos:listadoPlazosExpediente,formListadoControlPlazos:responsable_filtro,formListadoControlPlazos:activo_filtro,formListadoControlPlazos:pendiente_filtro"
+							onstart="PF('plazosExpedienteWV').paginator.setPage(0);" />  
+					</div>
+				</p:fieldset>
+				
+				<div class="botonera-form" align="right">
+				 	<p:commandButton id="botonExportarCSV" value="#{mensaje['csv']}" icon="pi pi-file-excel" title="Exportar a CSV">
+	                    <p:dataExporter type="xlsxstream" target="listadoPlazos" fileName="#{utilsComun.getNombreCsvExportar('PLAZOS')}"/>
+	                </p:commandButton>
+				</div>
+				
+				<p:outputPanel id="listadoPlazosExpediente">
+					<p:dataTable var="plazosExpediente" id="listadoPlazos"
+						value="#{controlPlazosBean.lazyModelPlazosExpediente}" paginator="true"
+						paginatorTemplate=" {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+						rowsPerPageTemplate="10,20,50,100" rows="10"
+						currentPageReportTemplate="#{mensaje['paginador.template']}"
+						selectionMode="single"
+						sortBy="#{controlPlazosBean.defaultOrden}"
+						sortOrder="ascending"
+						selection="#{controlPlazosBean.selectedPlazosExpedientes}"
+						rowKey="#{plazosExpediente.id}" paginatorPosition="bottom"
+						widgetVar="plazosExpedienteWV" >
+
+						<p:ajax event="rowDblselect" listener="#{controlPlazosBean.accesoRapido}" update="dialogFormPlazo"
+				        	global="false" oncomplete="PF('dialogFormPlazo').show()" />
+						
+						<p:column headerText="#{mensaje['fecha.limite']}" sortBy="#{plazosExpediente.fechaLimite}">
+							<h:outputText value="#{plazosExpediente.fechaLimite}" styleClass="#{controlPlazosBean.configEstiloTabla(plazosExpediente,plazosExpediente.diasRestantes)}">
+								<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+							</h:outputText>
+						</p:column>
+						<p:column headerText="#{mensaje['dias.restantes']}"> 
+							<h:outputText value="#{plazosExpediente.diasRestantes}" />
+						</p:column>
+						<p:column headerText="#{mensaje['tipo.plazo']}" sortBy="#{plazosExpediente.valorTipoPlazo.descripcion}">
+							<h:outputText value="#{plazosExpediente.valorTipoPlazo.descripcion}" />
+						</p:column>
+						<p:column headerText="#{mensaje['numero.expediente']}" sortBy="#{plazosExpediente.expediente.numExpediente}">
+							<h:outputText value="#{plazosExpediente.expediente.numExpediente}" />
+						</p:column>
+						<p:column headerText="#{mensaje['nombre.expediente']}" sortBy="#{plazosExpediente.expediente.nombreExpediente}">
+							<h:outputText value="#{plazosExpediente.expediente.nombreExpediente}" />
+						</p:column>
+						<p:column headerText="#{mensaje['situacion.expediente']}" sortBy="#{plazosExpediente.expediente.valorSituacionExpediente.descripcion}">
+							<h:outputText value="#{plazosExpediente.expediente.valorSituacionExpediente.descripcion}" />
+						</p:column>
+						<p:column headerText="#{mensaje['responsable.expediente']}" sortBy="#{plazosExpediente.expediente.responsable.descripcion}">
+							<h:outputText value="#{fu:ptoSusp(plazosExpediente.expediente.responsable.descripcion)}" />
+						</p:column>
+						<p:column headerText="#{mensaje['acciones']}" exportable="false">
+							<p:commandButton id="consultaExpediente" icon="pi pi-book" rendered="#{controlPlazosBean.permisoConsultaExpediente == true}"
+							action="#{controlPlazosBean.onConsultarExpediente(plazosExpediente.expediente.id,plazosExpediente.id)}" />
+							<p:tooltip for="consultaExpediente" value="Consulta expediente" showEffect="fade" showDelay="500" hideEffect="fade" position="top" />
+							
+							<p:commandButton id="consultaPlazoExp" icon="pi pi-eye" rendered="#{controlPlazosBean.permisoConsPlazoExp == true}"
+								action="#{controlPlazosBean.modoAccesoFormulario(plazosExpediente,'consulta')}"
+								update="dialogFormPlazo,
+									formFormularioPlazos:numeroExpedienteFormPlazo,formFormularioPlazos:nombreExpedienteFormPlazo,formFormularioPlazos:tipoPlazoFormPlazo,
+									formFormularioPlazos:fechaLimiteFormPlazoEdit,formFormularioPlazos:fechaLimiteFormPlazoCons,formFormularioPlazos:observacionesFormPlazo,
+									formFormularioPlazos:darCumplidoPlazo,formFormularioPlazos:cancelarPlazo,formFormularioPlazos:guardarPlazo,formListadoControlPlazos:listadoPlazos">
+							</p:commandButton>
+							<p:tooltip for="consultaPlazoExp" value="Consulta plazo" showEffect="fade" showDelay="500" hideEffect="fade" position="top" />
+
+							<p:commandButton id="editarPlazoExp" rendered="#{controlPlazosBean.permisoEditPlazoExp == true and plazosExpediente.activo and !plazosExpediente.cumplido}"
+								widgetVar="editarPlazoExp" icon="pi pi-pencil"
+								action="#{controlPlazosBean.modoAccesoFormulario(plazosExpediente,'editar')}"
+								update="dialogFormPlazo,
+									formFormularioPlazos:numeroExpedienteFormPlazo,formFormularioPlazos:nombreExpedienteFormPlazo,formFormularioPlazos:tipoPlazoFormPlazo,
+									formFormularioPlazos:fechaLimiteFormPlazoEdit,formFormularioPlazos:fechaLimiteFormPlazoCons,formFormularioPlazos:observacionesFormPlazo,
+									formFormularioPlazos:darCumplidoPlazo,formFormularioPlazos:cancelarPlazo,formFormularioPlazos:guardarPlazo,formListadoControlPlazos:listadoPlazos">
+							</p:commandButton>
+							<p:tooltip for="editarPlazoExp" value="Editar plazo" showEffect="fade" showDelay="500" hideEffect="fade" position="top" />
+							
+							<p:commandButton id="eliminarPlazoExp" icon="pi pi-times" rendered="#{plazosExpediente.activo and !plazosExpediente.cumplido and controlPlazosBean.permisoDesacPlazoExp == true}"
+								actionListener="#{controlPlazosBean.eliminarPlazo(plazosExpediente)}"
+								update="dialogFormPlazo,
+									formFormularioPlazos:numeroExpedienteFormPlazo,formFormularioPlazos:nombreExpedienteFormPlazo,formFormularioPlazos:tipoPlazoFormPlazo,
+									formFormularioPlazos:fechaLimiteFormPlazoEdit,formFormularioPlazos:fechaLimiteFormPlazoCons,formFormularioPlazos:observacionesFormPlazo,
+									formFormularioPlazos:darCumplidoPlazo,formFormularioPlazos:cancelarPlazo,formFormularioPlazos:guardarPlazo,formListadoControlPlazos:listadoPlazos">
+								<p:confirm header="#{mensaje['confirmar.operacion']}" message="#{mensaje['pregunta.confirma.eliminar']}" icon="pi pi-info-circle" />
+							</p:commandButton>
+							<p:tooltip for="eliminarPlazoExp" value="Eliminar plazo" showEffect="fade" showDelay="500" hideEffect="fade" position="top" />
+							
+							<p:commandButton id="activarPlazoExp" icon="pi pi-check" rendered="#{!plazosExpediente.activo and !plazosExpediente.cumplido and controlPlazosBean.permisoActivarPlazoExp == true}"
+								actionListener="#{controlPlazosBean.activarPlazo(plazosExpediente)}"
+								update="dialogFormPlazo,
+									formFormularioPlazos:numeroExpedienteFormPlazo,formFormularioPlazos:nombreExpedienteFormPlazo,formFormularioPlazos:tipoPlazoFormPlazo,
+									formFormularioPlazos:fechaLimiteFormPlazoEdit,formFormularioPlazos:fechaLimiteFormPlazoCons,formFormularioPlazos:observacionesFormPlazo,
+									formFormularioPlazos:darCumplidoPlazo,formFormularioPlazos:cancelarPlazo,formFormularioPlazos:guardarPlazo,formListadoControlPlazos:listadoPlazos">
+								<p:confirm header="#{mensaje['confirmar.operacion']}" message="#{mensaje['pregunta.confirma.activar']}" icon="pi pi-info-circle" />
+							</p:commandButton>
+							<p:tooltip for="activarPlazoExp" value="Activar plazo" showEffect="fade" hideEffect="fade" position="top" showDelay="500" />
+
+							
+							<p:commandButton id="rehabilitarPlazoExp" icon="pi pi-replay" rendered="#{plazosExpediente.activo and plazosExpediente.cumplido and controlPlazosBean.permisoRehabilitarPlazoExp == true}"
+								actionListener="#{controlPlazosBean.rehabilitarPlazo(plazosExpediente)}"
+								update="dialogFormPlazo,
+									formFormularioPlazos:numeroExpedienteFormPlazo,formFormularioPlazos:nombreExpedienteFormPlazo,formFormularioPlazos:tipoPlazoFormPlazo,
+									formFormularioPlazos:fechaLimiteFormPlazoEdit,formFormularioPlazos:fechaLimiteFormPlazoCons,formFormularioPlazos:observacionesFormPlazo,
+									formFormularioPlazos:darCumplidoPlazo,formFormularioPlazos:cancelarPlazo,formFormularioPlazos:guardarPlazo,formListadoControlPlazos:listadoPlazos">
+								<p:confirm header="#{mensaje['confirmar.operacion']}" message="#{mensaje['pregunta.confirma.rehabilitar']}" icon="pi pi-info-circle" />
+							</p:commandButton>
+							<p:tooltip for="rehabilitarPlazoExp" value="Rehabilitar plazo" showEffect="fade" hideEffect="fade" position="top" showDelay="500" />
+
+							<p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true">
+								<div class="botonera-form" align="right">
+									<p:commandButton value="#{mensaje['si']}" type="button" styleClass="ui-confirmdialog-yes" />
+									<p:commandButton value="#{mensaje['no']}" type="button" styleClass="ui-confirmdialog-no ui-button-flat" />
+								</div>								
+							</p:confirmDialog>
+						</p:column>
+					</p:dataTable>
+				</p:outputPanel>
+				
+			</p:panel>
+			
+			<br />
+			
+			<p:commandButton id="volver" value="#{mensaje['volver']}" actionListener="#{volverBean.migaPanVolver()}"
+				oncomplete="document.location.href='#{request.contextPath}/aplicacion/bienvenido.xhtml'" />
+
+
+		</h:form>
+		
+		
+		<!-- DIALOGO FORMULARIO PLAZO -->
+		<p:dialog id="dialogFormPlazo" header="#{controlPlazosBean.cabeceraDialogo}" widgetVar="dialogFormPlazo"
+			closable="true" resizable="false" draggable="true" modal="true" responsive="true">
+			<h:form id="formFormularioPlazos">		
+			
+				<p:messages for="messagesFormularioFormPlazo" id="messagesFormularioFormPlazo" showDetail="true" closable="true">
+					<p:autoUpdate />
+				</p:messages>
+				
+				<p:outputPanel id="panelEditarPlazoExpByForm" rendered="#{controlPlazosBean.permisoEditPlazoExp == true 
+						and controlPlazosBean.plazoExpDialogo.activo and !controlPlazosBean.plazoExpDialogo.cumplido and controlPlazosBean.modoAccesoConsulta}">
+					<div class="botonera-form" align="right">
+						<p:commandButton id="editarPlazoExpByForm" widgetVar="editarPlazoExpByForm" icon="pi pi-pencil"
+							action="#{controlPlazosBean.modoAccesoFormulario(plazoExpDialogo,'editar')}"
+							update="dialogFormPlazo,formFormularioPlazos:numeroExpedienteFormPlazo,formFormularioPlazos:nombreExpedienteFormPlazo,formFormularioPlazos:tipoPlazoFormPlazo,
+								formFormularioPlazos:fechaLimiteFormPlazoEdit,formFormularioPlazos:fechaLimiteFormPlazoCons,formFormularioPlazos:observacionesFormPlazo,
+								formFormularioPlazos:darCumplidoPlazo,formFormularioPlazos:cancelarPlazo,formFormularioPlazos:guardarPlazo,formListadoControlPlazos:listadoPlazos">
+						</p:commandButton>
+					</div>				
+				</p:outputPanel>				
+		
+				<div>
+					<div class="celda-form">
+						<p:outputLabel for="numeroExpedienteFormPlazo" value="#{mensaje['numero.expediente']}" />
+						<p:inputText id="numeroExpedienteFormPlazo" value="#{controlPlazosBean.plazoExpDialogo.expediente.numExpediente}" disabled="true" size="25" />
+					</div>
+					<div class="celda-form">			
+						<p:outputLabel for="nombreExpedienteFormPlazo" value="#{mensaje['nombre.expediente']}" />
+						<p:inputText id="nombreExpedienteFormPlazo" value="#{controlPlazosBean.plazoExpDialogo.expediente.nombreExpediente}" disabled="true" size="25" />
+					</div>
+					<div class="celda-form">
+						<p:outputLabel for="tipoPlazoFormPlazo" value="#{mensaje['tipo.plazo']}" />
+						<p:inputText id="tipoPlazoFormPlazo" value="#{controlPlazosBean.plazoExpDialogo.valorTipoPlazo.descripcion}" disabled="true" size="25" />			
+					</div>
+				</div>
+				<div>	
+					<div class="celda-form">
+						<p:outputLabel for="observacionesFormPlazo" value="#{mensaje['observaciones']}" />
+						<p:inputTextarea counter="textoControlPlazos" counterTemplate="#{mensaje['counter.template']}" rows="6" cols="100" id="observacionesFormPlazo" maxlength="4000" value="#{controlPlazosBean.plazoExpDialogo.observaciones.texto}" readonly="#{controlPlazosBean.modoAccesoConsulta}" autoResize="false"/>
+					</div>	
+					<div class="contador-char"><h:outputText id="textoControlPlazos" /></div>
+				</div>
+				<div>					
+					<div class="celda-form">
+						<p:outputLabel rendered="#{controlPlazosBean.modoAccesoConsulta or controlPlazosBean.plazoExpDialogoBloqueado}" for="fechaLimiteFormPlazoCons" value="#{mensaje['fecha.limite']}" />
+						<p:datePicker id="fechaLimiteFormPlazoCons" value="#{controlPlazosBean.plazoExpDialogo.fechaLimite}" disabled="true" 
+							rendered="#{controlPlazosBean.modoAccesoConsulta or controlPlazosBean.plazoExpDialogoBloqueado}" pattern="dd/MM/yyyy" locale="es"/>	
+						
+						<p:outputLabel rendered="#{!controlPlazosBean.modoAccesoConsulta and !controlPlazosBean.plazoExpDialogoBloqueado}" for="fechaLimiteFormPlazoEdit" value="#{mensaje['fecha.limite']} *" />
+						<p:datePicker id="fechaLimiteFormPlazoEdit" value="#{controlPlazosBean.fechaLimitePlazoExpDialogo}"
+							locale="es" monthNavigator="true" pattern="dd/MM/yyyy" converterMessage="#{mensaje['formato.fecha.invalido']}" mask="true"
+							rendered="#{!controlPlazosBean.modoAccesoConsulta and !controlPlazosBean.plazoExpDialogoBloqueado}"/>
+						<p:message for="fechaLimiteFormPlazoEdit"/>
+					</div>
+				</div>
+				<div>
+					<div class="celda-form">
+						<p:outputLabel value="#{mensaje['plazo.cumplido']}" rendered="#{controlPlazosBean.plazoExpDialogo.cumplido}"/>
+					</div>	
+				</div>
+				<div>	
+					<div class="celda-form">
+						<p:outputLabel for="usuarioCumplidoFormPlazo" value="#{mensaje['usuario.dio.cumplido']}" rendered="#{controlPlazosBean.plazoExpDialogo.cumplido}"/>
+						<p:inputText id="usuarioCumplidoFormPlazo" value="#{controlPlazosBean.plazoExpDialogo.usuModificacion}" disabled="true" size="25" rendered="#{controlPlazosBean.plazoExpDialogo.cumplido}"/>	
+					</div>
+					
+					<div class="celda-form">
+						<p:outputLabel for="fechaCumplidoFormPlazo" value="#{mensaje['fecha.dio.cumplido']}" rendered="#{controlPlazosBean.plazoExpDialogo.cumplido}"/>
+						<p:datePicker id="fechaCumplidoFormPlazo" value="#{controlPlazosBean.plazoExpDialogo.fechaModificacion}" disabled="true" 
+							rendered="#{controlPlazosBean.plazoExpDialogo.cumplido}" pattern="dd/MM/yyyy" locale="es"/>		
+					</div>	
+				</div>
+				<div>
+					<div class="botonera-form" align="right">
+						<p:commandButton icon="pi pi-save" id="guardarPlazo" rendered="#{!controlPlazosBean.modoAccesoConsulta and controlPlazosBean.permisoSavePlazoExp == true}"
+							value="#{mensaje['guardar']}" actionListener="#{controlPlazosBean.guardarPlazo()}"
+							update="formFormularioPlazos,formListadoControlPlazos:listadoPlazos" />
+							
+						<p:commandButton icon="pi pi-check-square" id="darCumplidoPlazo" rendered="#{!controlPlazosBean.modoAccesoConsulta and controlPlazosBean.permisoDarCumplidoPlazoExp == true}"
+							value="#{mensaje['dar.cumplido']}" actionListener="#{controlPlazosBean.darCumplidoPlazo()}"
+							update="dialogFormPlazo,
+										formFormularioPlazos:numeroExpedienteFormPlazo,formFormularioPlazos:nombreExpedienteFormPlazo,formFormularioPlazos:tipoPlazoFormPlazo,
+										formFormularioPlazos:fechaLimiteFormPlazoEdit,formFormularioPlazos:fechaLimiteFormPlazoCons,formFormularioPlazos:observacionesFormPlazo,
+										formFormularioPlazos:darCumplidoPlazo,formFormularioPlazos:cancelarPlazo,formFormularioPlazos:guardarPlazo,formListadoControlPlazos:listadoPlazos">
+							<p:confirm header="#{mensaje['confirmar.operacion']}" message="#{mensaje['pregunta.confirma.cumplirplazo']}" icon="pi pi-info-circle" />
+						</p:commandButton>
+							
+						<p:commandButton id="cancelarPlazo" value="#{mensaje['cancelar']}" icon="pi pi-times"
+							actionListener="#{volverBean.cancelar()}"
+							oncomplete="document.location.href='#{request.contextPath}/aplicacion/expedientes/controlplazos/listadoControlPlazos.jsf'"
+		              		rendered="#{!controlPlazosBean.modoAccesoConsulta}"
+		              		update="dialogFormPlazo,
+										formFormularioPlazos:numeroExpedienteFormPlazo,formFormularioPlazos:nombreExpedienteFormPlazo,formFormularioPlazos:tipoPlazoFormPlazo,
+										formFormularioPlazos:fechaLimiteFormPlazoEdit,formFormularioPlazos:fechaLimiteFormPlazoCons,formFormularioPlazos:observacionesFormPlazo,
+										formFormularioPlazos:darCumplidoPlazo,formFormularioPlazos:cancelarPlazo,formFormularioPlazos:guardarPlazo,formListadoControlPlazos:listadoPlazos">
+							<p:confirm header="#{mensaje['confirmar.operacion']}" message="#{mensaje['pregunta.confirma.cancelar']}" icon="pi pi-info-circle" />
+						</p:commandButton>
+						
+						<p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true" >
+							<div class="botonera-form" align="right">
+								<p:commandButton value="#{mensaje['si']}" type="button" styleClass="ui-confirmdialog-yes" />
+								<p:commandButton value="#{mensaje['no']}" type="button" styleClass="ui-confirmdialog-no ui-button-flat" />
+							</div>							
+						</p:confirmDialog>	
+					</div>				
+				</div>
+			</h:form>
+		</p:dialog>
+
+	</ui:define>
+
+</ui:composition>
+
+</html>

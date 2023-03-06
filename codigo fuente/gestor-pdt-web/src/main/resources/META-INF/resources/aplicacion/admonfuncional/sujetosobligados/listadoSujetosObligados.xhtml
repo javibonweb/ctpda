@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:sec="https://joinfaces.org/security">
+<ui:composition
+	template="#{navegacionBean.get('TEMPLATE_LAYOUT_GENERICO')}">
+	<ui:define name="content">
+
+    <script>
+      function clickBotonFila(tablaId, id, elemId) {
+        $("div[id='" + tablaId + "'] " //tabla (id jsf completo)
+            + "tr[data-rk='" + id + "'] " //fila (id = rowkey del datatable)
+            + "[id$=':" + elemId + "']") //botón (solo la terminación del id jsf)
+        .click();
+      }
+    </script>
+    
+    <h:form id="formListadoSujetosObligados">
+      
+			<p:messages for="messagesListado" id="messagesListado"
+				showDetail="true" closable="true">
+				<p:autoUpdate />
+			</p:messages>
+
+			<!-- PANEL FILTRO DE BUSQUEDA DE SUJETOS OBLIGADOS -->
+			<p:panel header="#{mensaje['gestion.sujetos.obligados']}">
+			<p:fieldset legend="#{mensaje['filtros.busqueda']}" id="bloqueFiltroBusqueda" toggleable="true" toggleSpeed="250">       		
+									
+					<div>
+						<div class="celda-form">
+							<p:outputLabel for="descripcion_filtro"
+								value="#{mensaje['sujeto.obligado']}" />
+							<p:inputText id="descripcion_filtro" maxlength="100" size="35"
+								value="#{sujetosObligadosBean.descripcionFiltro}" />
+						</div>
+					
+						<div class="celda-form">
+							<p:outputLabel value="#{mensaje['sujeto.obligado.superior']}"
+								for="sujetosObligadosSuperior_filtro" />
+							<p:selectOneMenu id="sujetosObligadosSuperior_filtro"
+								value="#{sujetosObligadosBean.selectedSujetosObligadosSupIdFiltro}"
+								style="width: 350px;">
+								<f:selectItem itemLabel="#{mensaje['todos']}" itemValue="" />
+								<f:selectItems
+									value="#{sujetosObligadosBean.listaSujetosObligadosSup}"
+									var="sujObliSupList" itemLabel="#{sujObliSupList.descripcion}"
+									widgetVar="comboFiltroSujetosObligadosSuperior"
+									itemValue="#{sujObliSupList.id}" />
+							</p:selectOneMenu>
+						</div>
+						<div class="celda-form">
+							<p:outputLabel value="#{mensaje['tipo.agrupacion']}"
+								for="tipoAgrupacion_filtro" />
+							<p:selectOneMenu id="tipoAgrupacion_filtro"
+								value="#{sujetosObligadosBean.selectedTipoAgrupacionIdFiltro}"
+								style="width: 350px;">
+								<f:selectItem itemLabel="#{mensaje['todos']}" itemValue="" />
+								<f:selectItems
+									value="#{sujetosObligadosBean.listaTipoAgrupaciones}"
+									var="tipAgrupSupList"
+									itemLabel="#{tipAgrupSupList.descripcion}"
+									widgetVar="comboFiltroTipoAgrupaciones"
+									itemValue="#{tipAgrupSupList.id}" />
+							</p:selectOneMenu>
+						</div>
+						<div class="celda-form">
+							<p:outputLabel for="activo_filtro" value="#{mensaje['activo']}" />
+							<p:selectBooleanCheckbox id="activo_filtro" value="#{sujetosObligadosBean.activoFiltro}" itemLabel="#{mensaje['si']}" />
+						</div>
+					</div>
+					
+					<div class="botonera-form">
+												 
+							<p:commandButton id="nuevoSujetoObligado" icon="pi pi-plus"
+							 	rendered="#{sujetosObligadosBean.permisoNewSujObl == true}"
+								value="#{mensaje['nuevo.sujeto.obligado']}"
+								action="#{sujetosObligadosBean.onCrear}" />
+							<p:commandButton id="filtrar"  icon="pi pi-filter"
+								value="#{mensaje['filtrar']}"
+								update="formListadoSujetosObligados:sujetosObligadosSuperior_filtro,
+									formListadoSujetosObligados:tipoAgrupacion_filtro,
+									formListadoSujetosObligados:descripcion_filtro,
+									formListadoSujetosObligados:activo_filtro,
+									formListadoSujetosObligados:tablaSujetosObligados"
+								onstart="PF('sujetosObligadosWV').paginator.setPage(0);" />
+							<p:commandButton id="limpiarFiltro"
+								value="#{mensaje['limpiar.filtro']}" icon="pi pi-filter-slash"
+								actionListener="#{sujetosObligadosBean.limpiarFiltro()}"
+								update="formListadoSujetosObligados:sujetosObligadosSuperior_filtro,
+									formListadoSujetosObligados:tipoAgrupacion_filtro,
+									formListadoSujetosObligados:descripcion_filtro,
+									formListadoSujetosObligados:activo_filtro,
+									formListadoSujetosObligados:tablaSujetosObligados"
+								onstart="PF('sujetosObligadosWV').paginator.setPage(0);" />
+			
+					</div>
+			</p:fieldset>
+			
+						  
+
+
+			<!-- PANEL CON LOS RESULTADOS DE BUSQUEDA -->
+			<p:outputPanel id="panelResultadosBusqueda" >
+				<p:dataTable var="sujetosObligados" id="tablaSujetosObligados"
+					value="#{sujetosObligadosBean.lazyModel}" paginator="true"
+					paginatorTemplate=" {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+					rowsPerPageTemplate="10,20,50,100" rows="10"
+					currentPageReportTemplate="#{mensaje['paginador.template']}"
+					selectionMode="single" sortBy="#{sujetosObligados.descripcion}"
+					sortOrder="ascending"
+					selection="#{sujetosObligadosBean.selectedSujetosObligados}"
+					rowKey="#{sujetosObligados.id}" paginatorPosition="bottom"
+					widgetVar="sujetosObligadosWV">
+
+					<p:ajax event="rowDblselect"
+						listener="#{sujetosObligadosBean.onTipAgrupRowDblClkSelect}"
+						global="false"
+						oncomplete="clickBotonFila(this.source, args.id, 'consultarSujetosObligados');">
+					</p:ajax>
+	 
+					<p:column headerText="#{mensaje['sujeto.obligado']}"
+						sortBy="#{sujetosObligados.descripcion}">
+						<h:outputText value="#{sujetosObligados.descripcion}" />
+					</p:column>						 
+										 
+					<p:column headerText="#{mensaje['sujeto.obligado.superior']}"
+						sortBy="#{sujetosObligados.sujetosObligadosPadre.descripcion}">
+						<h:outputText
+							value="#{sujetosObligados.sujetosObligadosPadre.descripcion}" />
+					</p:column>
+
+					<p:column headerText="#{mensaje['tipo.agrupacion']}"
+						sortBy="#{sujetosObligados.tipoAgrupacion.descripcion}">
+						<h:outputText
+							value="#{sujetosObligados.tipoAgrupacion.descripcion}" />
+					</p:column>
+
+					<p:column headerText="#{mensaje['activo']}"
+						sortBy="#{sujetosObligados.activa}">
+						<h:outputText value="#{mensaje['no']}"
+							rendered="#{sujetosObligados.activa == false}" />
+						<h:outputText value="#{mensaje['si']}"
+							rendered="#{sujetosObligados.activa == true}" />
+						<h:outputText value="#{mensaje['no.activo.erroneo']}"
+							rendered="#{sujetosObligados.activa == false and sujetosObligados.erroneo}" />
+					</p:column>								
+
+					<p:column headerText="#{mensaje['acciones']}">
+						<p:commandButton id="consultarSujetosObligados" icon="pi pi-eye"
+							rendered="#{sujetosObligadosBean.permisoConsSujObl == true}"
+							action="#{sujetosObligadosBean.onConsultar(sujetosObligados.id)}">
+							<f:param name="id" value="#{sujetosObligados.id}" />
+						</p:commandButton>
+
+						<p:commandButton id="editarSujetoObligado"
+							widgetVar="editarSujetoObligado" icon="pi pi-pencil"
+							action="#{sujetosObligadosBean.onEditar(sujetosObligados.id)}"
+							rendered="#{sujetosObligados.activa and sujetosObligadosBean.permisoEditSujObl == true}">
+							<f:param name="id" value="#{sujetosObligados.id}" />
+						</p:commandButton>
+
+
+						<p:commandButton id="eliminarSujetosObligados" icon="pi pi-times"
+							rendered="#{sujetosObligados.activa and sujetosObligadosBean.permisoDesacSujObl == true}"
+							actionListener="#{sujetosObligadosBean.eliminarSujetosObligados(sujetosObligados)}"
+							update="formListadoSujetosObligados:tablaSujetosObligados,formListadoSujetosObligados">
+
+							<p:confirm header="#{mensaje['confirmar.operacion']}"
+								message="#{mensaje['pregunta.confirma.eliminar']}"
+								icon="pi pi-info-circle" />
+
+
+						</p:commandButton>
+						<p:commandButton id="activarSujetosObligados" icon="pi pi-check"
+							rendered="#{!sujetosObligados.activa and sujetosObligadosBean.permisoActSujObl == true and (!sujetosObligados.erroneo)}"
+							actionListener="#{sujetosObligadosBean.activarSujetosObligados(sujetosObligados)}"
+							update="formListadoSujetosObligados:tablaSujetosObligados,formListadoSujetosObligados">
+							<p:confirm header="#{mensaje['confirmar.operacion']}" message="#{mensaje['pregunta.confirma.activar']}" icon="pi pi-info-circle" />
+						</p:commandButton>
+
+						<p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true">
+							<div class="botonera-form" align="right">
+								<p:commandButton value="#{mensaje['si']}" type="button" styleClass="ui-confirmdialog-yes" />
+								<p:commandButton value="#{mensaje['no']}" type="button" styleClass="ui-confirmdialog-no ui-button-flat" />
+							</div>							
+						</p:confirmDialog>
+						
+						<p:commandButton id="marcarErroneoSujetosObligados" icon="pi pi-trash"
+							actionListener="#{sujetosObligadosBean.marcarErroneoSujetosObligados(sujetosObligados)}"
+							update="formListadoSujetosObligados:tablaSujetosObligados,formListadoSujetosObligados"
+							rendered="#{(sujetosObligados.activa and sujetosObligadosBean.permisoErroneoSujObl == true and (!sujetosObligados.erroneo))}">
+
+							<p:confirm header="#{mensaje['confirmar.operacion']}"
+								message="#{mensaje['pregunta.confirma.erroneo']}"
+								icon="pi pi-info-circle" />
+						</p:commandButton>
+						
+					</p:column>
+				</p:dataTable>
+			</p:outputPanel>
+			</p:panel>
+			<br/>
+			<p:commandButton id="volver" value="#{mensaje['volver']}"
+				actionListener="#{volverBean.migaPanVolver()}"
+				oncomplete="document.location.href='#{request.contextPath}/aplicacion/bienvenido.xhtml'">
+			</p:commandButton>	
+															
+																						  
+						 
+		</h:form>
+	</ui:define>
+
+</ui:composition>
+
+</html>

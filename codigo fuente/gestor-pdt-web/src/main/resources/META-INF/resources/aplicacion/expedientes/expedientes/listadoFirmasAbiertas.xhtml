@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:sec="https://joinfaces.org/security"
+	xmlns:c="http://java.sun.com/jstl/core"
+	xmlns:fu="http://joinfaces.org/functions">
+	
+<ui:composition
+	template="#{navegacionBean.get('TEMPLATE_LAYOUT_GENERICO')}">
+	<ui:define name="content">
+
+
+		<c:set var="editable" value="#{firmasAbiertasBean.formEditable}" />
+
+		<h:form id="formListadoFirmasAbiertas">
+
+			<p:messages for="messagesListadoFirmasAbiertas" id="messagesListadoFirmasAbiertas"
+				showDetail="true" closable="true">
+				<p:autoUpdate />
+			</p:messages>
+			
+			<p:defaultCommand target="filtrar" />
+
+			<!-- PANEL FILTRO DE BUSQUEDA DE FIRMAS ABIERTAS -->
+
+			<p:panel header="#{mensaje['buscador.firmas.abiertas']}">
+				<p:fieldset legend="#{mensaje['filtros.busqueda']}"
+					id="bloqueFiltroBusqueda" toggleable="true" toggleSpeed="250">
+
+					<div>
+						<div class="celda-form">
+							<p:outputLabel value="#{mensaje['tipo.tramite']}"
+								for="tipoTram_filtro" />
+							<p:selectOneMenu id="tipoTram_filtro" disabled="true"
+								value="#{firmasAbiertasBean.selectedTipoTramiteIdFiltro}"
+								style="min-width: 150px;">
+								<f:selectItem itemLabel="#{mensaje['todos']}" itemValue="" />
+								<f:selectItems
+									value="#{firmasAbiertasBean.listaTipoTramites}"
+									var="tipTramList" itemLabel="#{fu:ptoSusp(tipTramList.descripcion)}"
+									widgetVar="comboFiltroTipoTramites"
+									itemValue="#{tipTramList.id}" />
+							</p:selectOneMenu>
+						</div>
+						<div class="celda-form">
+							<p:outputLabel for="firmante_filtro"
+								value="#{mensaje['firmante']}" />
+							<p:inputText id="firmante_filtro" maxlength="300"
+								value="#{firmasAbiertasBean.firmanteFiltro}" />
+						</div>						
+						<div class="celda-form">
+							<p:outputLabel value="#{mensaje['responsable.tramite']}"
+								for="responsableTram_filtro" />
+							<p:selectOneMenu id="responsableTram_filtro"
+								value="#{firmasAbiertasBean.selectedResponsableTramIdFiltro}"
+								style="min-width: 150px;" filter="true" filterMatchMode="contains">
+								<f:selectItem itemLabel="#{mensaje['todos']}" itemValue="" />
+								<f:selectItems
+									value="#{firmasAbiertasBean.listaResponsablesTramitacion}"
+									var="respTramList" itemLabel="#{respTramList.descripcion}"
+									widgetVar="comboFiltroResponsableTram" itemValue="#{respTramList.id}" />
+							</p:selectOneMenu>
+						</div>
+						<div class="celda-form">
+							<p:outputLabel value="#{mensaje['tipo.expedientes']}"
+								for="tipoExpedientes_filtro" />
+							<p:selectOneMenu id="tipoExpedientes_filtro"
+								value="#{firmasAbiertasBean.selectedTipoExpedienteIdFiltro}"
+								style="min-width: 150px;">
+								<f:selectItem itemLabel="#{mensaje['todos']}" itemValue="" />
+								<f:selectItems
+									value="#{firmasAbiertasBean.listaValoresDominioTipoExp}"
+									var="tipExpList" itemLabel="#{fu:ptoSusp(tipExpList.descripcion)}"
+									widgetVar="comboFiltroTipoExpedientes"
+									itemValue="#{tipExpList.id}" />
+							</p:selectOneMenu>
+						</div>												
+						<div class="celda-form">
+							<p:outputLabel for="numeroExpediente_filtro"
+								value="#{mensaje['numero.expediente']}" />
+							<p:inputText id="numeroExpediente_filtro" maxlength="255"
+								value="#{firmasAbiertasBean.numeroExpedienteFiltro}" />
+						</div>
+					</div>
+					<div>
+						<div class="celda-form">
+							<p:outputLabel value="#{mensaje['situacion']}"
+								for="situacion_filtro" />
+							<p:selectOneMenu id="situacion_filtro"
+								value="#{firmasAbiertasBean.selectedSituacionIdFiltro}"
+								style="min-width: 150px;">
+								<f:selectItem itemLabel="#{mensaje['todos']}" itemValue="" />
+								<f:selectItems
+									value="#{firmasAbiertasBean.listaValoresDominioSituacion}"
+									var="sitList" itemLabel="#{sitList.descripcion}"
+									widgetVar="comboFiltroSitacion" itemValue="#{sitList.id}" />
+							</p:selectOneMenu>
+						</div>					
+						<div class="celda-form">
+							<p:outputLabel for="fechaEntradaInicial_filtro"
+								value="#{mensaje['rango.inicial']}" />
+							<p:datePicker id="fechaEntradaInicial_filtro" value="#{firmasAbiertasBean.fechaEntradaInicialFiltro}" 
+								locale="es" monthNavigator="true" pattern="dd/MM/yyyy"
+								converterMessage="#{mensaje['formato.fecha.invalido']}" mask="true"/>
+							<p:message for="fechaEntradaInicial_filtro"/>
+						</div>
+						<div class="celda-form">
+							<p:outputLabel for="fechaEntradaFinal_filtro"
+								value="#{mensaje['rango.final']}" />
+							<p:datePicker id="fechaEntradaFinal_filtro" value="#{firmasAbiertasBean.fechaEntradaFinalFiltro}" 
+								locale="es" monthNavigator="true" pattern="dd/MM/yyyy"
+								converterMessage="#{mensaje['formato.fecha.invalido']}" mask="true"/>
+							<p:message for="fechaEntradaFinal_filtro"/>
+						</div>	
+	
+						<div class="celda-form">
+							<p:outputLabel value="#{mensaje['responsable.expediente']}" for="responsable_filtro" />
+							<p:selectOneMenu id="responsable_filtro"
+								value="#{firmasAbiertasBean.selectedResponsableExpIdFiltro}"
+								style="min-width: 150px;" filter="true" filterMatchMode="contains">
+								<f:selectItem itemLabel="#{mensaje['todos']}" itemValue="" />
+								<f:selectItems
+									value="#{firmasAbiertasBean.listaResponsablesExpediente}"
+									var="respExpList" itemLabel="#{respExpList.descripcion}"
+									widgetVar="comboFiltroResponsableExp" itemValue="#{respExpList.id}" />
+							</p:selectOneMenu>
+						</div>
+					</div>
+
+					<div class="botonera-form">
+						<p:commandButton id="filtrar" icon="pi pi-filter"
+							value="#{mensaje['filtrar']}"
+							actionListener="#{firmasAbiertasBean.buscar()}"
+							update="formListadoFirmasAbiertas:tipoTram_filtro,
+									formListadoFirmasAbiertas:firmante_filtro,
+ 									formListadoFirmasAbiertas:responsableTram_filtro, 
+ 									formListadoFirmasAbiertas:tipoExpedientes_filtro, 
+ 									formListadoFirmasAbiertas:numeroExpediente_filtro, 
+ 									formListadoFirmasAbiertas:situacion_filtro, 
+ 									formListadoFirmasAbiertas:fechaEntradaInicial_filtro, 
+ 									formListadoFirmasAbiertas:fechaEntradaFinal_filtro,
+ 									formListadoFirmasAbiertas:responsable_filtro"
+							onstart="PF('tramitesAbiertosMaestraWV').paginator.setPage(0);" />
+						<p:commandButton id="limpiarFiltro"
+							value="#{mensaje['limpiar.filtro']}" icon="pi pi-filter-slash"
+							actionListener="#{firmasAbiertasBean.limpiarFiltro()}"
+							update="formListadoFirmasAbiertas:tipoTram_filtro,
+									formListadoFirmasAbiertas:firmante_filtro,
+ 									formListadoFirmasAbiertas:responsableTram_filtro,
+ 									formListadoFirmasAbiertas:tipoExpedientes_filtro, 
+ 									formListadoFirmasAbiertas:numeroExpediente_filtro, 
+ 									formListadoFirmasAbiertas:situacion_filtro,
+ 									formListadoFirmasAbiertas:fechaEntradaInicial_filtro,
+ 									formListadoFirmasAbiertas:fechaEntradaFinal_filtro,
+ 									formListadoFirmasAbiertas:responsable_filtro"
+							onstart="PF('tramitesAbiertosMaestraWV').paginator.setPage(0);" />
+					</div>
+				</p:fieldset>
+				
+				<div class="botonera-form" align="right">
+				 	<p:commandButton id="botonExportarCSV" value="#{mensaje['csv']}" icon="pi pi-file-excel" title="Exportar a CSV" rendered="#{not empty firmasAbiertasBean.lazyModel}">
+	                    <p:dataExporter type="xlsxstream" target="listadoFirmasAbiertos" fileName="#{utilsComun.getNombreCsvExportar('FIRMAS_ENCURSO')}"/>
+	                </p:commandButton>
+				</div>
+
+				<!-- PANEL CON LOS RESULTADOS DE BUSQUEDA -->
+				<p:outputPanel id="panelResultadosBusqueda" >
+					<p:dataTable var="tramitesAbiertosMaestra" id="listadoFirmasAbiertos"
+						value="#{firmasAbiertasBean.lazyModel}" paginator="true"
+						paginatorTemplate=" {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+						rowsPerPageTemplate="10,20,50,100" rows="10"
+						currentPageReportTemplate="#{mensaje['paginador.template']}"
+						selectionMode="single"
+						sortBy="#{firmasAbiertasBean.defaultOrden}"
+						sortOrder="ascending"
+						selection="#{firmasAbiertasBean.selectedTramitesAbiertos}"
+						rowKey="#{tramitesAbiertosMaestra.id}" paginatorPosition="bottom"
+						widgetVar="tramitesAbiertosMaestraWV" rendered="#{not empty firmasAbiertasBean.lazyModel}">
+
+
+			            <p:column sortBy="#{tramitesAbiertosMaestra.id}" visible="false" exportable="false">
+							<h:outputText value="#{tramitesAbiertosMaestra.id}" />
+						</p:column>
+
+						<p:column headerText="#{mensaje['fecha.inicio']}" width="70px"
+							sortBy="#{tramitesAbiertosMaestra.fechaIni}">
+							<h:outputText value="#{tramitesAbiertosMaestra.getFechaIni()}" />
+						</p:column>
+
+						<p:column headerText="#{mensaje['tramite.superior']}" width="90px"
+							sortBy="#{tramitesAbiertosMaestra.descTramSup}">
+							<h:outputText value="#{fu:ptoSusp(tramitesAbiertosMaestra.descTramSup)}" /> 
+						</p:column>			
+						<p:column headerText="#{mensaje['resp.tramite']}" width="100px"	
+							sortBy="#{tramitesAbiertosMaestra.descRespTram}">
+							<h:outputText value="#{fu:ptoSusp(tramitesAbiertosMaestra.descRespTram)}" />
+						</p:column>															
+						<p:column headerText="#{mensaje['responsable.expediente']}" width="100px"	
+							sortBy="#{tramitesAbiertosMaestra.responsableExp}">
+							<h:outputText value="#{fu:ptoSusp(tramitesAbiertosMaestra.responsableExp)}" />
+						</p:column>															
+						
+						<p:column headerText="#{mensaje['numero.expediente']}" width="100px"
+							sortBy="#{tramitesAbiertosMaestra.numExp}">
+							<h:outputText value="#{tramitesAbiertosMaestra.numExp}" /> 
+						</p:column>
+						<p:column headerText="#{mensaje['situacion']}" width="100px"
+							sortBy="#{tramitesAbiertosMaestra.situacionExp}">
+							<h:outputText value="#{tramitesAbiertosMaestra.situacionExp}" />
+						</p:column>						
+						<p:column headerText="#{mensaje['subsituacion']}" width="90px"
+							sortBy="#{tramitesAbiertosMaestra.situacionAdicionalExp}">
+							<h:outputText value="#{tramitesAbiertosMaestra.situacionAdicionalExp}" />
+						</p:column>		
+						<p:column headerText="#{mensaje['firmante']}" width="60px"
+							sortBy="#{tramitesAbiertosMaestra.firmante}">
+							<h:outputText value="#{tramitesAbiertosMaestra.firmante}" />
+						</p:column>						
+						<p:column headerText="#{mensaje['fecha.envio']}" width="70px"
+								sortBy="#{tramitesAbiertosMaestra.fechaEnvio}">
+								<h:outputText value="#{tramitesAbiertosMaestra.fechaEnvio}">
+									<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+								</h:outputText>
+						</p:column>
+						<p:column headerText="#{mensaje['fecha.firma']}" width="70px"
+								sortBy="#{tramitesAbiertosMaestra.fechaFirma}">
+								<h:outputText value="#{tramitesAbiertosMaestra.fechaFirma}">
+									<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+								</h:outputText>
+						</p:column>																	
+						
+						
+
+						<p:column headerText="#{mensaje['acciones']}" exportable="false" width="70px">
+
+							<p:commandButton id="consultarExpedientes" icon="pi pi-eye"
+								action="#{firmasAbiertasBean.onConsultar(tramitesAbiertosMaestra.id)}">
+							</p:commandButton>
+
+							<p:commandButton id="editarExpedientes"
+								widgetVar="editarExpedientes" icon="pi pi-pencil"
+								action="#{firmasAbiertasBean.onEditar(tramitesAbiertosMaestra.id)}">
+							</p:commandButton>
+						</p:column>
+					</p:dataTable>
+				</p:outputPanel>
+			</p:panel>
+			<br />
+			<p:commandButton id="volver" value="#{mensaje['volver']}"
+				actionListener="#{volverBean.migaPanVolver()}"
+				oncomplete="document.location.href='#{request.contextPath}/aplicacion/bienvenido.xhtml'">
+			</p:commandButton>
+
+		</h:form>
+
+	</ui:define>
+
+</ui:composition>
+
+</html>

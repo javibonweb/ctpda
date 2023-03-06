@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:c="http://java.sun.com/jstl/core"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:sec="https://joinfaces.org/security"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+    xmlns:fu="http://joinfaces.org/functions">
+
+<ui:composition>
+
+	<c:set var="bean" value="#{plantillasBean}" />
+			
+	<p:dialog id="dialogPlantilla"
+		rendered="#{bean.permisoNuevaPlantilla or bean.permisoEditPlantillas or bean.permisoConsPlantillas}"
+		header="#{bean.tituloDialog}" modal="true"
+	 	widgetVar="dialogPlantilla"
+	 	contentWidth="100%" contentHeight="100%" width="900" >
+		
+		<c:set var="editable" value="#{bean.formEditable}" />
+			
+		<div >			
+				
+			<div>
+				<div class="celda-form">
+					<p:outputLabel for="codigoPlantilla"
+						value="#{mensaje['codigo.plan']} *" />
+					<p:inputText id="codigoPlantilla" disabled="#{!editable}"
+						value="#{bean.plantilla.codigo}" size="10" maxlength="10" />
+				</div>
+	
+				<div class="celda-form">
+					<p:outputLabel for="descripcionPlantilla"
+						value="#{mensaje['descripcion']} *" />
+					<p:inputText id="descripcionPlantilla" disabled="#{!editable}"
+						value="#{bean.plantilla.descripcion}" size="50" maxlength="50" />
+				</div>
+	
+				<div class="celda-form">
+					<p:outputLabel for="descripcionAbrevPlantilla"
+						value="#{mensaje['descripcion.abrev']}" />
+					<p:inputText id="descripcionAbrevPlantilla" disabled="#{!editable}"
+						value="#{bean.plantilla.descripcionAbrev}" size="15" maxlength="15" />
+				</div>
+			</div>
+
+			<p:outputPanel rendered="#{editable}">
+				<div class="celda-form">
+					<p:outputLabel
+						value="#{mensaje['fichero.plantilla'].concat(empty bean.plantilla.id? ' *': '')}" />
+	        		<p:fileUpload id="ficheroPlantilla" value="#{bean.file}" widgetVar="ficheroPlantillaWV" 
+	        			label="#{mensaje['seleccionar.fichero']}"
+	        			mode="simple" skinSimple="true" dragDropSupport="true"
+	        			sizeLimit="#{20 * 1024 * 1024}" allowTypes="/(\.|\/)(#{bean.extensionesPermitidas})$/"
+		 				invalidFileMessage="#{mensaje['extension.no.permitida']} #{bean.strExtensionesPermitidas}."
+						invalidSizeMessage="#{mensaje['tam.maximo.superado']} (20Mb)" />
+	        		<div class="nota-campo-form"><h:outputText value="#{mensaje['extensiones.permitidas']}: #{bean.strExtensionesPermitidas}" /></div>
+	        		
+	        		<p:remoteCommand name="onFileChg" update="descripcionPlantilla"
+	        			action="#{bean.aplicarNombreFichero()}" process="@this, descripcionPlantilla, ficheroPlantilla"/>
+	        		
+	        		<!-- Poner onchange en el p:fileUpload no funciona, -->
+	        		<!-- pero si añadimos un change con jQuery si -->
+	        		<script>
+	        		if(PF('ficheroPlantillaWV')){
+		        		var fileUploadId = PF('ficheroPlantillaWV').id
+		        		$('#' + CSS.escape(fileUploadId))
+		        			.change( function(event) { onFileChg(); } );
+	        		}
+	        		</script>
+				</div>           
+			</p:outputPanel>
+			
+			<p:outputPanel rendered="#{not empty bean.plantilla.id}">
+				<div class="celda-form">
+					<!-- La descarga de PF por ajax no soporta ViewScoped. Debe ponerse a false -->
+					<p:commandButton id="descargarPlantilla" icon="pi pi-download" ajax="false" process="@this"
+						value="#{mensaje['descargar.fichero.actual']}" >
+						<p:fileDownload value="#{bean.descargarFichero()}" />
+					</p:commandButton>
+					<h:outputText value="(#{bean.nombreFicheroActual})" />
+				</div>
+			</p:outputPanel>
+
+ 
+				
+	    <div class="botonera-form" align="right">
+			<p:commandButton icon="pi pi-save"
+				id="btnGuardarPlantilla" value="#{mensaje['guardar']}"
+				rendered="#{editable and bean.permisoGuardarPlantillas}"
+				actionListener="#{bean.guardarPlantilla}"
+				update="@form:tablaPlantillas"
+				oncomplete="if(args.saved) PF('dialogPlantilla').hide()" >
+			</p:commandButton>
+			<p:commandButton icon="pi pi-times" process="@this"
+				id="btnCancelarPlantilla" value="#{mensaje['cancelar']}"
+				rendered="#{editable}"
+				oncomplete="PF('dialogPlantilla').hide()" >
+				<p:confirm header="#{mensaje['confirmar.operacion']}"
+					message="#{mensaje['pregunta.confirma.cancelar']}"
+					icon="pi pi-info-circle" />
+			</p:commandButton>
+			<p:commandButton icon="pi pi-times" process="@this"
+				id="btnCerrarPlantilla" value="#{mensaje['cerrar']}"
+				rendered="#{not editable}"
+				oncomplete="PF('dialogPlantilla').hide()" >
+			</p:commandButton>
+		</div>
+		
+	</div>
+	
+	</p:dialog>
+
+</ui:composition>
+</html>
