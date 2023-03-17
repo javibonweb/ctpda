@@ -87,7 +87,6 @@ public class Usuario extends Auditable {
 	
 	@Column(name = "L_FIRMANTE")
 	@ColumnDefault("1")
-	@NotNull
 	@Getter
 	@Setter
 	private Boolean firmante;

@@ -1,6 +1,8 @@
 package es.juntadeandalucia.ctpda.gestionpdt.web.usuarios;
 
 import java.io.Serializable;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -449,6 +451,9 @@ public class DatosUsuariosBean extends BaseBean implements Serializable {
 				} else {
 					usuario.setValorTipoIdentificador(null);
 				}
+				
+				String contrasenya = convertirSHA256(usuario.getLogin());
+				usuario.setContrasenya(contrasenya);
 
 				this.usuarioService.guardar(this.usuario);
 				FacesMessage msgExito = new FacesMessage(FacesMessage.SEVERITY_INFO, "",
@@ -552,6 +557,28 @@ public class DatosUsuariosBean extends BaseBean implements Serializable {
 		}
 		return res;
 				
+	}
+	
+	/**
+	 * Cifrado a SHA256
+	 */
+	private String convertirSHA256(String password) {
+		MessageDigest md = null;
+		StringBuilder sb = new StringBuilder();
+		try {
+			md = MessageDigest.getInstance("SHA-256");
+			byte[] hash = md.digest(password.getBytes());
+			for (byte b : hash) {
+				sb.append(String.format("%02x", b));
+			}
+		} catch (NoSuchAlgorithmException e) {
+			FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "",
+					mensajesProperties.getString(MENSAJEERROR));
+			PrimeFaces.current().dialog().showMessageDynamic(message);
+			log.error(e.getMessage());
+			return null;
+		}
+		return sb.toString();
 	}
 
 }
