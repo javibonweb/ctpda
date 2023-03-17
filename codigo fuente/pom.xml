@@ -235,7 +235,7 @@
 		<profile>
 			<id>desarrollo</id>
 			<activation>
-                <activeByDefault>false</activeByDefault>
+                <activeByDefault>true</activeByDefault>
             </activation>			
 			<properties>
 		        <activatedProperties>desarrollo</activatedProperties>
@@ -244,7 +244,7 @@
 		<profile>
 			<id>integracion</id>
 			<activation>
-                <activeByDefault>true</activeByDefault>
+                <activeByDefault>false</activeByDefault>
             </activation>				
 			<properties>
 		        <activatedProperties>integracion</activatedProperties>
