@@ -45,7 +45,7 @@ REM GRANTS
 
 --INSERTS/UPDATES/DELETES
 REM INSERTS/UPDATES/DELETES
---@@05_inserts.sql
+@@05_inserts.sql
 
 
 PROMPT *****************************************

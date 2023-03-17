@@ -3,7 +3,7 @@ rem  Comprobación UTF8: Esto aparece en árabe: أنا تظهر في اللغة
 set define off
 spool 01_LANZADOR.log
 
-CONNECT gestor/X_1_GESTOR@10.244.12.148:1521/dbdesa01
+CONNECT GESTOR/X_1_GESTOR@143.47.59.212:8521/MORAL
 
 @@0.1.0/lanzador_v1.0.0.SQL
 @@0.2.0/lanzador_v1.0.0.SQL
