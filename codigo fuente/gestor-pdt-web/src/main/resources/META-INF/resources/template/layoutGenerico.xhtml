@@ -80,6 +80,9 @@
 		    .loading-icon {
 		       font-size: 3rem;
 		    }
+		    #nombreAntonio{
+		    	color: black;
+		    }
 		</style>
 
     	<p:ajaxStatus onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()"/>
@@ -139,6 +142,7 @@
 					<div class="ui-g-12 ui-g-nopad">
 					
 						<p:outputPanel id="layoutCentral">
+						<p id="nombreAntonio">Antonio Franco Ballesteros</p>
 							<h:form prependId="false" id="growlForm">
 								<p:growl id="growl" showDetail="true" showSummary="false"
 								 	sticky="false" life="10000" >
