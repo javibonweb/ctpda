@@ -649,6 +649,7 @@ drop sequence gestor.s_usuarios;
 drop sequence gestor.s_usuarios_perfiles;
 drop sequence gestor.s_valores_dominios;
 drop sequence gestor.s_valores_meta_eni;
+<<<<<<< HEAD
 drop table gestor.ge_accesos_docs cascade constraints;
 drop table gestor.ge_accesos_docs_h cascade constraints;
 drop table gestor.ge_agrup_documentos cascade constraints;
@@ -2168,3 +2169,5 @@ drop sequence gestor.s_usuarios;
 drop sequence gestor.s_usuarios_perfiles;
 drop sequence gestor.s_valores_dominios;
 drop sequence gestor.s_valores_meta_eni;
+=======
+>>>>>>> branch 'master' of https://github.com/beatriz-lamorena/ctpda.git

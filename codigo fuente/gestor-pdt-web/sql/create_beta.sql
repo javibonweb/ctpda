@@ -1543,6 +1543,7 @@ alter table gestor.ge_valores_dominios add constraint GE_VALDOM_VALDOM_FK foreig
 alter table gestor.ge_valores_dominios_h add constraint FKt4c1fpr500rhb5n1rg843uvxt foreign key (rev) references gestor.ge_revaud;
 alter table gestor.ge_valores_meta_eni add constraint VMETENI_TMETENI_FK foreign key (vmeteni_tmeteni_id) references gestor.ge_tipos_metadatos_eni;
 alter table gestor.ge_valores_meta_eni_h add constraint FKb4re98ordiwv3yx378mclcqbb foreign key (rev) references gestor.ge_revaud;
+<<<<<<< HEAD
 create sequence gestor.s_accesos_docs start with 1 increment by  1;
 create sequence gestor.s_agrup_documentos start with 1 increment by  1;
 create sequence gestor.s_agrup_expedientes start with 1 increment by  1;
@@ -5148,3 +5149,5 @@ alter table gestor.ge_valores_dominios add constraint GE_VALDOM_VALDOM_FK foreig
 alter table gestor.ge_valores_dominios_h add constraint FKt4c1fpr500rhb5n1rg843uvxt foreign key (rev) references gestor.ge_revaud;
 alter table gestor.ge_valores_meta_eni add constraint VMETENI_TMETENI_FK foreign key (vmeteni_tmeteni_id) references gestor.ge_tipos_metadatos_eni;
 alter table gestor.ge_valores_meta_eni_h add constraint FKb4re98ordiwv3yx378mclcqbb foreign key (rev) references gestor.ge_revaud;
+=======
+>>>>>>> branch 'master' of https://github.com/beatriz-lamorena/ctpda.git
