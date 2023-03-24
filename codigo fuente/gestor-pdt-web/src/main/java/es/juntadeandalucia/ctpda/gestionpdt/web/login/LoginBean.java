@@ -26,18 +26,21 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import es.juntadeandalucia.ctpda.gestionpdt.model.ConexionUsuario;
 import es.juntadeandalucia.ctpda.gestionpdt.model.Dominio;
+import es.juntadeandalucia.ctpda.gestionpdt.model.FormacionPruebas;
 import es.juntadeandalucia.ctpda.gestionpdt.model.Perfil;
 import es.juntadeandalucia.ctpda.gestionpdt.model.Usuario;
 import es.juntadeandalucia.ctpda.gestionpdt.service.ConexionUsuarioService;
+import es.juntadeandalucia.ctpda.gestionpdt.service.FormacionPruebasService;
+import es.juntadeandalucia.ctpda.gestionpdt.service.ParametroService;
 import es.juntadeandalucia.ctpda.gestionpdt.service.PerfilService;
 import es.juntadeandalucia.ctpda.gestionpdt.service.PermisoPerfilService;
 import es.juntadeandalucia.ctpda.gestionpdt.service.UsuarioService;
 import es.juntadeandalucia.ctpda.gestionpdt.service.core.exception.BaseException;
-import es.juntadeandalucia.ctpda.gestionpdt.service.ParametroService;
 import es.juntadeandalucia.ctpda.gestionpdt.util.FechaUtils;
 import es.juntadeandalucia.ctpda.gestionpdt.web.SesionBean;
 import es.juntadeandalucia.ctpda.gestionpdt.web.core.Constantes;
 import es.juntadeandalucia.ctpda.gestionpdt.web.core.JsfUtils;
+import es.juntadeandalucia.ctpda.gestionpdt.web.core.LazyDataModelByQueryService;
 import es.juntadeandalucia.ctpda.gestionpdt.web.menu.NavegacionBean;
 import es.juntadeandalucia.ctpda.gestionpdt.web.menu.NavegacionBean.ListadoNavegaciones;
 import es.juntadeandalucia.ctpda.gestionpdt.web.util.BaseBean;
@@ -135,6 +138,12 @@ public class LoginBean extends BaseBean implements Serializable {
 	private NavegacionBean navegacionBean;
 	@Autowired
 	private SesionBean sesionBean;
+	
+	@Getter
+	private LazyDataModelByQueryService<FormacionPruebas> lazyModelFormacionPruebas;
+	
+	@Autowired
+	private FormacionPruebasService formacionPruebasService;
 
 	/**
 	 * Initialize default attributes.
@@ -167,6 +176,11 @@ public class LoginBean extends BaseBean implements Serializable {
 
 		PrimeFaces.current().ajax().update("formLogin");
 		PrimeFaces.current().ajax().update("formDialogPerfiles");
+		
+		lazyModelFormacionPruebas = new LazyDataModelByQueryService<>(FormacionPruebas.class, formacionPruebasService);
+		lazyModelFormacionPruebas.setPreproceso((a, b, c, filters) -> {
+			//filtros
+		});
 
 	}
 
