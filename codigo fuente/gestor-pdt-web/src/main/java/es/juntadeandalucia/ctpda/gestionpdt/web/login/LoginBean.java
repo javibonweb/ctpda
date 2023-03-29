@@ -27,10 +27,12 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import es.juntadeandalucia.ctpda.gestionpdt.model.ConexionUsuario;
 import es.juntadeandalucia.ctpda.gestionpdt.model.Dominio;
 import es.juntadeandalucia.ctpda.gestionpdt.model.FormacionPruebas;
+import es.juntadeandalucia.ctpda.gestionpdt.model.FormacionPruebasGonzalo;
 import es.juntadeandalucia.ctpda.gestionpdt.model.Perfil;
 import es.juntadeandalucia.ctpda.gestionpdt.model.Usuario;
 import es.juntadeandalucia.ctpda.gestionpdt.service.ConexionUsuarioService;
 import es.juntadeandalucia.ctpda.gestionpdt.service.FormacionPruebasService;
+import es.juntadeandalucia.ctpda.gestionpdt.service.FormacionPruebasGonzaloService;
 import es.juntadeandalucia.ctpda.gestionpdt.service.ParametroService;
 import es.juntadeandalucia.ctpda.gestionpdt.service.PerfilService;
 import es.juntadeandalucia.ctpda.gestionpdt.service.PermisoPerfilService;
@@ -142,8 +144,14 @@ public class LoginBean extends BaseBean implements Serializable {
 	@Getter
 	private LazyDataModelByQueryService<FormacionPruebas> lazyModelFormacionPruebas;
 	
+	@Getter
+	private LazyDataModelByQueryService<FormacionPruebasGonzalo> lazyModelFormacionPruebasGonzalo;
+	
 	@Autowired
 	private FormacionPruebasService formacionPruebasService;
+	
+	@Autowired
+	private FormacionPruebasGonzaloService formacionPruebasGonzaloService;
 
 	/**
 	 * Initialize default attributes.
@@ -179,6 +187,11 @@ public class LoginBean extends BaseBean implements Serializable {
 		
 		lazyModelFormacionPruebas = new LazyDataModelByQueryService<>(FormacionPruebas.class, formacionPruebasService);
 		lazyModelFormacionPruebas.setPreproceso((a, b, c, filters) -> {
+			//filtros
+		});
+		
+		lazyModelFormacionPruebasGonzalo = new LazyDataModelByQueryService<>(FormacionPruebasGonzalo.class, formacionPruebasGonzaloService);
+		lazyModelFormacionPruebasGonzalo.setPreproceso((a, b, c, filters) -> {
 			//filtros
 		});
 
