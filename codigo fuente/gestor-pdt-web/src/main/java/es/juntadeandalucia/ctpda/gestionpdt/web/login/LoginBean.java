@@ -28,16 +28,19 @@ import es.juntadeandalucia.ctpda.gestionpdt.model.ConexionUsuario;
 import es.juntadeandalucia.ctpda.gestionpdt.model.Dominio;
 import es.juntadeandalucia.ctpda.gestionpdt.model.Perfil;
 import es.juntadeandalucia.ctpda.gestionpdt.model.Usuario;
+import es.juntadeandalucia.ctpda.gestionpdt.model.for_pruebas_pedro_romero;
 import es.juntadeandalucia.ctpda.gestionpdt.service.ConexionUsuarioService;
 import es.juntadeandalucia.ctpda.gestionpdt.service.PerfilService;
 import es.juntadeandalucia.ctpda.gestionpdt.service.PermisoPerfilService;
 import es.juntadeandalucia.ctpda.gestionpdt.service.UsuarioService;
+import es.juntadeandalucia.ctpda.gestionpdt.service.for_pruebas_pedro_romeroService;
 import es.juntadeandalucia.ctpda.gestionpdt.service.core.exception.BaseException;
 import es.juntadeandalucia.ctpda.gestionpdt.service.ParametroService;
 import es.juntadeandalucia.ctpda.gestionpdt.util.FechaUtils;
 import es.juntadeandalucia.ctpda.gestionpdt.web.SesionBean;
 import es.juntadeandalucia.ctpda.gestionpdt.web.core.Constantes;
 import es.juntadeandalucia.ctpda.gestionpdt.web.core.JsfUtils;
+import es.juntadeandalucia.ctpda.gestionpdt.web.core.LazyDataModelByQueryService;
 import es.juntadeandalucia.ctpda.gestionpdt.web.menu.NavegacionBean;
 import es.juntadeandalucia.ctpda.gestionpdt.web.menu.NavegacionBean.ListadoNavegaciones;
 import es.juntadeandalucia.ctpda.gestionpdt.web.util.BaseBean;
@@ -135,6 +138,11 @@ public class LoginBean extends BaseBean implements Serializable {
 	private NavegacionBean navegacionBean;
 	@Autowired
 	private SesionBean sesionBean;
+	
+	private LazyDataModelByQueryService<for_pruebas_pedro_romero> lazyModelFormacionPruebasPedroRomero;
+	
+	@Autowired
+	private for_pruebas_pedro_romeroService for_pruebas_pedro_romeroService;
 
 	/**
 	 * Initialize default attributes.
@@ -164,6 +172,14 @@ public class LoginBean extends BaseBean implements Serializable {
 		descripcionPerfil = "";
 
 		nombreCompletoUsuario = "";
+		
+		lazyModelFormacionPruebasPedroRomero = new LazyDataModelByQueryService<>(for_pruebas_pedro_romero.class, for_pruebas_pedro_romeroService);
+		lazyModelFormacionPruebasPedroRomero.setPreproceso((a, b, c, filters) -> {
+			//filtros
+		});
+
+		
+		
 
 		PrimeFaces.current().ajax().update("formLogin");
 		PrimeFaces.current().ajax().update("formDialogPerfiles");
