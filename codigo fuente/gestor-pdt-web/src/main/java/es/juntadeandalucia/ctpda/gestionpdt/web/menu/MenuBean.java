@@ -162,7 +162,12 @@ public class MenuBean extends BaseBean implements Serializable{
     	submenuAdmon.setLabel(mensajesProperties.getString("administracion"));
     	menuAdmon(submenuAdmon);
     	    	
-
+    	/*
+         * 	MENU FOMRACION VDC
+         * */    	
+    	DefaultSubMenu submenuForVictor = new DefaultSubMenu();
+    	submenuForVictor.setLabel(mensajesProperties.getString("formacion.blh"));
+    	menuForVictor(submenuForVictor);
     	    	
     	PrimeFaces.current().ajax().update("menuForm");
     	
@@ -488,6 +493,20 @@ public class MenuBean extends BaseBean implements Serializable{
         	submenuExpedientes.getElements().add(itemResoluciones);
         }
 	}
-
+	
+	private void menuForVictor (DefaultSubMenu submenuForVictor) {
+    	DefaultMenuItem itemForVictor = new DefaultMenuItem();
+    	itemForVictor.setAjax(false);
+    	itemForVictor.setAsync(false);
+    	itemForVictor.setUpdate(DATAFORM);
+    	itemForVictor.setValue(mensajesProperties.getString("formacion.vdc"));
+    	itemForVictor.setCommand("#{forVictor.redireccionMenu}");
+    	
+    	submenuForVictor.getElements().add(itemForVictor);
+		
+		if(!submenuForVictor.getElements().isEmpty()) {
+        	model.getElements().add(submenuForVictor);
+        }
+	}
 
 }

@@ -83,4 +83,7 @@ public class UsuarioService extends AbstractCRUDService<Usuario> {
 		return new BooleanBuilder();
 	}
 
+	public List<Usuario> findUsuariosActivos(){
+		return usuarioRepository.findUsuariosActivos();
+	}
 }
