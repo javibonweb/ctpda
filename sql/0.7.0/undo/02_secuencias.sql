@@ -1,0 +1,22 @@
+rem  Comprobación UTF8: Esto aparece en árabe: أنا تظهر في اللغة العربية
+
+SPOOL logs/007_UNDO_02_SECUENCIAS.LOG
+ALTER SESSION SET "_ORACLE_SCRIPT"= TRUE;
+
+DROP SEQUENCE S_CFG_METADATOS_TRAM;
+DROP SEQUENCE S_DETALLE_EXPDTE_TRAM;
+------------------------------------
+
+DROP SEQUENCE S_CFG_PLAZOS_ESTILOS;
+DROP SEQUENCE S_CFG_PLAZOS_EXPDTE;
+DROP SEQUENCE S_PLAZOS_EXPDTE;
+------------------------------------
+
+DROP SEQUENCE S_CFG_PLAZOS_AUT;
+------------------------------------
+
+DROP SEQUENCE S_DOCUMENTOS_EXPED_TRAMITES;
+
+
+
+SPOOL OFF;
