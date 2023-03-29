@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:c="http://java.sun.com/jstl/core"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:pe="http://primefaces.org/ui/extensions"
+      xmlns:sec="https://joinfaces.org/security">
+
+<ui:composition template="#{navegacionBean.get('TEMPLATE_LAYOUT_GENERICO')}">
+
+    <ui:define name="content" >
+        <h:form id="formListadoFormaciondfr">
+
+            <p:messages for="messagesListadoFormaciondfr" id="messagesListadoFormaciondfr" showDetail="true" closable="true">
+                <p:autoUpdate />
+            </p:messages>
+
+            <p:panel header="#{mensaje['formacion.dfr']}">
+                <p:fieldset legend="#{mensaje['filtros.busqueda']}" id="bloqueFiltroBusquedaListadoFormaciondfr" toggleable="true" toggleSpeed="250">
+                    <div>
+                        <div class="celda-form">
+                            <p:outputLabel for="codigo_filtro" value="#{mensaje['codigo']}" />
+                            <p:inputText id="codigo_filtro" maxlength="50" size="30" value="#{formacionDfrBean.codigoFiltro}" />
+                        </div>
+
+                        <div class="celda-form">
+                            <p:outputLabel for="descripcion_filtro" value="#{mensaje['descripcion']}" />
+                            <p:inputText id="descripcion_filtro" maxlength="255" size="50" value="#{formacionDfrBean.descripcionFiltro}" />
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="celda-form">
+                            <p:outputPanel styleClass="celda-form">
+                                <p:outputLabel for="activo_filtro" value="#{mensaje['activo']}" />
+                                <p:selectBooleanCheckbox id="activo_filtro" value="#{formacionDfrBean.activoFiltro}" itemLabel="#{mensaje['si']}" />
+                            </p:outputPanel>
+                        </div>
+
+                        <div class="celda-form">
+                            <p:outputLabel for="version_filtro" value="#{mensaje['version']}" />
+                            <p:inputNumber id="version_filtro" value="#{formacionDfrBean.versionFiltro}" minValue="1" decimalPlaces="0"/>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="celda-form">
+                            <p:outputLabel for="fechaCreacion_filtro" value="#{mensaje['fecha.creacion']}" />
+                            <p:datePicker id="fechaCreacion_filtro" value="#{formacionDfrBean.fechaCreacionFiltro}"
+                                          locale="es" monthNavigator="true" pattern="dd/MM/yyyy"
+                                          converterMessage="#{mensaje['formato.fecha.invalido']}" mask="true"/>
+                            <p:message for="fechaCreacion_filtro"/>
+                        </div>
+
+                        <div class="celda-form">
+                            <p:outputLabel value="#{mensaje['usuarios']}" for="usuarios_filtro" />
+                            <p:selectOneMenu id="usuarios_filtro" value="#{formacionDfrBean.selectedUsuarioFiltro}"
+                                             style="min-width: 150px;" filter="true" filterMatchMode="contains">
+                                <f:selectItem itemLabel="#{mensaje['todos']}" itemValue="" />
+                                <f:selectItems value="#{formacionDfrBean.listaUsuarios}"
+                                               var="usuarios" itemLabel="#{usuarios.login}"
+                                               widgetVar="comboFiltroUsuarios" itemValue="#{usuarios.id}" />
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+
+                    <div class="botonera-form">
+                        <p:commandButton id="nuevoFormacionDfr" icon="pi pi-plus"
+                                         value="#{mensaje['nueva.formaciondfr']}"
+                                         action="#{formacionDfrBean.onCrear}" />
+                        <p:commandButton id="filtrar" value="#{mensaje['filtrar']}"
+                                         icon="pi pi-filter"
+                                         update=""
+                        /><!-- onstart="PF('usuarioWV').paginator.setPage(0);" -->
+                        <p:commandButton id="limpiarFiltros" icon="pi pi-filter-slash"
+                                         value="#{mensaje['limpiar.filtro']}"
+                                         actionListener="#{formacionDfrBean.limpiarFiltros()}"
+                                         update="formListadoFormaciondfr:codigo_filtro,formListadoFormaciondfr:descripcion_filtro,
+								formListadoFormaciondfr:activo_filtro,formListadoFormaciondfr:version_filtro,
+								formListadoFormaciondfr:fechaCreacion_filtro,formListadoFormaciondfr:usuarios_filtro"
+                        /> <!-- onstart="PF('usuarioWV').paginator.setPage(0);" -->
+                    </div>
+                </p:fieldset>
+
+                <!-- TABLA -->
+                <p:outputPanel id="panelResultadosFormacionDfr">
+                    <p:dataTable var="formacionPruebasDfr" id="formacionPruebasDfr"
+                                 value="#{formacionDfrBean.lazyModel}" paginator="true"
+                                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                 rowsPerPageTemplate="10,20,50,100" rows="10"
+                                 currentPageReportTemplate="#{mensaje['paginador.template']}"
+                                 selectionMode="single"
+                                 sortBy="#{formacionDfrBean.codigoFiltro}"
+                                    paginatorPosition="bottom"
+                                    widgetVar="formacionPruebasDfrWV"
+                    >
+                        <p:column headerText="#{mensaje['codigo']}" sortBy="#{formacionPruebasDfr.codigo}">
+                            <h:outputText value="#{formacionPruebasDfr.codigo}" />
+                        </p:column>
+                        <p:column headerText="#{mensaje['descripcion']}" sortBy="#{formacionPruebasDfr.descripcion}">
+                            <h:outputText value="#{formacionPruebasDfr.descripcion}" />
+                        </p:column>
+                        <p:column headerText="#{mensaje['activo']}" sortBy="#{formacionPruebasDfr.activo}">
+                            <h:outputText value="#{formacionPruebasDfr.activo}" />
+                        </p:column>
+                        <!--p:column headerText="#{mensaje['version']}" sortBy="#{formacionPruebasDfr.nVersion}">
+                            <h:outputText value="#{formacionPruebasDfr.nVersion}" />
+                        </p:column-->
+                        <p:column headerText="#{mensaje['fecha.creacion']}" sortBy="#{formacionPruebasDfr.fechaCreacion}">
+                            <h:outputText value="#{formacionPruebasDfr.fechaCreacion}" />
+                        </p:column>
+                        <p:column headerText="#{mensaje['usuarios']}" sortBy="#{formacionPruebasDfr.usuario}">
+                            <h:outputText value="#{formacionPruebasDfr.usuario}" />
+                        </p:column>
+
+                    </p:dataTable>
+                </p:outputPanel>
+
+            </p:panel>
+
+        </h:form>
+    </ui:define>
+
+</ui:composition>
+
+</html>

@@ -161,14 +161,36 @@ public class MenuBean extends BaseBean implements Serializable{
     	DefaultSubMenu submenuAdmon = new DefaultSubMenu();
     	submenuAdmon.setLabel(mensajesProperties.getString("administracion"));
     	menuAdmon(submenuAdmon);
-    	    	
+
+		/*
+		 * 	MENU FORMACION
+		 * */
+		DefaultSubMenu submenuFormacionDfr = new DefaultSubMenu();
+		submenuFormacionDfr.setLabel(mensajesProperties.getString("formacion.dfr"));
+		menuFormacionDfr(submenuFormacionDfr);
 
     	    	
     	PrimeFaces.current().ajax().update("menuForm");
     	
     }
-    
-    private void menuMiMesa(DefaultSubMenu submenuMiMesa) {
+
+	private void menuFormacionDfr(DefaultSubMenu submenuFormacionDfr) {
+		if ((listaCodigoPermisos != null) && listaCodigoPermisos.contains(Constantes.PERMISO_MENU_RESOL)) {
+			DefaultMenuItem itemFormacionDfr = new DefaultMenuItem();
+			itemFormacionDfr.setAjax(false);
+			itemFormacionDfr.setAsync(false);
+			itemFormacionDfr.setUpdate(DATAFORM);
+			itemFormacionDfr.setValue(mensajesProperties.getString("formacion.dfr"));
+			itemFormacionDfr.setCommand("#{formacionDfrBean.redireccionMenu}");
+			submenuFormacionDfr.getElements().add(itemFormacionDfr);
+		}
+
+		if (!submenuFormacionDfr.getElements().isEmpty()) {
+			model.getElements().add(submenuFormacionDfr);
+		}
+	}
+
+	private void menuMiMesa(DefaultSubMenu submenuMiMesa) {
         if((listaCodigoPermisos!= null) && listaCodigoPermisos.contains(Constantes.PERMISO_MI_MESA)) {
         	DefaultMenuItem itemTareas = new DefaultMenuItem();
         	itemTareas.setAjax(false);
