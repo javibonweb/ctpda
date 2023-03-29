@@ -1,0 +1,26 @@
+#mainLayoutPane {
+  background-color: #ffffff;
+}
+
+#mainDiv {
+  background-color: #ffffff;
+}
+
+.CodeMirror { 
+  text-align: left; 
+  height: auto !important;
+}
+
+.center {
+  text-align: center;
+}
+
+
+.sinBorderGrid.ui-panelgrid>*>tr,
+.sinBorderGrid.ui-panelgrid .ui-panelgrid-cell,
+.sinBorderGrid.ui-panelgrid>*>tr>td>div {
+    border: none;
+}
+
+
+

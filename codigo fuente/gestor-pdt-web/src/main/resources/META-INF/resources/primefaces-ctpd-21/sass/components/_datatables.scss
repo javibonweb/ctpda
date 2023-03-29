@@ -1,0 +1,78 @@
+@import '../abstracts/variables';
+
+
+
+.ui-datatable thead th {
+  text-align: left;
+}
+
+
+.ui-datatable .ui-datatable-odd {
+	background-color: $color-filas-pares;
+}
+
+.ui-datatable .ui-datatable-odd {
+	background-color: $color-filas-pares;
+}
+
+
+.celda-editable {
+  /*padding-right: 10px;*/
+}
+
+.celda-editable:after {
+  content: " \f040";
+  font-family: "FontAwesome 5 Free";
+  font-weight: 900;
+}
+
+.page-list-button-bar {
+  padding: 10px 0;
+}
+
+.page-list-button-bar button {
+  /*border-radius: 0px; */
+}
+
+.page-list-button-bar button:first-child {
+  /*border-radius: 6px 0px 0px 6px ; */
+}
+
+.page-list-button-bar button:first-child {
+  /*border-radius: 0px 6px 6px 0px ; */
+}
+
+//El texto dentro de los botones del paginador no puede ser muy grande 
+//porque si no se empiezan a ver los iconos que hay debajo en el sprite.
+//Cambiamos a una fuente 'normal'
+.ui-paginator a {
+	font-family: 'Open Sans', sans-serif;
+	//font-size: 80%;
+}
+
+body .ui-datatable .ui-datatable-data > tr .ui-row-toggler { 
+	background-color: #263746; 
+	border: 1px solid #263746; 
+	border-radius: 2px; 
+} 
+
+.fondonegroletrablanca {
+	background-color: black !important; 
+	color: white !important;
+}	
+.fondorojoletrablanca {
+	background-color: red !important; 
+	color: white !important;
+}
+.fondorosaletraroja {
+	background-color: pink !important; 
+	color: red !important;
+}
+.fondoblancoletraroja {
+	background-color: white !important; 
+	color: red !important;
+}
+.fondomoradoletrablanca {
+	background-color: purple !important; 
+	color: white !important;
+}

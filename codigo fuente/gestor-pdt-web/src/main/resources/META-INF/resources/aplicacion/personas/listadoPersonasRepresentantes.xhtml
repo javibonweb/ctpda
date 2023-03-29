@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:c="http://java.sun.com/jstl/core"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:sec="https://joinfaces.org/security">
+
+<ui:composition>
+	<p:fieldset id="bloqueDatosGeneralesPersonasRepresentantes"
+		legend="#{mensaje['representantes']}" styleClass="ui-g"
+		toggleable="true" toggleSpeed="250"
+		rendered="#{datosPersonasBean.persona.id != null}">
+
+		<p:messages for="messagesFormularioListadoPersonasRepresentantes"
+			id="messagesFormularioListadoPersonasRepresentantes" showDetail="true"
+			closable="true">
+			<p:autoUpdate />
+		</p:messages>
+	
+		<!-- PANEL EXPEDIENTES DATOS PERSONAS -->
+	
+		<div>
+			<div class="celda-form">
+				<p:commandButton id="abrirBusquedaRepresentantes" icon="pi pi-search" value="#{mensaje['buscar.persona']}"
+					rendered="#{editable and datosPersonasRepresentantesBean.permisoBusPersRep == true}" immediate="true"
+					actionListener="#{datosPersonasRepresentantesBean.abrirBusquedaRepresentantes}"
+					process="@this"
+					update="formFormulario:dialogBuscarRepresentantes"/>
+			</div>
+		</div>
+	
+		<!-- TABLA DATOS PERSONA EXPEDIENTES -->
+		<p:outputPanel id="panelResultadosBusquedaRepresentantes">
+			<p:dataTable var="rep" id="tablaPersonasRepresentantes"
+				value="#{datosPersonasRepresentantesBean.lazyModelPersonasRepresentantes}"
+				paginator="true"
+				paginatorTemplate=" {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+				rowsPerPageTemplate="10,20,50,100" rows="10"
+				currentPageReportTemplate="#{mensaje['paginador.template']}"
+				selectionMode="single"
+				rowKey="#{rep.id}" paginatorPosition="bottom">
+
+				<p:column headerText="#{mensaje['principal']}" width="80" sortBy="#{rep.principal}">
+					<p:selectBooleanCheckbox value="#{rep.principal}"
+						disabled="#{!editable}">
+						<p:ajax
+							listener="#{datosPersonasRepresentantesBean.cambioCheckPrincipal(rep)}"
+							/>
+	
+					</p:selectBooleanCheckbox>
+				</p:column>
+				
+				<p:column headerText="#{mensaje['representante.legal']}" sortBy="#{rep.representante.nombreRazonsocial}">
+		            <h:outputText value="#{rep.representante.nombreAp}"/>
+				</p:column>
+								
+				<p:column headerText="#{mensaje['acciones']}" rendered="#{editable}" width="85">
+					<p:commandButton id="eliminarPersonaExp" icon="pi pi-trash" 
+								rendered="#{datosPersonasRepresentantesBean.permisoDelPersRep == true}"
+								actionListener="#{datosPersonasRepresentantesBean.eliminarRepresentante(rep)}"
+								update="tablaPersonasRepresentantes">
+								<p:confirm header="#{mensaje['confirmar.operacion']}" message="#{mensaje['pregunta.confirma.eliminar']}" icon="pi pi-info-circle"/>				
+					</p:commandButton>
+				</p:column>
+				
+					
+
+			</p:dataTable>
+		</p:outputPanel>
+		
+	</p:fieldset>
+	
+	<p:dialog id="eliminarRepreUnico" header="#{mensaje['confirmar.operacion']}" widgetVar="eliminarRepreUnicoVar" closable="true"  responsive="true" left="473.172px" top=" 98.219px" z-index="1019" >
+		<p:outputLabel value="#{mensaje['representante.principal.unico']}" />
+		
+		<div class="botonera-form" align="right">
+			<p:commandButton value="#{mensaje['si']}" styleClass="ui-confirmdialog-yes" actionListener="#{datosPersonasRepresentantesBean.eliminarRepresentanteUnico}"/>
+			<p:commandButton value="#{mensaje['no']}" styleClass="ui-confirmdialog-no ui-button-flat" actionListener="#{datosPersonasRepresentantesBean.ocultarEliminarRepreUnicoVar}"/>
+		</div>		
+	</p:dialog>
+	
+
+	
+	<!-- DIALOGO BUSCAR NUEVOS REPRESENTANTES -->
+	<p:dialog id="dialogBuscarRepresentantes" header="#{mensaje['buscador.persona']}" widgetVar="dialogBuscarRepresentantes" 
+		closable="true" resizable="false" draggable="true" modal="true" responsive="true" contentWidth="100%" contentHeight="100%" width="1200" height="500"
+		rendered="#{editable or datosPersonasBean.persona.id != null}">
+		
+			<p:messages for="messagesFormularioBusqRepre" id="messagesFormularioBusqRepre" showDetail="true" closable="true">
+				<p:autoUpdate/> 
+	        </p:messages>
+        
+				<p:fieldset legend="#{mensaje['filtros.busqueda']}"
+					id="bloqueFiltroBusquedaRepresentantes" toggleable="true" toggleSpeed="250">
+					<div>
+						<div class="celda-form">
+							<p:outputLabel for="nombreRazonSocial_filtro"
+								value="#{mensaje['nombre.razonsocial']}" />
+							<p:inputText id="nombreRazonSocial_filtro" maxlength="255"
+								value="#{datosPersonasRepresentantesBean.nombreRazonSocialFiltro}" />
+						</div>
+						<div class="celda-form">
+							<p:outputLabel for="nifCif_filtro"
+								value="#{mensaje['identificador']}" />
+							<p:inputText id="nifCif_filtro" maxlength="10"
+								value="#{datosPersonasRepresentantesBean.nifCifFiltro}" />
+						</div>
+
+					</div>
+
+					<div class="botonera-form">
+					<p:commandButton id="altaPersonasRepre"
+							value="#{mensaje['nueva.persona']}" icon="pi pi-plus"
+							rendered="#{datosPersonasRepresentantesBean.permisoDelPersRep == true and datosPersonasRepresentantesBean.numerosSaltos!=2}"
+							actionListener="#{datosPersonasBean.altaPersonaRepre}"
+							immediate="true" process="@this" />
+					
+						<p:commandButton id="filtrar" icon="pi pi-filter" 
+							value="#{mensaje['filtrar']}" actionListener="#{datosPersonasRepresentantesBean.buscarNuevosRepresentantes}"
+							update="tablaNuevosRepresentantes"
+							onstart="PF('repWV').paginator.setPage(0);" />
+<!-- 							update="tablaNuevosRepresentantes,numeroExpediente_filtro,fechaEntrada_filtro" /> -->
+						<p:commandButton id="limpiarFiltro"
+							value="#{mensaje['limpiar.filtro']}" icon="pi pi-filter-slash"
+							actionListener="#{datosPersonasRepresentantesBean.limpiarFiltro()}"
+							update="nombreRazonSocial_filtro,nifCif_filtro,tablaNuevosRepresentantes"
+							onstart="PF('repWV').paginator.setPage(0);" />
+					</div>
+				</p:fieldset>
+
+				<!-- PANEL CON LOS RESULTADOS DE BUSQUEDA -->
+				<p:outputPanel id="panelResultadosBusquedaNuevosRepresentantes">
+					<p:dataTable var="rep" id="tablaNuevosRepresentantes"
+						value="#{datosPersonasRepresentantesBean.lazyModelNuevosRepresentantes}" paginator="true"
+						paginatorTemplate=" {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+						rowsPerPageTemplate="10,20,50,100" rows="10"
+						currentPageReportTemplate="#{mensaje['paginador.template']}"
+						selectionMode="single"
+						sortOrder="ascending"
+						rowKey="#{rep.id}" paginatorPosition="bottom"
+						widgetVar="repWV">
+
+						<p:column headerText="#{mensaje['nombre.razonsocial']}" sortBy="#{rep.nombreRazonsocial}">
+							<h:outputText value="#{rep.nombreAp}" />
+						</p:column>
+						
+						<p:column headerText="#{mensaje['identificador']}" sortBy="#{rep.nifCif}">
+							<h:outputText value="#{rep.nifCif}" />
+						</p:column>
+						
+						<p:column headerText="#{mensaje['acciones']}" width="85">
+							<p:commandButton id="seleccionarRepre"
+								widgetVar="seleccionarRepre" icon="pi pi-plus-circle"
+								action="#{datosPersonasRepresentantesBean.asignarRepresentante(rep)}"
+								update="@form:tablaPersonasRepresentantes">
+							</p:commandButton>							
+						</p:column>
+					</p:dataTable>
+				</p:outputPanel>
+ 
+	</p:dialog>
+	
+
+</ui:composition>
+</html>

@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:c="http://java.sun.com/jstl/core"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:sec="https://joinfaces.org/security">
+<ui:composition
+	template="#{navegacionBean.get('TEMPLATE_LAYOUT_GENERICO')}">
+	<ui:define name="content">
+
+		<c:set var="editable" value="#{datosTipoAgrupacionBean.formEditable}" />
+
+		<h:form id="formFormularioTipoAgrupacion">
+
+			<p:messages for="messagesFormulario" id="messagesFormulario"
+				showDetail="true" closable="true">
+				<p:autoUpdate />
+			</p:messages>
+			
+			<p:panel id="panelTiposAgr">
+				<f:facet name="header">
+				<h:outputText value="#{mensaje['formulario.tipo.agrupacion']}" style="font-weight:bold" />
+				</f:facet>
+				
+				<p:outputPanel id="panelEditarTiposAgrByForm" rendered="#{datosTipoAgrupacionBean.tipoAgrupacion.activa and datosTipoAgrupacionBean.permisoEditTipAgrup == true and !editable and datosTipoAgrupacionBean.numerosSaltos!=2}">
+					<div class="botonera-form" align="right">
+						<p:commandButton id="editarTiposAgrByForm" widgetVar="editarTiposAgrByForm" icon="pi pi-pencil"
+							action="#{datosTipoAgrupacionBean.onEditarByForm(datosTipoAgrupacionBean.tipoAgrupacion.id)}">
+							<f:param name="id" value="#{datosTipoAgrupacionBean.tipoAgrupacion.id}" />
+						</p:commandButton>
+					</div>				
+				</p:outputPanel>
+
+			<!-- PANEL DIALOG TIPOS AGRUPACION -->
+			<p:fieldset id="bloqueTipoAgrupacion" legend="#{mensaje['datos.tipo.agrupacion']}" toggleable="true" toggleSpeed="250">
+				<div>
+						<div class="celda-form">
+							<p:outputLabel rendered="#{editable}" for="descripcion"
+								value="#{mensaje['tipo.agrupacion']} * " />
+							<p:outputLabel rendered="#{!editable}" for="descripcion"
+								value="#{mensaje['tipo.agrupacion']}" />
+							<p:inputText id="descripcion" maxlength="100" size="100"
+								value="#{datosTipoAgrupacionBean.tipoAgrupacion.descripcion}"
+								disabled="#{!editable}" />
+						</div>
+					</div>
+				<div>
+						<div class="celda-form">
+							<p:outputLabel for="comboTipoAgrupacion"
+								value="#{mensaje['tipo.agrupacion.superior']}" />
+							<p:selectOneMenu id="comboTipoAgrupacion" style="max-width: 400px"
+								value="#{datosTipoAgrupacionBean.selectedNuevoTipoAgrupacionId}"
+								disabled="#{!editable or (editable and !(datosTipoAgrupacionBean.tipoAgrupacion.id == null))}">
+								<f:selectItem itemLabel="#{mensaje['seleccione.tipo.agrupacion.superior']}"
+									itemValue="#{datosTipoAgrupacionBean.tipoAgrupacion.id}" />
+								<f:selectItems
+									value="#{datosTipoAgrupacionBean.listaTipoAgrupacionesSup}"
+									var="tipAgrupList" itemLabel="#{tipAgrupList.descripcion}"
+									widgetVar="comboTipoAgrupacion" itemValue="#{tipAgrupList.id}" />
+								<p:ajax
+									listener="#{datosTipoAgrupacionBean.calcularNivelAnidamiento}"
+									event="change" />
+							</p:selectOneMenu>
+						</div>
+						<div class="celda-form">
+							<p:outputLabel
+								rendered="#{!datosTipoAgrupacionBean.modoAccesoConsulta}"
+								for="nivelAnidamiento" value="#{mensaje['nivel.anidamiento']}" />
+							<p:outputLabel
+								rendered="#{datosTipoAgrupacionBean.modoAccesoConsulta}"
+								for="nivelAnidamiento" value="#{mensaje['nivel.anidamiento']}" />
+							<p:inputText id="nivelAnidamiento" size="3"
+								value="#{datosTipoAgrupacionBean.tipoAgrupacion.nivelAnidamiento}"
+								disabled="true" />
+						</div>	
+				</div>	  
+			</p:fieldset>
+
+			<!-- TABLA DESCENDIENTES -->
+			<p:fieldset id="bloqueAnidamientos" legend="#{mensaje['anidamientos']}" toggleable="true" toggleSpeed="250">
+				<p:dataTable var="tipoAgrupacionAscendente" id="tablaAcendentes"
+					value="#{datosTipoAgrupacionBean.listaTipoAgrupacionesAscendentes}"
+					paginator="true"
+					paginatorTemplate=" {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+					rowsPerPageTemplate="10,20,50,100" paginatorPosition="bottom"
+					rows="10"
+					currentPageReportTemplate="#{mensaje['paginador.template']}"
+					selectionMode="single"
+					sortBy="#{tipoAgrupacionAscendente.descripcion}"
+					sortOrder="ascending" rowKey="#{tipoAgrupacionAscendente.id}">
+
+					<p:column headerText="#{mensaje['anidamientos']}"
+						sortBy="#{tipoAgrupacionAscendente.descripcion}">
+						<h:outputText value="#{tipoAgrupacionAscendente.descripcion}" />
+					</p:column>
+				</p:dataTable>
+				<br></br>
+				<p:outputLabel value="#{mensaje['anidamientos.orden.agrupacion']}" />
+			</p:fieldset>
+			
+			<div class="botonera-form" align="right">
+				<p:commandButton rendered="#{editable and datosTipoAgrupacionBean.permisoSaveTipAgrup == true}" icon="pi pi-save"
+					id="guardarTipoAgrupacion" value="#{mensaje['guardar']}"
+					actionListener="#{datosTipoAgrupacionBean.guardarTipoAgrupacion()}"
+					update="formFormularioTipoAgrupacion" />
+				<p:commandButton rendered="#{editable}" icon="pi pi-times"
+					id="cancelarTipoAgrupacion" value="#{mensaje['cancelar']}"
+					actionListener="#{volverBean.cancelar()}"
+					oncomplete="document.location.href='#{request.contextPath}/aplicacion/admonfuncional/tiposagrupaciones/listadoTiposAgrupaciones.jsf'">
+					<p:confirm header="#{mensaje['confirmar.operacion']}"
+						message="#{mensaje['pregunta.confirma.cancelar']}"
+						icon="pi pi-info-circle" />
+				</p:commandButton>
+				<p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true" >
+					<div class="botonera-form" align="right">
+						<p:commandButton value="#{mensaje['si']}" type="button" styleClass="ui-confirmdialog-yes" />
+						<p:commandButton value="#{mensaje['no']}" type="button" styleClass="ui-confirmdialog-no ui-button-flat" />
+					</div>									
+				</p:confirmDialog>
+			</div>
+			
+			</p:panel>
+			<br/>
+			<p:commandButton id="volver" value="#{mensaje['volver']}"
+				actionListener="#{volverBean.migaPanVolver('Listado de tipos de agrupaciones')}"
+				oncomplete="document.location.href='#{request.contextPath}/aplicacion/admonfuncional/tiposagrupaciones/listadoTiposAgrupaciones.xhtml'">
+			</p:commandButton>			
+			
+		</h:form>
+
+	</ui:define>
+
+</ui:composition>
+
+</html>

@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:pe="http://primefaces.org/ui/extensions"                
+                xmlns:sec="https://joinfaces.org/security">
+<ui:composition template="#{navegacionBean.get('TEMPLATE_LAYOUT_GENERICO')}">                  
+    <ui:define name="content" >
+    
+	<script>
+	function clickBotonFila(tablaId, id , elemId){
+		$("div[id='" + tablaId+"'] "       //tabla (id jsf completo)
+			+ "tr[data-rk='" + id + "'] "  //fila (id = rowkey del datatable)
+			+ "[id$=':" + elemId+ "']")    //botón (solo la terminación del id jsf)
+			.click();
+	}
+	</script>   
+	    
+		<h:form id="formListadoTiposAgrupaciones">
+
+			
+			<p:messages for="messagesListado" id="messagesListado" showDetail="true" closable="true">
+            	<p:autoUpdate/>
+       		</p:messages>	
+			
+			<!-- PANEL FILTRO DE BUSQUEDA DE TIPOS DE AGRUPACIONES -->
+			<p:panel header="#{mensaje['gestion.tipos.agrupaciones']}" >
+			
+			<p:fieldset legend="#{mensaje['filtros.busqueda']}" id="bloqueFiltroBusqueda" toggleable="true" toggleSpeed="250">       		
+					<div>
+						<div class="celda-form">
+							<p:outputLabel for="descripcion_filtro" value="#{mensaje['tipo.agrupacion']}"/>
+					        <p:inputText id="descripcion_filtro" maxlength="100" size="30" value="#{tipoAgrupacionBean.descripcionFiltro}"/>
+						</div>
+						<div class="celda-form">		
+							<p:outputLabel value="#{mensaje['tipo.agrupacion.superior']}" for="tipoAgrupacionSuperior_filtro" />
+							<p:selectOneMenu id="tipoAgrupacionSuperior_filtro" value="#{tipoAgrupacionBean.selectedTipoAgrupacionSupIdFiltro}" style="width: 310px;">
+							<f:selectItem itemLabel="#{mensaje['todos']}" itemValue="" />
+							<f:selectItems value="#{tipoAgrupacionBean.listaTipoAgrupacionesSup}"
+								var="tipAgrupSupList" itemLabel="#{tipAgrupSupList.descripcion}"
+								widgetVar="comboFiltroTipoAgrupacionesSuperior"
+								itemValue="#{tipAgrupSupList.id}" />
+							</p:selectOneMenu>	
+						</div>	
+						<div class="celda-form">
+							<p:outputLabel for="nivelAnidamiento_filtro" value="#{mensaje['nivel.anidamiento']}"/>
+					        <p:inputText id="nivelAnidamiento_filtro" maxlength="3" size="3" value="#{tipoAgrupacionBean.nivelAnidamientoFiltro}"/>
+						</div>												
+						<div class="celda-form">
+							<p:outputLabel for="activo_filtro" value="#{mensaje['activo']}"/>
+					       	<p:selectBooleanCheckbox id="activo_filtro" value="#{tipoAgrupacionBean.activoFiltro}" itemLabel="#{mensaje['si']}" />	
+						</div>
+					</div>
+								
+					<div class="botonera-form">
+												 
+							<p:commandButton id="nuevoTipoAgrupacion" icon="pi pi-plus" value="#{mensaje['nuevo.tipo.agrupacion']}" 
+								rendered="#{tipoAgrupacionBean.permisoNewTipAgrup == true}"
+								action="#{tipoAgrupacionBean.onCrear}"
+								update="formListadoTiposAgrupaciones:tablaTiposAgrupaciones"/>								 
+						    <p:commandButton id="filtrar" icon="pi pi-filter" value="#{mensaje['filtrar']}" 
+						    update="formListadoTiposAgrupaciones:descripcion_filtro,formListadoTiposAgrupaciones:tipoAgrupacionSuperior_filtro,formListadoTiposAgrupaciones:nivelAnidamiento_filtro,formListadoTiposAgrupaciones:activo_filtro,formListadoTiposAgrupaciones:tablaTiposAgrupaciones"
+						    onstart="PF('tipoAgrupacionWV').paginator.setPage(0);"/>							
+						    <p:commandButton id="limpiarFiltro" icon="pi pi-filter-slash" value="#{mensaje['limpiar.filtro']}"
+						    	actionListener="#{tipoAgrupacionBean.limpiarFiltro()}"
+						    update="formListadoTiposAgrupaciones:descripcion_filtro,formListadoTiposAgrupaciones:tipoAgrupacionSuperior_filtro,formListadoTiposAgrupaciones:nivelAnidamiento_filtro,formListadoTiposAgrupaciones:activo_filtro,formListadoTiposAgrupaciones:tablaTiposAgrupaciones"
+						    onstart="PF('tipoAgrupacionWV').paginator.setPage(0);"/>
+			
+					</div>
+			</p:fieldset>	
+						
+						  
+   
+			<!-- PANEL CON LOS RESULTADOS DE BUSQUEDA -->
+			<p:outputPanel id="panelResultadosBusqueda">
+				<p:dataTable var="tipoAgrupacion" id="tablaTiposAgrupaciones"
+					value="#{tipoAgrupacionBean.lazyModel}"
+					paginator="true"
+					paginatorTemplate=" {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+					rowsPerPageTemplate="10,20,50,100"
+					paginatorPosition="bottom" 
+					rows="10" currentPageReportTemplate="#{mensaje['paginador.template']}"
+					selectionMode="single"  
+					selection="#{tipoAgrupacionBean.selectedTipoAgrupacion}"
+					rowKey="#{tipoAgrupacion.id}"
+					sortBy="#{tipoAgrupacion.descripcion}" sortOrder="ascending"
+					widgetVar="tipoAgrupacionWV">
+					
+					<p:ajax 
+				        event="rowDblselect"
+				        listener="#{tipoAgrupacionBean.onTipAgrupRowDblClkSelect}"
+				        global="false"
+				        oncomplete="clickBotonFila(this.source, args.id, 'consultarTipoAgrupacion');">
+					</p:ajax>
+					
+					
+					<p:column headerText="#{mensaje['tipo.agrupacion']}" sortBy="#{tipoAgrupacion.descripcion}">
+               			<h:outputText value="#{tipoAgrupacion.descripcion}"/>
+					</p:column>
+
+					<p:column headerText="#{mensaje['tipo.agrupacion.superior']}" sortBy="#{tipoAgrupacion.tipoAgrupacionPadre.descripcion}" >
+               			<h:outputText value="#{tipoAgrupacion.tipoAgrupacionPadre.descripcion}"/>
+					</p:column>
+					
+					<p:column headerText="#{mensaje['nivel.anidamiento']}" sortBy="#{tipoAgrupacion.nivelAnidamiento}">
+               			<h:outputText value="#{tipoAgrupacion.nivelAnidamiento}"/>
+					</p:column>						
+
+					<p:column headerText="#{mensaje['activo']}" sortBy="#{tipoAgrupacion.activa}" width="10%">
+               			<h:outputText value="#{mensaje['no']}" rendered="#{tipoAgrupacion.activa == false}"/>
+			    		<h:outputText value="#{mensaje['si']}" rendered="#{tipoAgrupacion.activa == true}"/>
+					</p:column>
+
+					<p:column headerText="#{mensaje['acciones']}">
+						<p:commandButton id="consultarTipoAgrupacion" 
+							rendered="#{tipoAgrupacionBean.permisoConsTipAgrup == true}"
+							icon="pi pi-eye" action="#{tipoAgrupacionBean.onConsultar(tipoAgrupacion.id)}">
+							<f:param name="id" value="#{tipoAgrupacion.id}" />
+						</p:commandButton>
+							
+						<p:commandButton id="editarTipoAgrupacion" widgetVar="editarTipoAgrupacion"
+							icon="pi pi-pencil" action="#{tipoAgrupacionBean.onEditar(tipoAgrupacion.id)}" rendered="#{tipoAgrupacion.activa and tipoAgrupacionBean.permisoEditTipAgrup == true}">
+							<f:param name="id" value="#{tipoAgrupacion.id}" />
+						</p:commandButton>
+						<p:commandButton id="eliminarTipoAgrupacion" 
+							icon="pi pi-times" 
+							rendered="#{tipoAgrupacion.activa and tipoAgrupacionBean.permisoDesacTipAgrup == true}"
+							actionListener="#{tipoAgrupacionBean.eliminarTipoAgrupacion(tipoAgrupacion)}"
+							update="formListadoTiposAgrupaciones:tablaTiposAgrupaciones,formListadoTiposAgrupaciones">
+							<p:confirm header="#{mensaje['confirmar.operacion']}" message="#{mensaje['pregunta.confirma.eliminar']}" icon="pi pi-info-circle"/>
+						</p:commandButton>	
+						<p:commandButton id="activarTipoAgrupacion" 
+							icon="pi pi-check"
+							rendered="#{!tipoAgrupacion.activa  and tipoAgrupacionBean.permisoActTipAgrup == true}"
+							actionListener="#{tipoAgrupacionBean.activarTipoAgrupacion(tipoAgrupacion)}"
+							update="formListadoTiposAgrupaciones:tablaTiposAgrupaciones,formListadoTiposAgrupaciones">
+							<p:confirm header="#{mensaje['confirmar.operacion']}" message="#{mensaje['pregunta.confirma.activar']}" icon="pi pi-info-circle"/>
+						</p:commandButton>		
+							
+						<p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true">
+				            <div class="botonera-form" align="right">
+				            	<p:commandButton value="#{mensaje['si']}" type="button" styleClass="ui-confirmdialog-yes" />
+				            	<p:commandButton value="#{mensaje['no']}" type="button" styleClass="ui-confirmdialog-no ui-button-flat"/>
+				            </div>				            
+						</p:confirmDialog>							
+					</p:column>
+				</p:dataTable>
+			</p:outputPanel>				
+			</p:panel>		
+			<br/>
+			<p:commandButton id="volver" value="#{mensaje['volver']}"
+				actionListener="#{volverBean.migaPanVolver()}"
+				oncomplete="document.location.href='#{request.contextPath}/aplicacion/bienvenido.xhtml'">
+			</p:commandButton>			
+		</h:form>
+
+	</ui:define>
+	
+</ui:composition>
+
+</html>	

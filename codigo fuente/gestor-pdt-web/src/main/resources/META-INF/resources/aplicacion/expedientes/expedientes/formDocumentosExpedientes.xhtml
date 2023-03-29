@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:c="http://java.sun.com/jstl/core"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:sec="https://joinfaces.org/security"
+	xmlns:fu="http://joinfaces.org/functions">
+
+<ui:composition>
+
+	<c:set var="ancho_sn" value="25" />
+						
+			<p:messages for="messagesFormularioDocExp" id="messagesFormularioDocExp" showDetail="true" closable="true"><p:autoUpdate/> 
+	        </p:messages>
+	
+				<p:fieldset legend="#{mensaje['filtros.busqueda']}"
+					id="bloqueFiltroBusquedaDoc" toggleable="true" toggleSpeed="250">
+
+					<div style="display:none">
+						<div class="celda-form">
+							<p:outputLabel value="#{mensaje['fecha.creacion.ini']}"
+								for="fechaCreaDocIni_filtro" />
+							<p:calendar id="fechaCreaDocIni_filtro" locale="es"
+								value="#{datosExpedientesDocumentosBean.fechaIniCreaFiltro}"
+								maxlength="10" size="10" showIcon="true" pattern="dd/MM/yyyy"
+								converterMessage="#{mensaje['formato.fecha.invalido']}" mask="true" >
+							</p:calendar>
+							<p:message for="fechaCreaDocIni_filtro"/>
+						</div>
+						<div class="celda-form">
+							<p:outputLabel value="#{mensaje['fecha.creacion.fin']}"
+								for="fechaCreaDocFin_filtro" />
+							<p:calendar id="fechaCreaDocFin_filtro" locale="es"
+								value="#{datosExpedientesDocumentosBean.fechaFinCreaFiltro}"
+								maxlength="10" size="10" showIcon="true" pattern="dd/MM/yyyy"
+								converterMessage="#{mensaje['formato.fecha.invalido']}" mask="true">
+							</p:calendar>
+							<p:message for="fechaCreaDocFin_filtro"/>
+						</div>
+						
+						<div class="celda-form">
+							<p:outputLabel value="#{mensaje['fecha.modificacion.ini']}"
+								for="fechaModDocIni_filtro" />
+							<p:calendar id="fechaModDocIni_filtro" locale="es"
+								value="#{datosExpedientesDocumentosBean.fechaIniModificaFiltro}"
+								maxlength="10" size="10" showIcon="true" pattern="dd/MM/yyyy"
+								converterMessage="#{mensaje['formato.fecha.invalido']}" mask="true" >
+							</p:calendar>
+							<p:message for="fechaModDocIni_filtro"/>
+						</div>
+						<div class="celda-form">
+							<p:outputLabel value="#{mensaje['fecha.modificacion.fin']}"
+								for="fechaModDocFin_filtro" />
+							<p:calendar id="fechaModDocFin_filtro" locale="es"
+								value="#{datosExpedientesDocumentosBean.fechaFinModificaFiltro}"
+								maxlength="10" size="10" showIcon="true" pattern="dd/MM/yyyy"
+								converterMessage="#{mensaje['formato.fecha.invalido']}" mask="true" >
+							</p:calendar>
+							<p:message for="fechaModDocFin_filtro"/>
+						</div>
+					</div>
+					
+					<div>
+						<div class="celda-form">
+							<p:outputLabel value="#{mensaje['tipo.documento']}"
+								for="tipoDocumentos_filtro" />
+							<p:selectOneMenu id="tipoDocumentos_filtro" styleClass="control-documentos"
+								value="#{datosExpedientesDocumentosBean.tipoDocumentoIdFiltro}"
+								style="min-width: 150px;">
+								<f:selectItem itemLabel="#{mensaje['todos']}" itemValue="" />
+								<f:selectItems
+									value="#{datosExpedientesDocumentosBean.listaTiposDocumentosFiltro}"
+									var="td" itemLabel="#{fu:ptoSusp(td.descripcion)}"
+									widgetVar="comboFiltroTipoDoc"
+									itemValue="#{td.id}" />
+							</p:selectOneMenu>
+						</div>
+						
+						<div class="celda-form">
+							<p:outputLabel for="vinculados_filtro" value="#{mensaje['ver.vinculados']}"   rendered="#{datosExpedientesDocumentosBean.permisoVerDocsOcultos}" />
+							<p:selectBooleanCheckbox id="vinculados_filtro"    value="#{datosExpedientesDocumentosBean.verVinculadosFiltro}"     itemLabel="#{mensaje['si']}"   rendered="#{datosExpedientesDocumentosBean.permisoVerDocsOcultos}" />
+						</div>
+	
+					</div>
+
+					<div class="botonera-form">
+						<p:commandButton id="filtrarDoc" icon="pi pi-filter"
+							value="#{mensaje['filtrar']}" oncomplete="actualizar_documentos()" >
+						</p:commandButton>
+						<p:commandButton id="limpiarFiltroDoc"
+							value="#{mensaje['limpiar.filtro']}" icon="pi pi-filter-slash"
+							actionListener="#{datosExpedientesDocumentosBean.limpiarFiltro}"
+							update="fechaCreaDocIni_filtro, fechaCreaDocFin_filtro, 
+ 									fechaModDocIni_filtro, fechaModDocFin_filtro,
+									tipoDocumentos_filtro, vinculados_filtro"
+							onstart="resetPaginatorDataTables('formFormularioExpedientes:tabViewPestanasExpediente:panelesDocumentos');" 
+							oncomplete="actualizar_documentos()" />
+					</div>
+
+				</p:fieldset>
+				
+		<p:outputPanel id="panelResultadosBusquedaDocs" styleClass="panel-documentos panel-docs-expediente">		
+			<p:panel toggleable="true" toggleableHeader="true" toggleSpeed="250" collapsed="false" 
+				rendered="#{not empty datosExpedientesDocumentosBean.listaCategoriasDocumentosExpediente}">
+				<ui:include src="listadoCategoriasDoc.xhtml" />
+			</p:panel>
+			<h:outputText value="No se encontraron registros."
+				rendered="#{empty datosExpedientesDocumentosBean.listaCategoriasDocumentosExpediente}" />
+		</p:outputPanel>
+		
+
+		
+		
+</ui:composition>
+</html>

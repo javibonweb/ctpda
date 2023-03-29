@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:c="http://java.sun.com/jstl/core"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:sec="https://joinfaces.org/security">
+
+<ui:composition>
+	<p:fieldset id="bloqueDatosGeneralesExpedientesRelacionados"
+		legend="#{mensaje['expedientes.relacionados']}" styleClass="ui-g"
+		toggleable="true" toggleSpeed="250">
+
+		<p:messages for="messagesFormularioListadoExpedientesRelacionados"
+			id="messagesFormularioListadoExpedientesRelacionados" showDetail="true"
+			closable="true">
+			<p:autoUpdate />
+		</p:messages>
+	
+		<!-- PANEL EXPEDIENTES RELACIONADOS -->
+	
+		<div>
+			<div class="celda-form">
+				<p:commandButton id="abrirBusquedaRelacionables" icon="pi pi-search" value="#{mensaje['buscar.expediente']}"
+					rendered="#{editable and datosExpedientesRelacionadosBean.permisoBusExpRel == true}" immediate="true"
+					actionListener="#{datosExpedientesRelacionadosBean.abrirBusquedaRelacionables}"
+					update="formFormularioExpedientes:tabViewPestanasExpediente:numeroExpediente_filtro,formFormularioExpedientes:tabViewPestanasExpediente:nombreExpediente_filtro,
+						formFormularioExpedientes:tabViewPestanasExpediente:fechaEntrada_filtro,formFormularioExpedientes:tabViewPestanasExpediente:tablaExpedientesRelacionables,
+						formFormularioExpedientes:tabViewPestanasExpediente:dialogBuscarRelacionados"
+					process="@this" />
+			</div>
+		</div>
+	
+		<!-- TABLA EXPEDIENTES RELACIONADOS -->
+		<p:outputPanel id="panelExpedientesRelacionados">
+			<p:dataTable var="rel" id="tablaExpedientesRelacionados"
+				value="#{datosExpedientesRelacionadosBean.lazyModelExpedientesRelacion}"
+				paginator="true"
+				paginatorTemplate=" {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+				rowsPerPageTemplate="10,20,50,100" rows="10"
+				currentPageReportTemplate="#{mensaje['paginador.template']}"
+				selectionMode="single" sortBy="#{rel.expedienteRelacionado.fechaEntrada}"
+				sortOrder="ascending"
+				paginatorAlwaysVisible="false"
+				selection="#{datosExpedientesRelacionadosBean.expedientesRelacion}"
+				rowKey="#{rel.id}" paginatorPosition="bottom">
+	
+				<p:column headerText="#{mensaje['numero.expediente']}" >
+		            <h:outputText value="#{rel.expedienteRelacionado.numExpediente}"/>
+				</p:column>
+				
+				<p:column headerText="#{mensaje['nombre.expediente']}" >
+		            <h:outputText value="#{rel.expedienteRelacionado.nombreExpediente}"/>
+				</p:column>
+				
+				<p:column headerText="#{mensaje['fecha.entrada']}" >
+		            <h:outputText value="#{rel.expedienteRelacionado.fechaEntrada}">
+						<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+					</h:outputText>
+				</p:column>	
+				
+				<p:column headerText="#{mensaje['motivo.relacion']}" >
+		            <h:outputText value="#{rel.motivo.descripcion}"/>
+				</p:column>
+				
+				<p:column headerText="#{mensaje['acciones']}">
+					<p:commandButton id="consultaExpedienteRelacionado" icon="pi pi-eye" 
+						rendered="#{datosExpedientesRelacionadosBean.permisoConsExp == true and datosExpedientesBean.numerosSaltos!=2}"
+						action="#{datosExpedientesBean.onConsultarExp(rel.expedienteRelacionado.id)}" />
+					<p:tooltip for="consultaExpedienteRelacionado" value="#{mensaje['ver.expediente']}"
+							showEffect="fade" hideEffect="fade" position="top" showDelay="500" />
+					<p:commandButton id="editarExpRel" icon="pi pi-pencil"
+						rendered="#{editable and datosExpedientesRelacionadosBean.permisoEditExpRel == true}"
+						actionListener="#{datosExpedientesRelacionadosBean.abrirAsignarMotRela(rel, null, 'editarExpRel')}"
+						update="formFormularioExpedientes:tabViewPestanasExpediente:dialogAsignarMotRelaExp,formFormularioExpedientes:panelActualizadoCabecera" />
+					<p:tooltip for="editarExpRel" value="#{mensaje['mod.relacion']}"
+							showEffect="fade" hideEffect="fade" position="top" showDelay="500" />
+					<p:commandButton id="eliminarExpRel" icon="pi pi-trash" 
+						rendered="#{editable and datosExpedientesRelacionadosBean.permisoDelExpRel == true}"
+						actionListener="#{datosExpedientesRelacionadosBean.eliminarRelacion(rel)}"
+						update="formFormularioExpedientes:tabViewPestanasExpediente:tablaExpedientesRelacionados,formFormularioExpedientes:panelActualizadoCabecera">
+						<p:confirm header="#{mensaje['confirmar.operacion']}" message="#{mensaje['pregunta.confirma.eliminar']}" icon="pi pi-info-circle"/>
+					</p:commandButton>
+					<p:tooltip for="eliminarExpRel" value="#{mensaje['borrar.relacion']}"
+							showEffect="fade" hideEffect="fade" position="top" showDelay="500" />
+				</p:column>
+
+			</p:dataTable>
+		</p:outputPanel>
+		
+		<p:spacer height="10" />
+		
+		
+			<!-- TABLA DATOS PERSONA EXPEDIENTES ORIGEN -->
+			<p:dataTable var="relExpOrigen" id="tablaExpedientesOrigen"
+				value="#{datosExpedientesRelacionadosBean.lazyModelExpedientesOrigen}"
+				paginator="true"
+				paginatorTemplate=" {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+				rowsPerPageTemplate="10,20,50,100" rows="10"
+				currentPageReportTemplate="#{mensaje['paginador.template']}"
+				selectionMode="single" sortBy="#{relExpOrigen.expedienteOrigen.numExpediente}"
+				sortOrder="ascending"
+				paginatorAlwaysVisible="false"
+				rowKey="#{relExpOrigen.id}" paginatorPosition="bottom">
+	
+				<p:column headerText="#{mensaje['numero.expediente']}" sortBy="#{relExpOrigen.expedienteOrigen.numExpediente}">
+		            <h:outputText value="#{relExpOrigen.expedienteOrigen.numExpediente}"/>
+				</p:column>				
+				<p:column headerText="#{mensaje['nombre.expediente']}" sortBy="#{relExpOrigen.expedienteOrigen.nombreExpediente}">
+		            <h:outputText value="#{relExpOrigen.expedienteOrigen.nombreExpediente}"/>
+				</p:column>	
+				<p:column headerText="#{mensaje['fecha.entrada']}" sortBy="#{relExpOrigen.expedienteOrigen.fechaEntrada}">
+		            <h:outputText value="#{relExpOrigen.expedienteOrigen.fechaEntrada}">
+						<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+					</h:outputText>
+				</p:column>								
+				<p:column headerText="#{mensaje['motivo.relacion']}" sortBy="#{relExpOrigen.motivo.descripcion}">
+		            <h:outputText value="#{relExpOrigen.motivo.descripcion}"/>
+				</p:column>
+				
+				<p:column headerText="#{mensaje['acciones']}">
+					<p:commandButton id="consultaExpedienteOrigen" icon="pi pi-eye" 
+						rendered="#{datosExpedientesRelacionadosBean.permisoConsExp == true and datosExpedientesBean.numerosSaltos!=2}"
+						action="#{datosExpedientesBean.onConsultarExp(relExpOrigen.expedienteOrigen.id)}" />
+					<p:tooltip for="consultaExpedienteOrigen" value="#{mensaje['ver.expediente']}"
+						showEffect="fade" hideEffect="fade" position="top" showDelay="500" />
+						
+				</p:column>
+			</p:dataTable>		
+		
+	</p:fieldset>
+	
+	<!-- DIALOGO BUSCAR EXPEDIENTE RELACIONADO -->
+	<p:dialog id="dialogBuscarRelacionados" header="#{datosExpedientesRelacionadosBean.cabeceraDialog}" widgetVar="dialogBuscarRelacionados" 
+		closable="true" resizable="false" draggable="true" modal="true" responsive="true" contentWidth="100%" contentHeight="100%" width="1200" height="500">
+		
+		<p:messages for="messagesFormularioBusqRel" id="messagesFormularioBusqRel" showDetail="true" closable="true">
+			<p:autoUpdate/> 
+        </p:messages>
+       
+			<p:fieldset legend="#{mensaje['filtros.busqueda']}"
+				id="bloqueFiltroBusquedaRelacionados" toggleable="true" toggleSpeed="250">
+				<div>
+					<div class="celda-form">
+						<p:outputLabel for="numeroExpediente_filtro"
+							value="#{mensaje['numero.expediente']}" />
+						<p:inputText id="numeroExpediente_filtro" maxlength="255"
+							value="#{datosExpedientesRelacionadosBean.numeroExpedienteFiltro}" />
+					</div>
+					
+					<div class="celda-form">
+						<p:outputLabel for="nombreExpediente_filtro"
+							value="#{mensaje['nombre.expediente']}" />
+						<p:inputText id="nombreExpediente_filtro" maxlength="255"
+							value="#{datosExpedientesRelacionadosBean.nombreExpedienteFiltro}" />
+					</div>
+
+					<div class="celda-form">
+						<p:outputLabel for="fechaEntrada_filtro"
+							value="#{mensaje['fecha.entrada']}" />
+						<p:datePicker id="fechaEntrada_filtro" 
+							value="#{datosExpedientesRelacionadosBean.fechaEntradaFiltro}" 
+							locale="es" monthNavigator="true" pattern="dd/MM/yyyy"
+							converterMessage="#{mensaje['formato.fecha.invalido']}" mask="true"/>
+						<p:message for="fechaEntrada_filtro"/>
+					</div>
+				</div>
+
+				<div class="botonera-form">
+					<p:commandButton id="filtrarBuscarExpedientes" icon="pi pi-filter" 
+						value="#{mensaje['filtrar']}"
+						update="formFormularioExpedientes:tabViewPestanasExpediente:numeroExpediente_filtro,formFormularioExpedientes:tabViewPestanasExpediente:nombreExpediente_filtro,
+						formFormularioExpedientes:tabViewPestanasExpediente:fechaEntrada_filtro,formFormularioExpedientes:tabViewPestanasExpediente:tablaExpedientesRelacionables"
+						onstart="PF('expRelWV').paginator.setPage(0);" />
+					<p:commandButton id="limpiarFiltroBuscarExpedientes"
+						value="#{mensaje['limpiar.filtro']}" icon="pi pi-filter-slash"
+						actionListener="#{datosExpedientesRelacionadosBean.limpiarFiltro()}"
+						update="formFormularioExpedientes:tabViewPestanasExpediente:numeroExpediente_filtro,formFormularioExpedientes:tabViewPestanasExpediente:nombreExpediente_filtro,
+						formFormularioExpedientes:tabViewPestanasExpediente:fechaEntrada_filtro,formFormularioExpedientes:tabViewPestanasExpediente:tablaExpedientesRelacionables"
+						onstart="PF('expRelWV').paginator.setPage(0);" />
+				</div>
+			</p:fieldset>
+
+			<!-- PANEL CON LOS RESULTADOS DE BUSQUEDA -->
+			<p:outputPanel id="panelResultadosBusquedaRelacionados">
+				<p:dataTable var="expRel" id="tablaExpedientesRelacionables"
+					value="#{datosExpedientesRelacionadosBean.lazyModelExpedientesRelacionables}" 
+					paginator="true"
+					paginatorTemplate=" {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+					rowsPerPageTemplate="10,20,50,100" rows="10"
+					currentPageReportTemplate="#{mensaje['paginador.template']}"
+					selectionMode="single" sortBy="#{expRel.numExpediente}"
+					sortOrder="ascending" rowKey="#{expRel.id}" 
+					paginatorPosition="bottom"
+					widgetVar="expRelWV">
+
+					<p:column headerText="#{mensaje['numero.expediente']}" sortBy="#{expRel.numExpediente}">
+						<h:outputText value="#{expRel.numExpediente}" />
+					</p:column>
+					
+					<p:column headerText="#{mensaje['nombre.expediente']}" sortBy="#{expRel.nombreExpediente}">
+						<h:outputText value="#{expRel.nombreExpediente}" />
+					</p:column>
+
+					<p:column headerText="#{mensaje['fecha.entrada']}"
+						sortBy="#{expRel.fechaEntrada}">
+						<h:outputText value="#{expRel.fechaEntrada}" >
+							<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+						</h:outputText>
+					</p:column>				
+					
+					<p:column headerText="#{mensaje['acciones']}" width="70px">
+						<p:commandButton id="seleccionarExpediente"
+							widgetVar="seleccionarExpedientes" icon="pi pi-plus-circle"
+							action="#{datosExpedientesRelacionadosBean.abrirAsignarMotRela(null, expRel, 'asignarMotRela')}"
+							update="formFormularioExpedientes:tabViewPestanasExpediente:dialogAsignarMotRelaExp">
+						</p:commandButton>							
+					</p:column>
+				</p:dataTable>
+			</p:outputPanel>
+ 
+	</p:dialog>
+	
+	<!-- DIALOGO BUSCAR EXPEDIENTE RELACIONADO -->
+	<p:dialog id="dialogAsignarMotRelaExp"  header="#{datosExpedientesRelacionadosBean.cabeceraDialogoMotivoRelacion}" widgetVar="dialogAsignarMotRelaExp">
+		
+		<p:messages for="messagesFormularioMotRelExp" id="messagesFormularioMotRelExp" showDetail="true" closable="true">
+			<p:autoUpdate/> 
+        </p:messages>
+        
+        <div>        	
+        	<div class="celda-form">
+				<p:outputLabel for="comboValorRelacionExpRelacionados"
+					rendered="#{datosExpedientesRelacionadosBean.cabeceraDialogoMotivoRelacion.contains('Seleccionar')}"
+					value="#{mensaje['asignar.motivo.relacion.expedientes.relacionados']}" />
+				<p:outputLabel for="comboValorRelacionExpRelacionados" value="#{mensaje['motivo.relacion']} *" />
+				<p:selectOneMenu id="comboValorRelacionExpRelacionados"
+						value="#{datosExpedientesRelacionadosBean.selectedMotivoRelacionId}"
+						filter="true">
+						<f:selectItem itemLabel="Seleccione una opción"
+							itemValue="#{rel.motivo.id}" />
+						<f:selectItems
+							value="#{datosExpedientesRelacionadosBean.listaValoresMotivosRelacionExpediente}"
+							var="motiRelaList" itemLabel="#{motiRelaList.descripcion}"
+							itemValue="#{motiRelaList.id}" 
+							widgetVar="comboValorRelacionExpRelacionados"/>
+				</p:selectOneMenu>
+			</div>		
+			
+			<div class="botonera-form" align="right">
+				<p:commandButton icon="pi pi-save" id="asignarMotRelaExp" value="#{mensaje['guardar']}"
+					actionListener="#{datosExpedientesRelacionadosBean.asignarMotRelaExpedienteRelacion()}"
+					update="formFormularioExpedientes:tabViewPestanasExpediente:tablaExpedientesRelacionados,formFormularioExpedientes:panelActualizadoCabecera,
+					formFormularioExpedientes:tabViewPestanasExpediente:tablaExpedientesRelacionables">
+				</p:commandButton>
+			</div>					
+        </div>				 
+	</p:dialog>
+
+
+</ui:composition>
+</html>

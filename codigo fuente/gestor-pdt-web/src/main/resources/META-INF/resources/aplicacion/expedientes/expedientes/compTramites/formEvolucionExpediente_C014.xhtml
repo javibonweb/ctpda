@@ -1,0 +1,39 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:c="http://java.sun.com/jstl/core"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:sec="https://joinfaces.org/security"
+    xmlns:comp="http://xmlns.jcp.org/jsf/composite/aplicacion/expedientes/expedientes/compTramites/cc_evol"
+    xmlns:fu="http://joinfaces.org/functions">
+<ui:composition>
+
+
+		<!-- CAMPOS ASOCIADOS AL COMPORTAMIENTO C014 -->
+		<p:outputPanel id="panelTramiteComportamientoTramC014" autoUpdate="true" rendered="#{tramiteExpediente.tipoTramite.comportamiento == 'C014'}">
+
+			<div>
+				<div class="celda-form">
+					<p:outputLabel  value="#{datosEvolucionExpedienteBean.metadatosExpediente('instructorAPI',tramiteExpediente)}"/>
+					<p:inputText size="50" value="#{tramiteExpediente.detalleExpdteTramMappedBy.valorInstructorAPI.descripcion}" disabled="true"/>					
+				</div>
+				<div class="celda-form">
+					<p:outputLabel value="#{datosEvolucionExpedienteBean.metadatosExpediente('fechaInforme',tramiteExpediente)}" rendered="#{tramiteExpediente.detalleExpdteTramMappedBy.expediente.valorTipoExpediente.codigo == 'PSAN'}"/>
+					<p:inputText value="#{tramiteExpediente.detalleExpdteTramMappedBy.fechaInforme}" disabled="true" rendered="#{tramiteExpediente.detalleExpdteTramMappedBy.expediente.valorTipoExpediente.codigo == 'PSAN'}">
+						<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+					</p:inputText>	
+				</div> 
+			</div>
+			<div>
+				<div class="celda-form">
+					<p:outputLabel  value="#{datosEvolucionExpedienteBean.metadatosExpediente('numeroPsan',tramiteExpediente)}"/>
+					<p:inputText id="numeroExpPsanCompC014Evol" size="50" value="#{tramiteExpediente.detalleExpdteTramMappedBy.numeroPsan}" disabled="true"/>		
+				</div>				
+			</div>
+		
+		</p:outputPanel>
+
+</ui:composition>
+</html>

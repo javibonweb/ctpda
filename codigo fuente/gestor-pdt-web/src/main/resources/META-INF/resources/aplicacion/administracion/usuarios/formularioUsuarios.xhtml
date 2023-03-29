@@ -1,0 +1,352 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:c="http://java.sun.com/jstl/core"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:sec="https://joinfaces.org/security"
+	template="#{navegacionBean.get('TEMPLATE_LAYOUT_GENERICO')}">
+
+	<ui:define name="content">
+
+		<c:set var="editable" value="#{datosUsuariosBean.formEditable}" />
+		<c:set var="idUsuario" value="#{datosUsuariosBean.idUsuario}" />
+
+		<h:form id="formFormularioUsuarios">
+
+			<p:messages for="messagesFormulario" id="messagesFormulario"
+				showDetail="true" closable="true">
+				<p:autoUpdate />
+			</p:messages>
+
+			<p:panel id="panelUsuario">
+				<f:facet name="header">
+					<h:outputText value="#{mensaje['formulario.usuario']}" style="font-weight:bold" />
+				</f:facet>
+
+				<p:spacer height="10" />
+
+				<p:outputPanel id="panelEditarUsurioByForm"
+					rendered="#{datosUsuariosBean.permisoEditUsu == true and !editable and datosUsuariosBean.numerosSaltos!=2}">
+					<div class="botonera-form" style="text-align: right">
+						<p:commandButton id="editarUsuarioByForm" widgetVar="editarUsuarioByForm" icon="pi pi-pencil"
+							action="#{datosUsuariosBean.onEditarByForm(datosUsuariosBean.usuario.id)}">
+							<f:param name="id" value="#{datosUsuariosBean.usuario.id}" />
+						</p:commandButton>
+					</div>
+				</p:outputPanel>
+
+
+				<p:outputPanel id="panelIdentificacion">
+
+					<p:fieldset id="bloqueIdentificacion"
+						legend="#{mensaje['datos.identificativos']}" styleClass="ui-g"
+						toggleable="true" toggleSpeed="250">
+						<div>
+							<div class="celda-form">
+								<p:outputLabel rendered="#{editable}" for="nombre"
+									value="#{mensaje['nombre']} *" />
+								<p:outputLabel rendered="#{!editable}" for="nombre"
+									value="#{mensaje['nombre']}" />
+								<p:inputText id="nombre" maxlength="100" size="15"
+									value="#{datosUsuariosBean.usuario.nombre}"
+									disabled="#{!editable}" />
+							</div>
+							<div class="celda-form">
+								<p:outputLabel rendered="#{editable}" for="primerApellido"
+									value="#{mensaje['primer.apellido']} *" />
+								<p:outputLabel rendered="#{!editable}" for="primerApellido"
+									value="#{mensaje['primer.apellido']} " />
+								<p:inputText id="primerApellido" maxlength="100" size="15"
+									value="#{datosUsuariosBean.usuario.primerApellido}"
+									disabled="#{!editable}" />
+							</div>
+
+
+							<div class="celda-form">
+								<p:outputLabel rendered="#{editable}" for="segundoApellido"
+									value="#{mensaje['segundo.apellido']}" />
+								<p:outputLabel rendered="#{!editable}" for="segundoApellido"
+									value="#{mensaje['segundo.apellido']}" />
+								<p:inputText id="segundoApellido" maxlength="100" size="15"
+									value="#{datosUsuariosBean.usuario.segundoApellido}"
+									disabled="#{!editable}" />
+							</div>
+
+							<div class="celda-form">
+								<p:outputLabel for="comboValorIdentificador"
+									styleClass="p-d-block"
+									value="#{mensaje['tipo.identificador']} *"
+									rendered="#{editable}" />
+								<p:outputLabel for="comboValorIdentificador"
+									styleClass="p-d-block" value="#{mensaje['tipo.identificador']}"
+									rendered="#{!editable}" />
+								<p:selectOneMenu id="comboValorIdentificador"
+									value="#{datosUsuariosBean.idTipoIdentificadorSeleccionado}"
+									disabled="#{not editable}">
+									<f:selectItem itemLabel="Seleccione una opción"
+										itemValue="#{null}" noSelectionOption="true" />
+									<f:selectItems
+										value="#{datosUsuariosBean.listaValoresDominioTipoIdentificador}"
+										var="t" itemLabel="#{t.descripcion}" itemValue="#{t.id}" />
+								</p:selectOneMenu>
+							</div>
+
+
+
+							<div class="celda-form">
+								<p:outputLabel rendered="#{editable}" for="identificador"
+									value="#{mensaje['identificador']} *" />
+								<p:outputLabel rendered="#{!editable}" for="identificador"
+									value="#{mensaje['identificador']}" />
+								<p:inputText id="identificador" maxlength="9" size="10"
+									value="#{datosUsuariosBean.usuario.identificador}"
+									disabled="#{!editable}" />
+							</div>
+						</div>
+
+						<div>
+							<div class="celda-form">
+								<p:outputLabel rendered="#{editable}" for="email"
+									value="#{mensaje['email']}" />
+								<p:outputLabel rendered="#{!editable}" for="email"
+									value="#{mensaje['email']}" />
+								<p:inputText id="email" maxlength="100" size="30"
+									value="#{datosUsuariosBean.usuario.email}"
+									disabled="#{!editable}" />
+							</div>
+
+							<div class="celda-form">
+								<p:outputLabel rendered="#{editable}" for="telefono"
+									value="#{mensaje['telefono']}" />
+								<p:outputLabel rendered="#{!editable}" for="telefono"
+									value="#{mensaje['telefono']}" />
+								<p:inputNumber id="telefono" maxValue="999999999" size="10"
+									decimalPlaces="0" value="#{datosUsuariosBean.usuario.telefono}"
+									disabled="#{!editable}" />
+							</div>
+
+
+
+							<div class="celda-form">
+								<p:outputLabel rendered="#{editable}" for="login"
+									value="#{mensaje['login']}" />
+								<p:outputLabel rendered="#{!editable}" for="login"
+									value="#{mensaje['login']}" />
+								<p:inputText id="login" maxlength="50" size="30"
+									value="#{datosUsuariosBean.usuario.login}"
+									disabled="#{!editable}" />
+							</div>
+						</div>
+
+						<div>
+
+							<div class="celda-form">
+								<p:outputLabel rendered="#{editable}" for="fechaUltAcceso"
+									value="#{mensaje['fecha.ultimo.acceso']}" />
+								<p:outputLabel rendered="#{!editable}" for="fechaUltAcceso"
+									value="#{mensaje['fecha.ultimo.acceso']}" />
+								<p:datePicker id="fechaUltAcceso" size="10" disabled="true"
+									locale="es" monthNavigator="true" pattern="dd/MM/yyyy"
+									converterMessage="#{mensaje['formato.fecha.invalido']}"
+									mask="true"
+									value="#{datosUsuariosBean.usuario.fechaUltimoAcceso}" />
+							</div>
+
+
+
+
+						</div>
+					</p:fieldset>
+				</p:outputPanel>
+
+				<p:outputPanel id="panelAsignarPerfil" rendered="#{datosUsuariosBean.ocultaPerfilesAsignados() eq false}">
+
+					<p:fieldset id="bloqueAsignarPerfil"
+						legend="#{mensaje['perfiles.asginados']}" styleClass="ui-g"
+						toggleable="true" toggleSpeed="250">
+
+
+						<div>
+							<div class="celda-form">
+								<p:commandButton id="abrirBusquedaPerfiles" icon="pi pi-search"
+									value="#{mensaje['buscar.perfiles']}" immediate="true"
+									actionListener="#{datosUsuariosBean.abrirBusquedaPerfiles}"
+									update="formFormularioUsuarios:tablaNuevosPerfiles, formFormularioUsuarios:dialogBuscarPerfiles"
+									process="@this" 
+									rendered="#{datosUsuariosBean.permisoBusUsuPer == true and editable}"/>
+							</div>
+						</div>
+
+
+						<!-- TABLA DATOS PERSONA EXPEDIENTES -->
+						<p:outputPanel id="panelResultadosBusquedaPerfiles">
+
+							<p:dataTable var="usuarioPerfil" id="tablaUsuarioPerfilAsignado"
+								value="#{datosUsuariosBean.lazyModelUsuarioPerfilRelacion}"
+								paginator="true"
+								paginatorTemplate=" {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+								rowsPerPageTemplate="10,20,50,100" rows="10"
+								currentPageReportTemplate="#{mensaje['paginador.template']}"
+								selectionMode="single" sortOrder="ascending"
+								selection="#{datosUsuariosBean.selectedUsuarioPerfil}"
+								rowKey="#{usuarioPerfil.id}" paginatorPosition="bottom"
+								widgetVar="usuarioPerfilWV">
+
+
+								<p:column headerText="#{mensaje['descripcion']}"
+									sortBy="#{usuarioPerfil.perfil.descripcion}">
+									<h:outputText value="#{usuarioPerfil.perfil.descripcion}"  />
+								</p:column>
+								<p:column headerText="#{mensaje['descripcion.corta']}"
+									sortBy="#{usuarioPerfil.perfil.descripcionCorta}">
+									<h:outputText value="#{usuarioPerfil.perfil.descripcionCorta}" />
+								</p:column>
+
+								<p:column headerText="#{mensaje['acciones']}" rendered="#{editable}">
+									<p:commandButton id="eliminarUsuario" icon="pi pi-times"
+										rendered="#{usuarioPerfil.activa and editable}"
+										actionListener="#{datosUsuariosBean.eliminarRelPerfilUsuario(usuarioPerfil)}"
+										update="formFormularioUsuarios:tablaUsuarioPerfilAsignado,formFormularioUsuarios:tablaNuevosPerfiles">
+										<p:confirm header="#{mensaje['confirmar.operacion']}"
+											message="#{mensaje['pregunta.confirma.eliminar']}"
+											icon="pi pi-info-circle" />
+									</p:commandButton>
+								</p:column>
+
+
+
+							</p:dataTable>
+						</p:outputPanel>
+
+
+
+
+
+
+					</p:fieldset>
+				</p:outputPanel>
+
+
+
+
+				<div class="botonera-form" align="right">
+					<p:commandButton id="guardar"
+						rendered="#{editable and datosUsuariosBean.permisoSaveUsu == true}"
+						icon="pi pi-save" value="#{mensaje['guardar']}"
+						actionListener="#{datosUsuariosBean.saveUsuarios}" />
+
+					<p:commandButton id="cancelarUsuario"
+						value="#{mensaje['cancelar']}" rendered="#{editable}"
+						icon="pi pi-times"
+						actionListener="#{volverBean.cancelar()}"
+						oncomplete="document.location.href='#{request.contextPath}/aplicacion/administracion/usuarios/listadoUsuarios.jsf'">
+						<p:confirm header="#{mensaje['confirmar.operacion']}"
+							message="#{mensaje['pregunta.confirma.cancelar']}"
+							icon="pi pi-info-circle" />
+					</p:commandButton>
+					<p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true">
+						<div class="botonera-form" align="right">
+							<p:commandButton value="#{mensaje['si']}" type="button" styleClass="ui-confirmdialog-yes" />
+							<p:commandButton value="#{mensaje['no']}" type="button" styleClass="ui-confirmdialog-no ui-button-flat" />
+						</div>						
+					</p:confirmDialog>
+				</div>
+				<p:commandButton id="volver" value="#{mensaje['volver']}"
+					actionListener="#{volverBean.migaPanVolver('Listado de usuarios')}"
+					oncomplete="document.location.href='#{request.contextPath}/aplicacion/administracion/usuarios/listadoUsuarios.xhtml'">
+				</p:commandButton>
+			</p:panel>
+
+
+			<!-- DIALOGO BUSCAR NUEVOS REPRESENTANTES -->
+			<p:dialog id="dialogBuscarPerfiles"
+				header="#{datosUsuariosBean.cabeceraDialog}"
+				widgetVar="dialogBuscarPerfiles" closable="true" resizable="false"
+				draggable="true" modal="true" responsive="true" contentWidth="100%"
+				contentHeight="100%" width="1200" height="500">
+
+				<p:messages for="messagesFormularioBusqPerfiles"
+					id="messagesFormularioBusqPerfiles" showDetail="true"
+					closable="true">
+					<p:autoUpdate />
+				</p:messages>
+
+				<p:fieldset legend="#{mensaje['filtros.busqueda']}"
+					id="bloqueFiltroBusquedaPerfiles" toggleable="true"
+					toggleSpeed="250">
+					<div>
+						<div class="celda-form">
+							<p:outputLabel for="descripcionPerfil_filtro"
+								value="#{mensaje['descripcion']}" />
+							<p:inputText id="descripcionPerfil_filtro" maxlength="255"
+								value="#{datosUsuariosBean.descripcionPerfilFiltro}" />
+						</div>
+						<div class="celda-form">
+							<p:outputLabel for="descripcionCortaPerfil_filtro"
+								value="#{mensaje['descripcion.corta']}" />
+							<p:inputText id="descripcionCortaPerfil_filtro" maxlength="255"
+								value="#{datosUsuariosBean.descripcionCortaPerfilFiltro}" />
+						</div>
+
+					</div>
+
+					<div class="botonera-form">
+
+						<p:commandButton id="filtrar" icon="pi pi-filter"
+							value="#{mensaje['filtrar']}"
+							update="formFormularioUsuarios:panelResultadosBusquedaNuevosPerfiles"
+							onstart="PF('perfilRelWV').paginator.setPage(0);" />
+						<p:commandButton id="limpiarFiltro"
+							value="#{mensaje['limpiar.filtro']}" icon="pi pi-filter-slash"
+							update="formFormularioUsuarios:panelResultadosBusquedaNuevosPerfiles,formFormularioUsuarios:bloqueFiltroBusquedaPerfiles"
+							actionListener="#{datosUsuariosBean.limpiarFiltroPerfiles()}"
+							onstart="PF('perfilRelWV').paginator.setPage(0);" />
+					</div>
+				</p:fieldset>
+
+				<!-- PANEL CON LOS RESULTADOS DE BUSQUEDA -->
+				<p:outputPanel id="panelResultadosBusquedaNuevosPerfiles">
+
+					<p:dataTable var="perfil" id="tablaNuevosPerfiles"
+						value="#{datosUsuariosBean.lazyModelPerfil}" paginator="true"
+						paginatorTemplate=" {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+						rowsPerPageTemplate="10,20,50,100" rows="10"
+						currentPageReportTemplate="#{mensaje['paginador.template']}"
+						selectionMode="single" sortBy="#{perfil.descripcion}"
+						sortOrder="ascending" rowKey="#{perfil.id}"
+						paginatorPosition="bottom" widgetVar="perfilRelWV">
+
+						<p:column headerText="#{mensaje['descripcion']}"
+							sortBy="#{perfil.descripcion}">
+							<h:outputText value="#{perfil.descripcion}" />
+						</p:column>
+
+						<p:column headerText="#{mensaje['descripcion.corta']}"
+							sortBy="#{perfil.descripcionCorta}">
+							<h:outputText value="#{perfil.descripcionCorta}" />
+						</p:column>
+
+						<p:column headerText="#{mensaje['acciones']}" width="70px">
+							<p:commandButton id="seleccionarPerfil"
+								widgetVar="seleccionarPerfil" icon="pi pi-plus-circle"
+								action="#{datosUsuariosBean.asignarPerfil(perfil)}"
+								update="formFormularioUsuarios:bloqueAsignarPerfil,formFormularioUsuarios:panelResultadosBusquedaPerfiles,formFormularioUsuarios:dialogBuscarPerfiles,formFormularioUsuarios:tablaUsuarioPerfilAsignado,
+								formFormularioUsuarios:tablaNuevosPerfiles">
+							</p:commandButton>
+						</p:column>
+					</p:dataTable>
+				</p:outputPanel>
+
+			</p:dialog>
+
+
+
+
+		</h:form>
+
+	</ui:define>
+</ui:composition>

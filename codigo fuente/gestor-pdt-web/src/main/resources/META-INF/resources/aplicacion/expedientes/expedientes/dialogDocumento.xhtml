@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:c="http://java.sun.com/jstl/core"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:sec="https://joinfaces.org/security"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+    xmlns:fu="http://joinfaces.org/functions">
+
+<ui:composition>
+
+	<c:set var="bean" value="#{datosExpedientesDocumentosBean}" />
+	<c:set var="docu" value="#{datosExpedientesDocumentosBean.documento}" />
+			
+	<p:dialog id="dialogDocumento" 
+		rendered="#{datosExpedientesDocumentosBean.permisoEditarPropsDoc and editable and !(datosExpedientesDocumentosBean.expedientes.id == null)}"
+		header="#{datosExpedientesDocumentosBean.cabeceraDialog}" modal="true"
+	 	widgetVar="dialogDocumento" >
+				
+		<div style="wi dth:830px">
+			
+			<p:outputPanel rendered="#{datosExpedientesDocumentosBean.permisoCambiarTipoDoc}">
+		    	<div class="celda-form">
+					<p:outputLabel for="comboTipoDocumento"
+						value="#{mensaje['tipo.documento']}" />
+					<p:selectOneMenu id="comboTipoDocumento" disabled="#{empty docu.tramiteExpedienteId}"
+						value="#{docu.tipoDocumentoId}" >
+						<f:selectItems
+							value="#{datosExpedientesDocumentosBean.listaTiposDocumentos}"
+							var="t" itemLabel="#{t.descripcion}" itemValue="#{t.id}" />
+					</p:selectOneMenu>				
+				</div>
+			</p:outputPanel>
+				
+           	<div class="celda-form">
+				<p:outputLabel for="descDocumentoExp"
+					value="#{mensaje['descripcion']} *" />
+				<p:inputText id="descDocumentoExp" disabled="#{not editable or datosExpedientesDocumentosBean.expedientes.id == null}" 
+					value="#{docu.descripcion}" size="60" maxlength="255" />
+			</div>           
+          	<div class="celda-form">
+				<p:outputLabel for="descAbrevDocumentoExp"
+					value="#{mensaje['descripcion.abreviada']}" />
+				<p:inputText id="descAbrevDocumentoExp" disabled="#{not editable or datosExpedientesDocumentosBean.expedientes.id == null}" 
+					value="#{docu.descripcionAbrev}" size="20" maxlength="100" />
+			</div>
+			<p:outputPanel rendered="#{docu.origenIncorporado}">
+         	<div class="celda-form">
+				<p:outputLabel value="#{mensaje['nombre.fichero']}" />
+				<p:inputText disabled="true" value="#{docu.nombreFichero}" size="110" />
+			</div>
+			</p:outputPanel>
+			
+			<div>
+           	<div class="celda-form">
+				<p:outputLabel for="comboCategoriaDocumento"
+					value="#{mensaje['categoria']} *" />
+				<p:selectOneMenu id="comboCategoriaDocumento" value="#{docu.categoriaId}" >
+					<f:selectItem itemLabel="Seleccione una categoría de documento"
+						itemValue="#{null}" />
+					<f:selectItems value="#{bean.listaCategoriasDocumentos}"
+						var="c" itemLabel="#{c.descripcion}" itemValue="#{c.id}" />
+				</p:selectOneMenu>
+			</div>
+			</div>
+				
+			<div class="celda-form" style="margin-top: 10px">
+				<p:selectBooleanCheckbox id="docExpSellado"     		value="#{docu.sellado}"     		itemLabel="#{mensaje['origen.externo']}"     	disabled="#{not editable or datosExpedientesDocumentosBean.expedientes.id == null}" />
+				<p:selectBooleanCheckbox id="docExpFirmado"     		value="#{docu.firmado}"     		itemLabel="#{mensaje['firmado']}"     			disabled="#{not editable or datosExpedientesDocumentosBean.expedientes.id == null}" />
+				<p:selectBooleanCheckbox id="docExpAnonimizado" 		value="#{docu.anonimizado}" 		itemLabel="#{mensaje['anonimizado']}" 			disabled="#{not editable or datosExpedientesDocumentosBean.expedientes.id == null}" rendered="#{docu.tipoTramite == 'PWEB'}"/>
+				<p:selectBooleanCheckbox id="docExpAnonimizadoParcial" 	value="#{docu.anonimizadoParcial}" 	itemLabel="#{mensaje['documento.sensible']}" 	disabled="#{not editable or datosExpedientesDocumentosBean.expedientes.id == null}"  />
+				<p:selectBooleanCheckbox id="docExpEditable"    		value="#{docu.editable}"    		itemLabel="#{mensaje['editable']}"    			disabled="#{not editable or datosExpedientesDocumentosBean.expedientes.id == null}" />
+			</div>
+   		</div>
+	    <div class="botonera-form" align="right">
+			<p:commandButton icon="pi pi-check"
+				id="btnAceptarEditarDoc" value="#{mensaje['aceptar']}"
+				actionListener="#{datosExpedientesDocumentosBean.guardarPropiedades}"
+				update="@(.panel-documentos), @(.panel-actualizado-cabecera),
+					formFormularioExpedientes:tabViewPestanasExpediente:tipoDocumentos_filtro"
+				oncomplete="if(args.saved) PF('dialogDocumento').hide()" >
+			</p:commandButton>
+			<p:commandButton icon="pi pi-times"
+				id="btnCancelarEditarDoc" value="#{mensaje['cancelar']}"
+				oncomplete="PF('dialogDocumento').hide()" >
+			</p:commandButton>
+		</div>
+	</p:dialog>
+
+
+</ui:composition>
+</html>

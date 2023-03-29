@@ -1,0 +1,67 @@
+//Estos estilos vienen en theme.css de PF, se pierden al aplicar el tema de la aplicación.
+//En realidad PF debería incorporarlos desde components.css.
+
+@import 'abstracts/variables';
+
+$radius: $ui-corner-radius;
+
+/*body .ui-inputgroup .ui-inputgroup-addon,
+body .ui-inputgroup .ui-inputgroup-addon-checkbox {
+  padding: 0.5rem 0.5rem;
+  border-color: #ced4da;
+  background: #e9ecef;
+  color: #6c757d;
+  min-width: 2.357rem;
+}*/
+body .ui-inputgroup .ui-inputgroup-addon:first-child,
+body .ui-inputgroup .ui-inputgroup-addon-checkbox:first-child {
+  border-top-left-radius: $radius;
+  border-bottom-left-radius: $radius;
+}
+body .ui-inputgroup .ui-inputgroup-addon:last-child,
+body .ui-inputgroup .ui-inputgroup-addon-checkbox:last-child {
+  border-top-right-radius: $radius;
+  border-bottom-right-radius: $radius;
+}
+body .ui-inputgroup button:first-child, body .ui-inputgroup input:first-child, body .ui-inputgroup textarea:first-child {
+  border-top-left-radius: $radius;
+  border-bottom-left-radius: $radius;
+}
+body .ui-inputgroup .ui-float-label:first-child input,
+body .ui-inputgroup .ui-float-label:first-child textarea {
+  border-top-left-radius: $radius;
+  border-bottom-left-radius: $radius;
+}
+body .ui-inputgroup button:last-child, body .ui-inputgroup input:last-child, body .ui-inputgroup textarea:last-child {
+  border-top-right-radius: $radius;
+  border-bottom-right-radius: $radius;
+}
+body .ui-inputgroup .ui-float-label:last-child input,
+body .ui-inputgroup .ui-float-label:last-child textarea {
+  border-top-right-radius: $radius;
+  border-bottom-right-radius: $radius;
+}
+body .ui-inputgroup > .ui-widget,
+body .ui-inputgroup > .ui-float-label > .ui-widget {
+  border-radius: 0;
+}
+body .ui-inputgroup > .ui-widget.ui-state-focus,
+body .ui-inputgroup > .ui-float-label > .ui-widget.ui-state-focus {
+  z-index: 1;
+}
+body .ui-inputgroup > .ui-widget.ui-state-focus ~ label,
+body .ui-inputgroup > .ui-float-label > .ui-widget.ui-state-focus ~ label {
+  z-index: 1;
+}
+body .ui-inputgroup .ui-inputgroup-addon-checkbox {
+  padding: 0;
+  position: relative;
+}
+body .ui-inputgroup .ui-inputgroup-addon-checkbox .ui-chkbox {
+  vertical-align: baseline;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-top: -0.75rem;
+  margin-left: -0.75rem;
+}

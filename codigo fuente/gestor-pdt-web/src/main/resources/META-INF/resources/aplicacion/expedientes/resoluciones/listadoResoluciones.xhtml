@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:sec="https://joinfaces.org/security"
+	xmlns:c="http://java.sun.com/jstl/core"
+	xmlns:fu="http://joinfaces.org/functions">
+	
+<ui:composition template="#{navegacionBean.get('TEMPLATE_LAYOUT_GENERICO')}">
+
+	<ui:define name="content">
+	
+		<script type="text/javascript">
+			function clickBotonFila(tablaId, id, elemId) {
+				$("div[id='" + tablaId + "'] " //tabla (id jsf completo)
+						+ "tr[data-rk='" + id + "'] " //fila (id = rowkey del datatable)
+						+ "[id$=':" + elemId + "']") //botón (solo la terminación del id jsf)
+				.click();
+			}
+		</script>
+
+		<c:set var="editable" value="#{resolucionesBean.formEditable}" />
+
+		<h:form id="formListadoResoluciones">
+
+			<p:messages for="messagesFormulario" id="messagesFormulario" showDetail="true" closable="true">
+				<p:autoUpdate />
+			</p:messages>
+			
+			<p:panel >
+				<f:facet name="header">
+					<h:outputText id="tituloPanelResoluciones" value="#{mensaje['gestion.resoluciones']}" />
+				</f:facet>
+				<p:fieldset legend="#{mensaje['filtros.busqueda']}" id="bloqueFiltroBusqueda" toggleable="true" toggleSpeed="250">
+
+					<p:outputPanel id="filtroResoluciones">
+						<div class="celda-form">
+							<p:outputLabel for="numeroResolucion_filtro"
+								value="#{mensaje['numero.resolucion']}" />
+							<p:inputText id="numeroResolucion_filtro" size="15" maxlength="15"
+								value="#{resolucionesBean.numeroResolucionFiltro}" />
+						</div>
+						<div class="celda-form">
+							<p:outputLabel for="fechaInicial_filtro"
+								value="#{mensaje['rango.fecha.inicial']}" />
+							<p:datePicker id="fechaInicial_filtro" value="#{resolucionesBean.fechaInicialFiltro}" 
+								locale="es" monthNavigator="true" pattern="dd/MM/yyyy" size="10"
+								converterMessage="#{mensaje['formato.fecha.invalido']}" mask="true"/>
+							<p:message for="fechaInicial_filtro"/>
+						</div>
+						<div class="celda-form">
+							<p:outputLabel for="fechaFinal_filtro"
+								value="#{mensaje['rango.fecha.final']}" />
+							<p:datePicker id="fechaFinal_filtro" value="#{resolucionesBean.fechaFinalFiltro}" 
+								locale="es" monthNavigator="true" pattern="dd/MM/yyyy" size="10"
+								converterMessage="#{mensaje['formato.fecha.invalido']}" mask="true"/>
+							<p:message for="fechaFinal_filtro"/>
+						</div>
+						<div class="celda-form">
+							<p:outputLabel for="sujetoObligado_filtro"
+								value="#{mensaje['sujeto.obligado']}" />
+							<p:inputText id="sujetoObligado_filtro" size="30" maxlength="40"
+								value="#{resolucionesBean.sujetoObligadoFiltro}" />
+						</div>
+						<div class="celda-form">
+							<p:outputLabel for="persona_filtro"
+								value="#{mensaje['persona']}" />
+							<p:inputText id="persona_filtro" size="30" maxlength="40"
+								value="#{resolucionesBean.personaFiltro}" />
+						</div>
+						<div class="celda-form">
+							<p:outputLabel for="ident_persona_filtro" value="#{mensaje['ident.persona']}" />
+							<p:inputText id="ident_persona_filtro" maxlength="15"
+								value="#{resolucionesBean.identPersonaFiltro}" />
+						</div>
+						
+					</p:outputPanel>
+
+					<div class="botonera-form">
+						<p:commandButton id="filtrar" icon="pi pi-filter"
+							value="#{mensaje['filtrar']}"
+							actionListener="#{resolucionesBean.onBuscarResoluciones}"
+							update="listadoResoluciones"
+							onstart="PF('listadoResoluciones').paginator.setPage(0);" /> 
+						<p:commandButton id="limpiarFiltro" value="#{mensaje['limpiar.filtro']}" icon="pi pi-filter-slash"
+							actionListener="#{resolucionesBean.limpiarFiltro()}"
+							update="filtroResoluciones, listadoResoluciones" process="@this"
+							onstart="PF('listadoResoluciones').paginator.setPage(0);" />  
+					</div>
+				</p:fieldset>
+				
+				<div class="botonera-form" align="right">
+				 	<p:commandButton id="botonExportarCSV" value="#{mensaje['csv']}" icon="pi pi-file-excel" title="Exportar a CSV">
+	                    <p:dataExporter type="xlsxstream" target="listadoResoluciones" fileName="#{utilsComun.getNombreCsvExportar('RESOLUCIONES')}" postProcessor="#{utilsComun.postProcessXLS}"/>
+	                </p:commandButton>
+				</div>
+				
+				<p:outputPanel id="panelListadoResoluciones">
+					<p:dataTable var="r" id="listadoResoluciones" widgetVar="listadoResoluciones"
+						value="#{resolucionesBean.lazyModel}" paginator="true"
+						paginatorTemplate=" {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+						rowsPerPageTemplate="10,20,50,100" rows="10"
+						currentPageReportTemplate="#{mensaje['paginador.template']}"
+						selectionMode="single"
+						sortBy="#{resolucionesBean.defaultOrden}"
+						sortOrder="ascending"
+						rowKey="#{r.id}" paginatorPosition="bottom">
+						
+						<p:ajax event="rowDblselect" listener="#{resolucionesBean.onResolRowDblClkSelect}" global="false" 
+							oncomplete="clickBotonFila(this.source, args.id, 'consultarResolucion');" />
+
+						<p:column headerText="#{mensaje['num.resolucion']}" sortBy="#{r.codigoResolucion}" width="85">
+							<h:outputText value="#{r.codigoResolucion}" />
+						</p:column>
+						<p:column headerText="#{mensaje['fecha']}" sortBy="#{r.fechaResolucion}" width="50">
+							<h:outputText value="#{r.fechaResolucion}" >
+								<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+							</h:outputText>
+						</p:column>
+						
+						<p:column headerText="#{mensaje['sujeto.obligado']}" sortBy="#{r.nombreSujetoObligado}" width="200">
+							<h:outputText value="#{r.nombreSujetoObligado}" />
+						</p:column>
+						<p:column headerText="#{mensaje['interesado']}" sortBy="#{r.nombrePersona}" width="200">
+							<h:outputText value="#{r.nombrePersona}" />
+						</p:column>
+						
+						<p:column headerText="#{mensaje['tipologia']}" sortBy="#{r.tipoResolucion}" width="80">
+							<h:outputText value="#{r.tipoResolucion}" />
+						</p:column>
+						<p:column headerText="#{mensaje['sentido']}" sortBy="#{r.sentidoResolucion}" width="100">
+							<h:outputText value="#{r.sentidoResolucion}" />
+						</p:column>
+						
+						<p:column headerText="#{mensaje['f.pub.web']}" sortBy="#{r.fechaPublicacionWeb}" width="50">
+							<h:outputText value="#{r.fechaPublicacionWeb}" >
+								<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+							</h:outputText>
+						</p:column>
+						
+						
+						<p:column headerText="#{mensaje['acciones']}" width="150" exportable="false"> 
+						
+							<p:commandButton id="consultarResolucion" icon="pi pi-eye"
+								rendered="#{resolucionesBean.permisoVerResol == true}"
+								action="#{resolucionesBean.onConsultar(r.id)}">
+							</p:commandButton>
+							<p:tooltip for="consultarResolucion" value="#{mensaje['consultar.resolucion']}" 
+									rendered="#{resolucionesBean.permisoVerResol == true}"
+									showEffect="fade" hideEffect="fade" position="top" showDelay="500" />
+
+							<p:commandButton id="editarResolucion" icon="pi pi-pencil"
+								rendered="#{resolucionesBean.permisoEditarResol == true}"
+								action="#{resolucionesBean.onEditar(r.id)}">
+							</p:commandButton>
+							<p:tooltip for="editarResolucion" value="#{mensaje['editar.resolucion']}" 
+									rendered="#{resolucionesBean.permisoEditarResol == true}"
+									showEffect="fade" hideEffect="fade" position="top" showDelay="500" />
+							
+						</p:column>
+					</p:dataTable>
+				</p:outputPanel>
+				
+			</p:panel>
+			
+			<br />
+			
+			<p:commandButton id="volver" value="#{mensaje['volver']}" actionListener="#{volverBean.migaPanVolver()}"
+				oncomplete="document.location.href='#{request.contextPath}/aplicacion/bienvenido.xhtml'" />
+		</h:form>		
+	</ui:define>
+
+</ui:composition>
+
+</html>

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:c="http://java.sun.com/jstl/core"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+	
+	<div class="ui-g-12 ui-g-nopad" style="margin-top: 5px; font-size: 90%">
+		<p:panel>
+			<div id="cabeceraUsuario" style="display:flex" >
+				<div>
+					<p:commandButton id="homeButton"
+						action="#{menuBean.redireccionInicio}"
+						immediate="true"
+						icon="pi pi-home"
+						title="#{mensaje['inicio']}" />
+
+					<p:outputPanel id="btnMostrarMenuPanel" style="display:inline; width: 20px">
+						<p:commandButton id="btnMostrarMenu" icon="pi pi-angle-double-#{not sesionBean.menuOculto? 'left':'right'}" actionListener="#{sesionBean.toggleMenu()}" update="btnMostrarMenuPanel" process="@this" oncomplete="toggleMenu()"/>					
+						<p:tooltip id="btnMostrarMenuTip" for="btnMostrarMenu" value="#{not sesionBean.menuOculto? mensaje['ocultar.menu']: mensaje['mostrar.menu']}"
+								showEffect="fade" hideEffect="fade" position="top" showDelay="500" />
+					</p:outputPanel>										
+				</div>
+				
+				<div><h:outputText id="textoMigaPan" escape="false" value="#{navegacionBean.txtMigaPan}" style="font-weight: bold;"/></div>
+					
+				<div style="display: flex">									
+					<div id="reloj">
+						<p:clock pattern="dd/MM/yyyy HH:mm"/>
+					</div>
+						
+					<div><span class="texto-usuario"><h:outputText value="#{loginBean.nombreCompletoUsuario}"/>
+					<h:outputText value=" [#{loginBean.descripcionPerfil}]"/></span></div>
+					
+					
+					<div id="botones-sesion" ><p:commandButton id="cambiarPerfil"
+						rendered="#{not empty loginBean.nombreCompletoUsuario}"
+						action="#{loginBean.cambiarPerfil}"
+						icon="pi pi-users"
+						immediate="true"
+						title="Cambiar perfil" />		
+														
+					<p:commandButton id="cerrarSesion"
+						action="#{loginBean.logOut('MANUAL')}"
+						icon="pi pi-sign-out"
+						immediate="true"
+						title="Cerrar sesión">
+						<p:confirm header="#{mensaje['confirmar.operacion']}" message="#{mensaje['pregunta.confirmar.salir.sistema']}" icon="pi pi-info-circle"/>
+					</p:commandButton></div>
+					<p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true">
+			            <div class="botonera-form" align="right">
+			           		<p:commandButton value="#{mensaje['si']}" type="button" styleClass="ui-confirmdialog-yes" />
+			           	 	<p:commandButton value="#{mensaje['no']}" type="button" styleClass="ui-confirmdialog-no ui-button-flat"/>
+			            </div>
+			            
+					</p:confirmDialog>									
+				</div>										
+			</div>							
+		</p:panel>
+	</div>
+					
+					
+	<p:dialog id="dialogPerfiles" header="#{mensaje['cambio.perfil.asociado']}" widgetVar="dialogPerfiles">
+		<h:form id="formDialogPerfiles">
+
+			<p:messages for="messagesDialogPerfiles" id="messagesDialogPerfiles"
+				showDetail="true" closable="true">
+				<p:autoUpdate />
+			</p:messages>
+
+			<div>
+			<div class="celda-form">
+				<p:outputLabel value="#{mensaje['perfiles.asociados']}: *" for="perfilesAsociados"/>
+				<p:selectOneMenu id="perfilesAsociados"
+					value="#{loginBean.selectedPerfilAsociado}"
+					style="min-width: 150px;">
+					<f:selectItem itemLabel="#{mensaje['seleccione.perfil']}" itemValue="#{null}" noSelectionOption="true" />
+					<f:selectItems
+						value="#{loginBean.listaPerfilesAsociados}"
+						var="perfil" itemLabel="#{perfil.descripcion}"
+						widgetVar="comboPerfilesAsociados" itemValue="#{perfil.id}" />
+				</p:selectOneMenu>
+					</div>
+			</div>				
+
+
+			<div class="botonera-form" align="right">
+				<p:commandButton id="acceder" value="#{mensaje['acceder']}"
+					action="#{loginBean.redireccionInicioCambioPerfil}" update="menuForm"/>
+
+			</div>
+
+		</h:form>
+	</p:dialog>	
+					
+</html>

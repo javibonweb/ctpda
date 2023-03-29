@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:c="http://java.sun.com/jstl/core"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:sec="https://joinfaces.org/security">
+
+<ui:composition>
+
+<!-- 	<c:set var="bean" value="#{datosExpedientesRelacionadosResolucionBean}" /> -->
+
+	<!-- DIALOGO BUSCAR EXPEDIENTE RELACIONADO -->
+	<p:dialog id="dialogBuscarExpRelacionadosResolucion" header="#{bean.cabeceraDialog}" widgetVar="dialogBuscarExpRelacionadosResolucion" 
+		closable="true" resizable="false" draggable="true" modal="true" responsive="true" contentWidth="100%" contentHeight="100%" width="1200" height="500">
+		
+		<p:messages for="messagesFormularioBusqRel" id="messagesFormularioBusqRel" showDetail="true" closable="true">
+			<p:autoUpdate/> 
+        </p:messages>
+       
+			<p:fieldset legend="#{mensaje['filtros.busqueda']}"
+				id="bloqueFiltroBusquedaRelacionados" toggleable="true" toggleSpeed="250">
+				<div>
+					<div class="celda-form">
+						<p:outputLabel for="numeroExpediente_filtro"
+							value="#{mensaje['numero.expediente']}" />
+						<p:inputText id="numeroExpediente_filtro" maxlength="255"
+							value="#{bean.numeroExpedienteFiltro}" />
+					</div>
+					
+				</div>
+
+				<div class="botonera-form">
+					<p:commandButton id="filtrarBuscarExpedientes" icon="pi pi-filter" 
+						value="#{mensaje['filtrar']}"
+						update="bloqueFiltroBusquedaRelacionados, tablaExpedientesRelacionables"
+						onstart="PF('expRelWV').paginator.setPage(0);" />
+					<p:commandButton id="limpiarFiltroBuscarExpedientes"
+						value="#{mensaje['limpiar.filtro']}" icon="pi pi-filter-slash"
+						action="#{bean.limpiarFiltroBusquedaRelacionables}" immediate="true" process="@this"
+						update="bloqueFiltroBusquedaRelacionados, tablaExpedientesRelacionables"
+						onstart="" />
+				</div>
+			</p:fieldset>
+
+			<!-- PANEL CON LOS RESULTADOS DE BUSQUEDA -->
+			<p:outputPanel id="panelResultadosBusquedaRelacionados">			
+				<p:dataTable var="expRel" id="tablaExpedientesRelacionables"
+					value="#{bean.lazyModelExpedientesRelacionables}" 
+					paginator="true"
+					paginatorTemplate=" {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+					rowsPerPageTemplate="10,20,50,100" rows="10"
+					currentPageReportTemplate="#{mensaje['paginador.template']}"
+					selectionMode="single" sortBy="#{expRel.numExpediente}"
+					sortOrder="ascending" rowKey="#{expRel.id}" 
+					paginatorPosition="bottom"
+					widgetVar="expRelWV">
+
+					<p:column headerText="#{mensaje['numero.expediente']}" sortBy="#{expRel.numExpediente}">
+						<h:outputText value="#{expRel.numExpediente}" />
+					</p:column>
+					
+					<p:column headerText="#{mensaje['nombre.expediente']}" sortBy="#{expRel.nombreExpediente}">
+						<h:outputText value="#{expRel.nombreExpediente}" />
+					</p:column>
+
+					<p:column headerText="#{mensaje['fecha.entrada']}"
+						sortBy="#{expRel.fechaEntrada}">
+						<h:outputText value="#{expRel.fechaEntrada}" >
+							<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+						</h:outputText>
+					</p:column>				
+					
+					<p:column headerText="#{mensaje['acciones']}" width="70px">
+						<p:commandButton id="seleccionarExpediente"
+							widgetVar="seleccionarExpedientes" icon="pi pi-plus-circle"
+							action="#{bean.agregarRelacionExpediente(expRel.id)}"
+							oncomplete="if(args.saved) PF('dialogBuscarExpRelacionadosResolucion').hide()">
+							<p:confirm header="#{mensaje['confirmar.operacion']}"
+								message="#{mensaje['pregunta.confirmar.vinculacion.resolucion']}"
+								icon="pi pi-info-circle" />
+						</p:commandButton>							
+					</p:column>
+				</p:dataTable>
+			</p:outputPanel>
+ 
+	</p:dialog>
+
+</ui:composition>
+</html>

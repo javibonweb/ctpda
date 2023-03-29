@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:c="http://java.sun.com/jstl/core"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:sec="https://joinfaces.org/security"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+    xmlns:fu="http://joinfaces.org/functions">
+
+<ui:composition>
+
+	<p:dialog id="dialogPersonaResolucion" 
+		header="#{mensaje['editar.persona.relacionada.resolucion']}" modal="true"
+	 	widgetVar="dialogPersonaResolucion" >
+				
+		<div>
+		
+					<div class="celda-form">
+						<p:outputLabel for="fechaNotificacionPersona" value="#{mensaje['fecha.notificacion']}" />
+						<p:datePicker id="fechaNotificacionPersona"
+							value="#{bean.personaResolucion.fechaNotificacion}"
+							locale="es" pattern="dd/MM/yyyy"
+							readonlyInput="true" monthNavigator="true" showButtonBar="true"
+							converterMessage="#{mensaje['formato.fecha.invalido']}" mask="true">
+						</p:datePicker>
+						<p:message for="fechaNotificacionPersona"/>
+					</div>
+		
+		</div>
+
+	    <div class="botonera-form" align="right">
+			<p:commandButton icon="pi pi-check"
+				value="#{mensaje['aceptar']}"
+				actionListener="#{bean.guardarRelacionPersona}"
+				update="listaPersonasResolucion"
+				oncomplete="if(args.saved) PF('dialogPersonaResolucion').hide()" >
+			</p:commandButton>
+			<p:commandButton icon="pi pi-times" value="#{mensaje['cerrar']}"
+				oncomplete="PF('dialogPersonaResolucion').hide()" >
+			</p:commandButton>
+		</div>
+	</p:dialog>
+
+
+</ui:composition>
+</html>

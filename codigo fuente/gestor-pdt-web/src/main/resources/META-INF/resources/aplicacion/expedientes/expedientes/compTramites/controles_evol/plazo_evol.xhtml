@@ -1,0 +1,29 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:c="http://java.sun.com/jstl/core"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:sec="https://joinfaces.org/security"
+    xmlns:fu="http://joinfaces.org/functions">
+<ui:composition>
+
+		<div class="celda-form">
+			<p:outputLabel  value="#{datosEvolucionExpedienteBean.metadatosExpediente('tipoPlazo',tramiteExpediente)}"/>
+			<p:inputText  size="50" value="#{tramiteExpediente.detalleExpdteTramMappedBy.valorTipoPlazo.descripcion}" disabled="true"/>	
+		</div>   															
+		<div class="celda-form">
+  				<p:outputLabel  value="#{datosEvolucionExpedienteBean.metadatosExpediente('plazo',tramiteExpediente)}" />
+			<p:inputNumber maxValue="999999999" size="10" decimalPlaces="0" disabled="true"
+				value="#{tramiteExpediente.detalleExpdteTramMappedBy.plazo}"/>
+		</div>
+		<div class="celda-form">
+			<p:outputLabel  value="#{datosEvolucionExpedienteBean.metadatosExpediente('fechaLimite',tramiteExpediente)}"/>
+			<p:inputText value="#{tramiteExpediente.detalleExpdteTramMappedBy.fechaLimite}" disabled="true">
+				<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+			</p:inputText>						
+		</div>	
+
+</ui:composition>
+</html>

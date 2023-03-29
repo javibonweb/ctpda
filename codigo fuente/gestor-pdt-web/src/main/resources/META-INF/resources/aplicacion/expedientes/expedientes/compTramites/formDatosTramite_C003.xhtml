@@ -1,0 +1,206 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:c="http://java.sun.com/jstl/core"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:sec="https://joinfaces.org/security"
+    xmlns:fu="http://joinfaces.org/functions">
+<ui:composition>
+
+
+			<!-- CAMPOS ASOCIADOS AL COMPORTAMIENTO C003 -->
+			<p:outputPanel id="panelTramiteComportamientoTramC003" autoUpdate="true"
+				rendered="#{tramExp.tipoTramite.comportamiento == 'C003'}">
+
+			<div>
+				<div class="celda-form">
+					<p:outputLabel rendered="#{editable and tramExp.cfgMetadatosTram != null}" for="comboTipoInteresadoC003" value="#{tramExp.cfgMetadatosTram.tipoInteresado} *" />
+					<p:outputLabel rendered="#{!editable and tramExp.cfgMetadatosTram != null}" for="comboTipoInteresadoC003" value="#{tramExp.cfgMetadatosTram.tipoInteresado}" />
+					<p:outputLabel rendered="#{editable and tramExp.cfgMetadatosTram == null}" for="comboTipoInteresadoC003" value="#{mensaje['etiqueta.pendiente.definir']} *" />
+					<p:outputLabel rendered="#{!editable and tramExp.cfgMetadatosTram == null}" for="comboTipoInteresadoC003" value="#{mensaje['etiqueta.pendiente.definir']}" />
+					<p:selectOneMenu id="comboTipoInteresadoC003" disabled="#{!editable}"
+						value="#{tramExp.selectedNuevoTipoInteresadoId}">
+						<f:selectItem
+							itemLabel="#{mensaje['seleccione.una.opcion']}"
+							itemValue="#{null}"/>
+						<f:selectItems
+							value="#{tramExp.listaValoresDominioTipoInteresado}"
+							var="tipIntList" itemLabel="#{tipIntList.descripcion}"
+							widgetVar="comboTipoInteresadoC003" itemValue="#{tipIntList.id}" />
+						<p:ajax
+							listener="#{datosTramiteExpedienteBean.onChangeTipoInteresado(tramExp)}"
+							update="combosIdentInteresadoC003-#{tramExp.id}, comboCanalSalidaC003-#{tramExp.id}"/>																	
+					</p:selectOneMenu>
+				</div>
+					<p:outputPanel id="combosIdentInteresadoC003-#{tramExp.id}" styleClass="celda-form">
+						<p:outputLabel for="comboIdentSujOblC003-#{tramExp.id}" value="#{tramExp.cfgMetadatosTram.identifInteresado} *" rendered="#{editable and tramExp.selectedNuevoTipoInteresadoId != null and tramExp.cfgMetadatosTram != null}"/>	
+						<p:outputLabel for="comboIdentSujOblC003-#{tramExp.id}" value="#{tramExp.cfgMetadatosTram.identifInteresado}" rendered="#{!editable and tramExp.selectedNuevoTipoInteresadoId != null and tramExp.cfgMetadatosTram != null}"/>	
+						<p:outputLabel rendered="#{editable and tramExp.selectedNuevoTipoInteresadoId != null and tramExp.cfgMetadatosTram == null}" for="comboIdentSujOblC003-#{tramExp.id}" value="#{mensaje['etiqueta.pendiente.definir']} *" />
+						<p:outputLabel rendered="#{!editable and tramExp.selectedNuevoTipoInteresadoId != null and tramExp.cfgMetadatosTram == null}" for="comboIdentSujOblC003-#{tramExp.id}" value="#{mensaje['etiqueta.pendiente.definir']}" />						
+						<p:selectOneMenu id="comboIdentSujOblC003-#{tramExp.id}" disabled="#{!editable}"
+							value="#{tramExp.selectedNuevaIdentifInteresadoId}"
+							rendered="#{tramExp.esIdentIntSujOblig == true}">
+							<f:selectItem
+								itemLabel="#{mensaje['seleccione.una.opcion']}"
+								itemValue="#{tramExp.detalleExpdteTram.valorDominioInteresado.id}" />
+							<f:selectItems
+								value="#{tramExp.listaIdentifIntSujOblig}"
+								var="identifIntList" itemLabel="#{identifIntList.descripcion}"
+								widgetVar="comboIdentSujOblC003-#{tramExp.id}"
+								itemValue="#{identifIntList.id}" />
+						</p:selectOneMenu>
+						<p:selectOneMenu id="comboIdentDPDC003-#{tramExp.id}" disabled="#{!editable}"
+							value="#{tramExp.selectedNuevaIdentifInteresadoId}"
+							rendered="#{tramExp.esIdentIntAutControl == true}">
+							<f:selectItem
+								itemLabel="#{mensaje['seleccione.una.opcion']}"
+								itemValue="#{tramExp.detalleExpdteTram.valorDominioInteresado.id}" />
+							<f:selectItems
+								value="#{tramExp.listaValoresDominioIdentifInteresado}"
+								var="identifIntList" itemLabel="#{identifIntList.descripcion}"
+								widgetVar="comboIdentDPDC003-#{tramExp.id}"
+								itemValue="#{identifIntList.id}" />
+						</p:selectOneMenu>
+						<p:selectOneMenu id="comboIdentPersC003-#{tramExp.id}" disabled="#{!editable}"
+							value="#{tramExp.selectedNuevaIdentifInteresadoId}"
+							rendered="#{tramExp.esIdentIntPersona == true}">
+							<f:selectItem
+								itemLabel="#{mensaje['seleccione.una.opcion']}"
+								itemValue="#{tramExp.detalleExpdteTram.valorDominioInteresado.id}" />
+							<f:selectItems
+								value="#{tramExp.listaIdentifIntPersDTO}"
+								var="identifIntList" itemLabel="#{identifIntList.nombreRazonSocial}"
+								widgetVar="comboIdentPersC003-#{tramExp.id}"
+								itemValue="#{identifIntList.id}" />
+						</p:selectOneMenu>
+						<p:selectOneMenu id="comboIdentDpdC003-#{tramExp.id}" disabled="#{!editable}"
+							value="#{tramExp.selectedNuevaIdentifInteresadoId}"
+							rendered="#{tramExp.esIdentIntDPD == true}">
+							<f:selectItem
+								itemLabel="#{mensaje['seleccione.una.opcion']}"
+								itemValue="#{tramExp.detalleExpdteTram.valorDominioInteresado.id}" />
+							<f:selectItems
+								value="#{tramExp.listaIdentifIntDpd}"
+								var="identifIntList" itemLabel="#{identifIntList.getNombreAp()}"
+								itemValue="#{identifIntList.id}" />
+						</p:selectOneMenu>
+					</p:outputPanel>					
+			</div>				
+				
+				<div>
+					<div class="celda-form">
+						<p:outputLabel rendered="#{tramExp.cfgMetadatosTram != null}" for="comboCanalSalidaC003-#{tramExp.id}" value="#{tramExp.cfgMetadatosTram.canalSalida}" />
+						<p:outputLabel rendered="#{tramExp.cfgMetadatosTram == null}" for="comboCanalSalidaC003-#{tramExp.id}" value="#{mensaje['etiqueta.pendiente.definir']}" />
+						<p:selectOneMenu id="comboCanalSalidaC003-#{tramExp.id}" disabled="#{!editable}"
+							value="#{tramExp.selectedNuevoCanalSalidaId}">
+							<f:selectItem itemLabel="#{mensaje['seleccione.una.opcion']}"
+							itemValue="#{null}"/>
+							<f:selectItems
+								value="#{datosTramiteExpedienteBean.listaValoresDominioCanalSalida}"
+								var="canalSalidaList" itemLabel="#{canalSalidaList.descripcion}"
+								itemValue="#{canalSalidaList.id}" />
+						</p:selectOneMenu>
+					</div>
+					<div class="celda-form">
+						<p:outputLabel rendered="#{tramExp.cfgMetadatosTram != null}" for="datosCanalSalidaC003-#{tramExp.id}" value="#{tramExp.cfgMetadatosTram.datosCanalSalida}" />
+						<p:outputLabel rendered="#{tramExp.cfgMetadatosTram == null}" for="datosCanalSalidaC003-#{tramExp.id}" value="#{mensaje['etiqueta.pendiente.definir']}" />
+						<p:inputText id="datosCanalSalidaC003-#{tramExp.id}" maxlength="40" size="40"
+							value="#{tramExp.detalleExpdteTram.datosCanalSalida}"
+							disabled="#{!editable}" />
+					</div>
+				</div>
+					
+				<div>
+					<div class="celda-form">
+						<p:outputLabel rendered="#{tramExp.cfgMetadatosTram != null}" for="fechaEnvioC003-#{tramExp.id}" value="#{tramExp.cfgMetadatosTram.fechaEnvio}" />
+						<p:outputLabel rendered="#{tramExp.cfgMetadatosTram == null}" for="fechaEnvioC003-#{tramExp.id}" value="#{mensaje['etiqueta.pendiente.definir']}" />
+						<p:datePicker id="fechaEnvioC003-#{tramExp.id}" disabled="#{!editable}"
+							value="#{tramExp.detalleExpdteTram.fechaEnvio}" locale="es"
+							monthNavigator="true" pattern="dd/MM/yyyy"
+							converterMessage="#{mensaje['formato.fecha.invalido']}"
+							mask="true"
+							showButtonBar="true"
+							readonlyInput="true">
+							<p:ajax
+							listener="#{datosTramiteExpedienteBean.actualizarFechaLimiteBasico(tramExp)}"
+							update="fechaLimite003-#{tramExp.id}"/>
+							</p:datePicker>
+						<p:message for="fechaEnvioC003-#{tramExp.id}" />
+					</div>
+					<div class="celda-form">
+						<p:outputLabel rendered="#{tramExp.cfgMetadatosTram != null}" for="checkAcuseRecibo-C003#{tramExp.id}" value="#{tramExp.cfgMetadatosTram.acuseRecibo}" />
+						<p:outputLabel rendered="#{tramExp.cfgMetadatosTram == null}" for="checkAcuseRecibo-C003#{tramExp.id}" value="#{mensaje['etiqueta.pendiente.definir']}" />			
+						<p:selectBooleanCheckbox id="checkAcuseRecibo-C003#{tramExp.id}" value="#{tramExp.detalleExpdteTram.acuseRecibo}" 
+							itemLabel="#{mensaje['si']}" disabled="#{!editable}">
+						</p:selectBooleanCheckbox>
+					</div>					
+					<div class="celda-form">
+						<p:outputLabel rendered="#{editable and tramExp.cfgMetadatosTram != null}" for="comboTipoPlazo003-#{tramExp.id}"  value="#{tramExp.cfgMetadatosTram.tipoPlazo} *" />
+						<p:outputLabel rendered="#{!editable and tramExp.cfgMetadatosTram != null}" for="comboTipoPlazo003-#{tramExp.id}"  value="#{tramExp.cfgMetadatosTram.tipoPlazo}" />
+						<p:outputLabel rendered="#{editable and tramExp.cfgMetadatosTram == null}" for="comboTipoPlazo003-#{tramExp.id}" value="#{mensaje['etiqueta.pendiente.definir']} *" />
+						<p:outputLabel rendered="#{!editable and tramExp.cfgMetadatosTram == null}" for="comboTipoPlazo003-#{tramExp.id}" value="#{mensaje['etiqueta.pendiente.definir']}" />
+						<p:selectOneMenu id="comboTipoPlazo003-#{tramExp.id}" disabled="true"
+							value="#{tramExp.selectedNuevoTipoPlazoId}">
+							<f:selectItem itemLabel="#{mensaje['seleccione.una.opcion']}"
+								itemValue="#{null}" />
+							<f:selectItems
+								value="#{datosTramiteExpedienteBean.listaValoresDominioTipoPlazo}"
+								var="tipoPlazoList"
+								itemLabel="#{tipoPlazoList.descripcion}" itemValue="#{tipoPlazoList.id}" />
+							<p:ajax
+							listener="#{datosTramiteExpedienteBean.actualizarFechaLimiteBasico(tramExp)}"
+							update="fechaLimite003-#{tramExp.id}"/>
+						</p:selectOneMenu>
+					</div>
+					<div class="celda-form">
+		   				<p:outputLabel rendered="#{tramExp.cfgMetadatosTram != null}" for="plazo003-#{tramExp.id}" value="#{tramExp.cfgMetadatosTram.plazo}" />
+		   				<p:outputLabel rendered="#{tramExp.cfgMetadatosTram == null}" for="plazo003-#{tramExp.id}" value="#{mensaje['etiqueta.pendiente.definir']}" />
+						<p:inputNumber id="plazo003-#{tramExp.id}" maxValue="999999999" size="10" decimalPlaces="0" disabled="#{!editable}"
+							value="#{tramExp.detalleExpdteTram.plazo}">
+							<p:ajax
+							listener="#{datosTramiteExpedienteBean.actualizarFechaLimiteBasico(tramExp)}"
+							update="fechaLimite003-#{tramExp.id}"/>
+						</p:inputNumber>
+					</div>	
+				</div>
+				<div>
+					<div class="celda-form">
+						<p:outputLabel rendered="#{tramExp.cfgMetadatosTram != null}" for="fechaLimite003-#{tramExp.id}" value="#{tramExp.cfgMetadatosTram.fechaLimite}" />
+						<p:outputLabel rendered="#{tramExp.cfgMetadatosTram == null}" for="fechaLimite003-#{tramExp.id}" value="#{mensaje['etiqueta.pendiente.definir']}" />
+						<p:datePicker id="fechaLimite003-#{tramExp.id}" disabled="true"
+							value="#{tramExp.detalleExpdteTram.fechaLimite}" locale="es"
+							pattern="dd/MM/yyyy" />
+						<p:message for="fechaLimite003-#{tramExp.id}" />
+					</div>		
+					<div class="celda-form">
+						<p:outputLabel rendered="#{tramExp.cfgMetadatosTram != null}" for="fechaNotificacionC003-#{tramExp.id}" value="#{tramExp.cfgMetadatosTram.fechaNotificacion}" />
+						<p:outputLabel rendered="#{tramExp.cfgMetadatosTram == null}" for="fechaNotificacionC003-#{tramExp.id}" value="#{mensaje['etiqueta.pendiente.definir']}" />
+						<p:datePicker id="fechaNotificacionC003-#{tramExp.id}" disabled="#{!editable}"
+							value="#{tramExp.detalleExpdteTram.fechaNotificacion}" locale="es"
+							monthNavigator="true" pattern="dd/MM/yyyy"
+							converterMessage="#{mensaje['formato.fecha.invalido']}"
+							mask="true" >
+							</p:datePicker>
+						<p:message for="fechaNotificacionC003-#{tramExp.id}" />
+					</div>			
+					<div class="celda-form">
+						<p:outputLabel rendered="#{tramExp.cfgMetadatosTram != null}" for="comboResultNotifC003-#{tramExp.id}" value="#{tramExp.cfgMetadatosTram.notifInfructuosa}" />
+						<p:outputLabel rendered="#{tramExp.cfgMetadatosTram == null}" for="comboResultNotifC003-#{tramExp.id}" value="#{mensaje['etiqueta.pendiente.definir']}" />
+						<p:selectOneMenu id="comboResultNotifC003-#{tramExp.id}" disabled="#{!editable}"
+							value="#{tramExp.selectedNuevoResulNotificacionId}" >
+							<f:selectItem
+								itemLabel="#{mensaje['seleccione.una.opcion']}"
+								itemValue="#{null}" />
+							<f:selectItems
+								value="#{datosTramiteExpedienteBean.listaValoresDominioResultadosNotificacion}"
+								var="res" itemLabel="#{res.descripcion}" itemValue="#{res.id}" />
+						</p:selectOneMenu>
+					</div>		
+				</div>
+			</p:outputPanel>
+			<!-- FIN DE LOS CAMPOS ASOCIADOS AL COMPORTAMIENTO C003 -->
+
+</ui:composition>
+</html>

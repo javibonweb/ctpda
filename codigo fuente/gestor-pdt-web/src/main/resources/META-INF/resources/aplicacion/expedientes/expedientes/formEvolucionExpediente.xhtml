@@ -1,0 +1,1134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:c="http://java.sun.com/jstl/core"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:sec="https://joinfaces.org/security"
+	xmlns:fu="http://joinfaces.org/functions">
+
+<ui:composition>
+
+	<p:messages for="messagesFormEvolucionExpediente"
+		id="messagesFormEvolucionExpediente" showDetail="true"
+		closable="true">
+		<p:autoUpdate />
+	</p:messages>
+	
+	<p:fieldset legend="#{mensaje['filtros.busqueda']}" id="bloqueFiltroEvolucionExp" toggleable="true" toggleSpeed="250">
+
+		<div>
+			<div class="celda-form">
+				<p:outputLabel for="fechaInicial_filtro" value="#{mensaje['rango.fecha.inicial']}" />
+				<p:datePicker id="fechaInicial_filtro" value="#{datosEvolucionExpedienteBean.fechaInicialFiltro}" 
+					locale="es" monthNavigator="true" pattern="dd/MM/yyyy"
+					converterMessage="#{mensaje['formato.fecha.invalido']}" mask="true"/>
+				<p:message for="fechaInicial_filtro"/>
+			</div>
+						
+			<div class="celda-form">
+				<p:outputLabel for="fechaFinal_filtro" value="#{mensaje['rango.fecha.final']}" />
+				<p:datePicker id="fechaFinal_filtro" value="#{datosEvolucionExpedienteBean.fechaFinalFiltro}" 
+					locale="es" monthNavigator="true" pattern="dd/MM/yyyy"
+					converterMessage="#{mensaje['formato.fecha.invalido']}" mask="true"/>
+				<p:message for="fechaFinal_filtro"/>
+			</div>
+						
+			<div class="celda-form">
+				<p:outputLabel for="nivelSuperior_filtro" value="#{mensaje['solo.nivel.superior']}"/>
+				<p:selectBooleanCheckbox id="nivelSuperior_filtro" value="#{datosEvolucionExpedienteBean.nivelSuperiorFiltro}" itemLabel="#{mensaje['si']}"/>
+			</div>	
+			
+			<div class="celda-form">
+				<p:outputLabel value="#{mensaje['estado']}" for="estados_filtro" />
+				<p:selectOneMenu id="estados_filtro" value="#{datosEvolucionExpedienteBean.selectedEstadoIdFiltro}"
+					style="min-width: 150px;">
+					<f:selectItem itemLabel="#{mensaje['todos']}" itemValue="" />
+					<f:selectItem itemLabel="#{mensaje['abierto']}" itemValue="0"/>
+                    <f:selectItem itemLabel="#{mensaje['finalizado']}" itemValue="1"/>
+				</p:selectOneMenu>
+			</div>			
+		</div>
+		<div>
+			<div class="celda-form">
+				<p:outputLabel value="#{mensaje['tipo.tramite']}" for="tipoTramite_filtro" />				
+				<p:selectOneRadio id="tipoTramite_filtro" unselectable="true" value="#{datosEvolucionExpedienteBean.tipoTramiteFiltro}">
+					<f:selectItem itemLabel="#{mensaje['formal']}" itemValue="formal" />
+					<f:selectItem itemLabel="#{mensaje['informal']}" itemValue="informal" />
+					<f:selectItem itemLabel="#{mensaje['todos']}" itemValue="todos" />
+					<p:ajax event="change" listener="#{datosEvolucionExpedienteBean.onChangeListaTipoTramite}" process="@this" update="listatipoTramite_filtro" />
+				</p:selectOneRadio>					
+				<p:selectOneMenu id="listatipoTramite_filtro" value="#{datosEvolucionExpedienteBean.selectedTipoTramiteIdFiltro}" style="min-width: 260px;">
+					<f:selectItem itemLabel="#{mensaje['todos']}" itemValue="" />
+					<f:selectItems value="#{datosEvolucionExpedienteBean.listaTiposTramites}" var="tipoTramiteList" itemLabel="#{fu:ptoSusp(tipoTramiteList)}"
+						widgetVar="comboTipoTramiteFiltro" itemValue="#{tipoTramiteList}" />					
+				</p:selectOneMenu>
+			</div>
+		</div>
+		
+		<div class="botonera-form">
+			<p:commandButton id="filtrarTramites" icon="pi pi-filter" value="#{mensaje['filtrar']}"
+				update="formFormularioExpedientes:tabViewPestanasExpediente:listadoTramitesExpediente"
+				onstart="PF('tramiteExpedienteWV').paginator.setPage(0);" />
+			
+			<p:commandButton id="limpiarTramites" value="#{mensaje['limpiar.filtro']}" icon="pi pi-filter-slash"
+				actionListener="#{datosEvolucionExpedienteBean.limpiarFiltro()}"
+				update="formFormularioExpedientes:tabViewPestanasExpediente:fechaInicial_filtro, formFormularioExpedientes:tabViewPestanasExpediente:fechaFinal_filtro,
+					formFormularioExpedientes:tabViewPestanasExpediente:tipoTramite_filtro,formFormularioExpedientes:tabViewPestanasExpediente:listatipoTramite_filtro,formFormularioExpedientes:tabViewPestanasExpediente:nivelSuperior_filtro,
+					formFormularioExpedientes:tabViewPestanasExpediente:estados_filtro,formFormularioExpedientes:tabViewPestanasExpediente:listadoTramitesExpediente"
+				onstart="PF('tramiteExpedienteWV').paginator.setPage(0);" />
+		</div>
+	</p:fieldset>
+	
+	<p:outputPanel id="panelListadoTramitesExpediente">
+	 	<p:dataTable var="tramiteExpediente" id="listadoTramitesExpediente"
+			value="#{datosEvolucionExpedienteBean.lazyTramitesExpediente}" paginator="true"
+			paginatorTemplate=" {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+			rowsPerPageTemplate="10,20,50,100" rows="10"
+			currentPageReportTemplate="#{mensaje['paginador.template']}"
+			paginatorAlwaysVisible="false"
+			sortBy="#{datosEvolucionExpedienteBean.defaultOrdenListLazyTramitesExpediente}"
+			sortOrder="ascending"
+			rowKey="#{tramiteExpediente.id}" paginatorPosition="bottom"
+			widgetVar="tramiteExpedienteWV" > 
+			
+			<p:column style="width:2rem;">
+                <p:rowToggler />
+            </p:column>
+            
+            <p:column sortBy="#{tramiteExpediente.id}" visible="false">
+				<h:outputText value="#{tramiteExpediente.id}" />
+			</p:column>
+			
+			<p:column sortBy="#{tramiteExpediente.fechaIni}" visible="false">
+				<h:outputText value="#{tramiteExpediente.fechaIni}" />
+			</p:column>
+			
+			<p:column headerText="#{mensaje['fecha.alta']}" sortBy="#{tramiteExpediente.fechaIni}">
+				<h:outputText value="#{tramiteExpediente.fechaIni}">
+					<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+				</h:outputText>
+			</p:column>
+			
+			<p:column headerText="#{mensaje['fecha.tramite']}" sortBy="#{tramiteExpediente.fechaTramite}">
+				<h:outputText value="#{tramiteExpediente.fechaTramite}">
+					<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+				</h:outputText>
+			</p:column>		
+			
+			<p:column headerText="#{mensaje['info.relevante']}" sortBy="#{tramiteExpediente.informacionRelevante}">
+				<h:outputText value="#{tramiteExpediente.informacionRelevante}" />
+			</p:column>				
+			
+			<p:column headerText="#{mensaje['descripcion.tramite']}" sortBy="#{tramiteExpediente.descripcion}">
+				<h:outputText value="#{tramiteExpediente.descripcion}" />
+			</p:column>
+			
+			<p:column headerText="#{mensaje['descripcion.tramite.superior']}" sortBy="#{tramiteExpediente.tramiteExpedienteSup.descripcion}">
+				<h:outputText value="#{tramiteExpediente.tramiteExpedienteSup.descripcion}" />
+			</p:column>
+			
+			<p:column width="50" sortBy="#{tramiteExpediente.finalizado}">
+				<f:facet name="header">
+					<h:outputText id="hdrDep" value="#{mensaje['estado']}" />
+				</f:facet>
+				<span class="#{tramiteExpediente.cssSemaforoFinalizado(tramiteExpediente.finalizado)}"></span>
+			</p:column>
+			
+			<p:column width="80" headerText="#{mensaje['acciones']}" rendered="#{datosEvolucionExpedienteBean.permisoConsTramiteEvol}">
+				<p:commandButton id="consultarTramite" icon="pi pi-eye" rendered="#{tramiteExpediente.finalizado == false}"
+					action="#{datosEvolucionExpedienteBean.onConsultarTramite(tramiteExpediente.id)}" />
+			</p:column>
+						
+			<p:rowExpansion>
+				<div>
+					<div class="celda-form">
+	                   	<p:outputLabel for="descripcionEvolExp" value="#{mensaje['descripcion']}" />
+						<p:inputText id="descripcionEvolExp" size="40" value="#{tramiteExpediente.descripcion}" disabled="true"/>	
+					</div>
+					<div class="celda-form">
+	                   	<p:outputLabel for="descripcionAbrevEvolExp" value="#{mensaje['descripcion.abrev']}"/>
+						<p:inputText id="descripcionAbrevEvolExp" size="20" value="#{tramiteExpediente.descripcionAbrev}" disabled="true"/>
+					</div>
+				</div>
+				
+				<div>
+					<div class="celda-form">
+						<p:outputLabel for="fechaInicioEvolExp" value="#{mensaje['fecha.inicio']}" />
+						<p:inputText id="fechaInicioEvolExp" value="#{tramiteExpediente.fechaIni}" disabled="true">
+							<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+						</p:inputText>
+					</div>
+	                <div class="celda-form">
+						<p:outputLabel for="responsableEvolExp" value="#{mensaje['responsable']} " />
+						<p:inputText id="responsableEvolExp" size="50" value="#{tramiteExpediente.responsable.descripcion}"  disabled="true"/>									
+					</div>     
+					<div class="celda-form">
+						<p:outputLabel for="usuCreacionEvolExp" value="#{mensaje['usuario.creacion']} " />
+						<p:inputText id="usuCreacionEvolExp" size="50" value="#{tramiteExpediente.usuarioTramitador.getNombreAp()}"  disabled="true"/>									
+					</div>                          
+					                     
+				</div>
+				
+				<div>
+					<div class="celda-form">
+					<p:outputLabel for="fechaFinRealEvolExp" value="#{mensaje['fecha.fin.real']}" rendered="#{tramiteExpediente.finalizado == true }"/>
+						<p:inputText id="fechaFinRealEvolExp" value="#{tramiteExpediente.fechaFinReal}" disabled="true" rendered="#{tramiteExpediente.finalizado == true }">
+							<f:convertDateTime locale="es" pattern="dd/MM/yyyy HH:mm:ss" />
+						</p:inputText>										
+					</div>
+					
+					<div class="celda-form">
+					<p:outputLabel for="fechaFinEvolExp" value="#{mensaje['fecha.fin.tramite']}" rendered="#{tramiteExpediente.finalizado == true }"/>
+						<p:inputText id="fechaFinEvolExp" value="#{tramiteExpediente.fechaFin}" disabled="true" rendered="#{tramiteExpediente.finalizado == true }">
+							<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+						</p:inputText>										
+					</div>
+					
+					<div class="celda-form">
+					<p:outputLabel for="usuarioFinEvolExp" value="#{mensaje['usuario.fin.tramite']} " rendered="#{tramiteExpediente.finalizado == true }"/>
+						<p:inputText id="usuarioFinEvolExp" size="50" value="#{datosTramiteExpedienteBean.nombreUsuario(tramiteExpediente)}"  disabled="true" rendered="#{tramiteExpediente.finalizado == true }"/>								
+					</div>
+				</div>
+				
+				<!-- CAMPOS ASOCIADOS AL COMPORTAMIENTO C005 -->
+				<p:outputPanel rendered="#{tramiteExpediente.tipoTramite.comportamiento == 'C005' or tramiteExpediente.tipoTramite.comportamiento == 'C001'
+											or tramiteExpediente.tipoTramite.comportamiento == 'C023'}">
+					<div>
+						<div class="celda-form">
+							<p:outputLabel for="tipoInteresado5EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('tipoInteresado',tramiteExpediente)}"/>
+							<p:inputText id="tipoInteresado5EvolExp" size="50" value="#{tramiteExpediente.detalleExpdteTramMappedBy.valorTipoInteresado.descripcion}" disabled="true"/>	
+						</div>     
+							
+						<div class="celda-form">
+							<p:outputLabel rendered="#{tramiteExpediente.detalleExpdteTramMappedBy.valorTipoInteresado.codigo == 'AUTCON'}" for="valDomInteresado5EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('identifInteresado',tramiteExpediente)}"/>
+							<p:inputText rendered="#{tramiteExpediente.detalleExpdteTramMappedBy.valorTipoInteresado.codigo == 'AUTCON'}"
+								id="valDomInteresado5EvolExp" size="50" value="#{tramiteExpediente.detalleExpdteTramMappedBy.valorDominioInteresado.descripcion}" disabled="true"/>
+							
+							<p:outputLabel rendered="#{tramiteExpediente.detalleExpdteTramMappedBy.valorTipoInteresado.codigo == 'SUJOBL'}" for="sujObligadInteresado5EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('identifInteresado',tramiteExpediente)}"/>
+							<p:inputText rendered="#{tramiteExpediente.detalleExpdteTramMappedBy.valorTipoInteresado.codigo == 'SUJOBL'}"
+								id="sujObligadInteresado5EvolExp" size="50" value="#{tramiteExpediente.detalleExpdteTramMappedBy.sujetosObligadosInteresado.descripcion}" disabled="true"/>
+							
+							<p:outputLabel rendered="#{tramiteExpediente.detalleExpdteTramMappedBy.valorTipoInteresado.codigo == 'DPD' or tramiteExpediente.detalleExpdteTramMappedBy.valorTipoInteresado.codigo == 'PERS'}" for="persInteresado5EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('identifInteresado',tramiteExpediente)}"/>
+							<p:inputText rendered="#{tramiteExpediente.detalleExpdteTramMappedBy.valorTipoInteresado.codigo == 'DPD' or tramiteExpediente.detalleExpdteTramMappedBy.valorTipoInteresado.codigo == 'PERS'}"
+								id="persInteresado5EvolExp" size="50" value="#{tramiteExpediente.detalleExpdteTramMappedBy.personasInteresado.nombreAp}" disabled="true"/>	
+						</div> 	
+					</div>   
+					<div>
+						<div class="celda-form">
+							<p:outputLabel for="fechaEntradaEvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('fechaEntrada',tramiteExpediente)}"/>
+							<p:inputText id="fechaEntradaEvolExp" value="#{tramiteExpediente.detalleExpdteTramMappedBy.fechaEntrada}" disabled="true">
+								<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+							</p:inputText>						
+						</div>
+						<div class="celda-form">
+							<p:outputLabel for="fechaRegistroEvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('fechaRegistro',tramiteExpediente)}"/>
+							<p:inputText id="fechaRegistroEvolExp" value="#{tramiteExpediente.detalleExpdteTramMappedBy.fechaRegistro}" disabled="true">
+								<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+							</p:inputText>						
+						</div>						
+							<div class="celda-form">
+								<p:outputLabel for="canalEntradaEvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('canalEntrada',tramiteExpediente)}"/>
+								<p:inputText id="canalEntradaEvolExp" size="50" value="#{tramiteExpediente.detalleExpdteTramMappedBy.valorCanalEntrada.descripcion}" disabled="true"/>
+							</div>
+	                   <div class="celda-form">
+	                      	<p:outputLabel for="registroEntradaEvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('identifEntrada',tramiteExpediente)}" />
+							<p:inputText id="registroEntradaEvolExp" size="40" value="#{tramiteExpediente.detalleExpdteTramMappedBy.identifEntrada}" disabled="true"/>	
+	                     </div>		                        
+						<div class="celda-form">
+							<p:outputLabel for="actoRecEvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('actoRec',tramiteExpediente)}"
+															rendered="#{tramiteExpediente.tipoTramite.comportamiento == 'C023'}"/>
+							<p:inputText id="actoRecEvolExp" size="50" value="#{tramiteExpediente.detalleExpdteTramMappedBy.valorDominioActoRec.descripcion}" disabled="true"
+															rendered="#{tramiteExpediente.tipoTramite.comportamiento == 'C023'}"/>
+						</div> 							 
+ 					
+					</div>
+					<p:fieldset toggleable="true" legend="#{mensaje['extracto']}" collapsed="true" style="margin-top:20px; background-color: #{tramExp.tipoTramite.colorTramite}; border-width:5px; border-style:double">
+					<div>
+						<div class="celda-form">
+							<p:outputLabel value="#{mensaje['indicador.extracto.expediente']}" style="display: inline-block;  margin-right: 0.5em;" />
+							<p:selectBooleanCheckbox value="#{tramiteExpediente.detalleExpdteTramMappedBy.extractoExpediente}" 
+								itemLabel="#{mensaje['si']}" disabled="true" />
+						</div>
+						<p:commandButton icon="pi pi-replay" id="activarExtractoC005" actionListener="#{datosTramiteExpedienteBean.activarExtractos(tramiteExpediente)}"  value="#{mensaje['activarextantec']}"
+							update="formFormularioExpedientes,formFormularioExpedientes:tabViewPestanasExpediente,formFormularioExpedientes:tabViewPestanasExpediente:listadoTramitesExpediente,formFormularioExpedientes:panelActualizadoCabecera" rendered="#{tramiteExpediente.finalizado and empty tramiteExpediente.detalleExpdteTramMappedBy.textoExtractoExpediente}"> 
+						</p:commandButton>		
+						
+					</div>
+					<div>
+						<div class="celda-form-block">
+							<p:inputTextarea rows="6" value="#{tramiteExpediente.detalleExpdteTramMappedBy.textoExtractoExpediente}"
+								style="width:100%" disabled="true" />
+						</div>
+					</div>
+					</p:fieldset>
+				
+					<p:fieldset toggleable="true" legend="#{mensaje['antecedentes']}" rendered="false" collapsed="true" style="margin-top:20px; background-color: #{tramExp.tipoTramite.colorTramite}; border-width:5px; border-style:double">
+					<div>
+						<div class="celda-form">
+							<p:outputLabel value="#{mensaje['indicador.antecedentes.expediente']}" style="display: inline-block;  margin-right: 0.5em;" />
+							<p:selectBooleanCheckbox value="#{tramiteExpediente.detalleExpdteTramMappedBy.antecedentesExpediente}" 
+								itemLabel="#{mensaje['si']}" disabled="true" />
+						</div>
+						<p:commandButton icon="pi pi-replay" id="activarAntedecentesC005" actionListener="#{datosTramiteExpedienteBean.activarAntecedentes(tramiteExpediente)}"  value="#{mensaje['activarextantec']}"
+							update="formFormularioExpedientes,formFormularioExpedientes:tabViewPestanasExpediente,formFormularioExpedientes:tabViewPestanasExpediente:listadoTramitesExpediente,formFormularioExpedientes:panelActualizadoCabecera" rendered="#{tramiteExpediente.finalizado and empty tramiteExpediente.detalleExpdteTramMappedBy.textoAntecedentesExpediente}"> 
+						</p:commandButton>		
+					</div>
+					<div>
+						<div class="celda-form-block">
+							<p:inputTextarea rows="6" value="#{tramiteExpediente.detalleExpdteTramMappedBy.textoAntecedentesExpediente}"
+								style="width:100%" disabled="true" />
+						</div>
+					</div>
+					</p:fieldset>
+				</p:outputPanel>
+				<!-- FIN CAMPOS ASOCIADOS AL COMPORTAMIENTO C005 -->				
+				
+				<!-- CAMPOS ASOCIADOS AL COMPORTAMIENTO C006 -->
+				<p:outputPanel rendered="#{tramiteExpediente.tipoTramite.comportamiento == 'C006'}">
+					<div>
+						<div class="celda-form">
+							<p:outputLabel for="tipoInteresadoEvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('tipoInteresado',tramiteExpediente)}"/>
+							<p:inputText id="tipoInteresadoEvolExp" size="50" value="#{tramiteExpediente.detalleExpdteTramMappedBy.valorTipoInteresado.descripcion}" disabled="true"/>	
+						</div>     
+							
+						<div class="celda-form">
+							<p:outputLabel rendered="#{tramiteExpediente.detalleExpdteTramMappedBy.valorTipoInteresado.codigo == 'AUTCON'}" for="valDomInteresadoEvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('identifInteresado',tramiteExpediente)}"/>
+							<p:inputText rendered="#{tramiteExpediente.detalleExpdteTramMappedBy.valorTipoInteresado.codigo == 'AUTCON'}"
+								id="valDomInteresadoEvolExp" size="50" value="#{tramiteExpediente.detalleExpdteTramMappedBy.valorDominioInteresado.descripcion}" disabled="true"/>
+							
+							<p:outputLabel rendered="#{tramiteExpediente.detalleExpdteTramMappedBy.valorTipoInteresado.codigo == 'SUJOBL'}" for="sujObligadInteresadoEvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('identifInteresado',tramiteExpediente)}"/>
+							<p:inputText rendered="#{tramiteExpediente.detalleExpdteTramMappedBy.valorTipoInteresado.codigo == 'SUJOBL'}"
+								id="sujObligadInteresadoEvolExp" size="50" value="#{tramiteExpediente.detalleExpdteTramMappedBy.sujetosObligadosInteresado.descripcion}" disabled="true"/>
+							
+							<p:outputLabel rendered="#{tramiteExpediente.detalleExpdteTramMappedBy.valorTipoInteresado.codigo == 'DPD' or tramiteExpediente.detalleExpdteTramMappedBy.valorTipoInteresado.codigo == 'PERS'}" for="persInteresadoEvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('identifInteresado',tramiteExpediente)}"/>
+							<p:inputText rendered="#{tramiteExpediente.detalleExpdteTramMappedBy.valorTipoInteresado.codigo == 'DPD' or tramiteExpediente.detalleExpdteTramMappedBy.valorTipoInteresado.codigo == 'PERS'}"
+								id="persInteresadoEvolExp" size="50" value="#{tramiteExpediente.detalleExpdteTramMappedBy.personasInteresado.nombreAp}" disabled="true"/>	
+						</div> 	
+					</div>   
+					<div>
+						<div class="celda-form">
+							<p:outputLabel for="canalSalidaEvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('canalSalida',tramiteExpediente)}"/>
+							<p:inputText id="canalSalidaEvolExp" size="50" value="#{tramiteExpediente.detalleExpdteTramMappedBy.valorCanalSalida.descripcion}" disabled="true"/>
+						</div> 
+	                    <div class="celda-form">
+	                      	<p:outputLabel for="datosCanalSalidaEvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('datosCanalSalida',tramiteExpediente)}" />
+							<p:inputText id="datosCanalSalidaEvolExp" size="40" value="#{tramiteExpediente.detalleExpdteTramMappedBy.datosCanalSalida}" disabled="true"/>	
+	                     </div>		                        
+						<div class="celda-form">
+							<p:outputLabel for="fechaEnvio6EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('fechaEnvio',tramiteExpediente)}"/>
+							<p:inputText id="fechaEnvio6EvolExp" value="#{tramiteExpediente.detalleExpdteTramMappedBy.fechaEnvio}" disabled="true">
+								<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+							</p:inputText>						
+						</div>
+					</div>
+				</p:outputPanel>
+				<!-- FIN CAMPOS ASOCIADOS AL COMPORTAMIENTO C006 -->
+				
+				
+				<!-- CAMPOS ASOCIADOS AL COMPORTAMIENTO C007 -->
+				<p:outputPanel rendered="#{tramiteExpediente.tipoTramite.comportamiento == 'C007'}">
+					<div>
+						<div class="celda-form">
+							<p:outputLabel for="tipoInteresado7EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('tipoInteresado',tramiteExpediente)}"/>
+							<p:inputText id="tipoInteresado7EvolExp" size="50" value="#{tramiteExpediente.detalleExpdteTramMappedBy.valorTipoInteresado.descripcion}" disabled="true"/>	
+						</div>     
+							
+						<div class="celda-form">
+							<p:outputLabel rendered="#{tramiteExpediente.detalleExpdteTramMappedBy.valorTipoInteresado.codigo == 'AUTCON'}" for="valDomInteresado7EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('identifInteresado',tramiteExpediente)}"/>
+							<p:inputText rendered="#{tramiteExpediente.detalleExpdteTramMappedBy.valorTipoInteresado.codigo == 'AUTCON'}"
+								id="valDomInteresado7EvolExp" size="50" value="#{tramiteExpediente.detalleExpdteTramMappedBy.valorDominioInteresado.descripcion}" disabled="true"/>
+							
+							<p:outputLabel rendered="#{tramiteExpediente.detalleExpdteTramMappedBy.valorTipoInteresado.codigo == 'SUJOBL'}" for="sujObligadInteresado7EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('identifInteresado',tramiteExpediente)}"/>
+							<p:inputText rendered="#{tramiteExpediente.detalleExpdteTramMappedBy.valorTipoInteresado.codigo == 'SUJOBL'}"
+								id="sujObligadInteresado7EvolExp" size="50" value="#{tramiteExpediente.detalleExpdteTramMappedBy.sujetosObligadosInteresado.descripcion}" disabled="true"/>
+							
+							<p:outputLabel rendered="#{tramiteExpediente.detalleExpdteTramMappedBy.valorTipoInteresado.codigo == 'DPD' or tramiteExpediente.detalleExpdteTramMappedBy.valorTipoInteresado.codigo == 'PERS'}" for="persInteresado7EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('identifInteresado',tramiteExpediente)}"/>
+							<p:inputText rendered="#{tramiteExpediente.detalleExpdteTramMappedBy.valorTipoInteresado.codigo == 'DPD' or tramiteExpediente.detalleExpdteTramMappedBy.valorTipoInteresado.codigo == 'PERS'}"
+								id="persInteresado7EvolExp" size="50" value="#{tramiteExpediente.detalleExpdteTramMappedBy.personasInteresado.nombreAp}" disabled="true"/>	
+						</div> 	
+					</div>
+					<div>
+						<div class="celda-form">
+							<p:outputLabel for="canalSalida7EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('canalSalida',tramiteExpediente)}"/>
+							<p:inputText id="canalSalida7EvolExp" size="50" value="#{tramiteExpediente.detalleExpdteTramMappedBy.valorCanalSalida.descripcion}" disabled="true"/>
+						</div> 
+	                    <div class="celda-form">
+	                      	<p:outputLabel for="datosCanalSalida7EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('datosCanalSalida',tramiteExpediente)}" />
+							<p:inputText id="datosCanalSalida7EvolExp" size="40" value="#{tramiteExpediente.detalleExpdteTramMappedBy.datosCanalSalida}" disabled="true"/>	
+	                     </div>		                        
+						<div class="celda-form">
+							<p:outputLabel for="fechaEnvio7EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('fechaEnvio',tramiteExpediente)}"/>
+							<p:inputText id="fechaEnvio7EvolExp" value="#{tramiteExpediente.detalleExpdteTramMappedBy.fechaEnvio}" disabled="true">
+								<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+							</p:inputText>						
+						</div>
+					</div>	
+					<div>
+						<div class="celda-form">
+			   				<p:outputLabel for="plazo7EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('plazo',tramiteExpediente)}" />
+							<p:inputNumber id="plazo7EvolExp" maxValue="999999999" size="10" decimalPlaces="0" disabled="true"
+								value="#{tramiteExpediente.detalleExpdteTramMappedBy.plazo}"/>
+						</div>
+						<div class="celda-form">
+							<p:outputLabel for="tipoPlazo7EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('tipoPlazo',tramiteExpediente)}"/>
+							<p:inputText id="tipoPlazo7EvolExp" size="50" value="#{tramiteExpediente.detalleExpdteTramMappedBy.valorTipoPlazo.descripcion}" disabled="true"/>	
+						</div>   															
+						<div class="celda-form">
+							<p:outputLabel for="fechaLimite7EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('fechaLimite',tramiteExpediente)}"/>
+							<p:inputText id="fechaLimite7EvolExp" value="#{tramiteExpediente.detalleExpdteTramMappedBy.fechaLimite}" disabled="true">
+								<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+							</p:inputText>						
+						</div>	
+						<div class="celda-form">
+							<p:outputLabel for="checkAfectaPlazoEvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('afectaPlazos',tramiteExpediente)}" />
+							<p:selectBooleanCheckbox id="checkAfectaPlazoEvolExp" value="#{tramiteExpediente.detalleExpdteTramMappedBy.afectaPlazos}" 
+								itemLabel="#{mensaje['si']}" disabled="true">
+							</p:selectBooleanCheckbox>
+						</div>	
+					</div>	
+					<div>
+
+
+
+						<div class="celda-form">
+							<p:outputLabel for="fechaNotif7EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('fechaNotificacion',tramiteExpediente)}"/>
+							<p:inputText id="fechaNotif7EvolExp" value="#{tramiteExpediente.detalleExpdteTramMappedBy.fechaNotificacion}" disabled="true">
+								<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+							</p:inputText>						
+						</div>
+						<div class="celda-form">
+							<p:outputLabel  value="#{datosEvolucionExpedienteBean.metadatosExpediente('notifInfructuosa',tramiteExpediente)}" />
+							<p:inputText size="50" value="#{tramiteExpediente.detalleExpdteTramMappedBy.valorResultadoNotificacion.descripcion}" disabled="true"/>	
+						</div>	
+						<div class="celda-form">
+							<p:outputLabel for="fechaSubsanacion7EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('fechaSubsanacion',tramiteExpediente)}"/>
+							<p:inputText id="fechaSubsanacion7EvolExp" value="#{tramiteExpediente.detalleExpdteTramMappedBy.fechaSubsanacion}" disabled="true">
+								<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+							</p:inputText>						
+						</div>		
+						<div class="celda-form">
+							<p:outputLabel for="checkSubsanaAdecEvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('subsanaAdecuadamente',tramiteExpediente)}" />
+							<p:selectBooleanCheckbox id="checkSubsanaAdecEvolExp" value="#{tramiteExpediente.detalleExpdteTramMappedBy.subsanaAdecudamente}" 
+								itemLabel="#{mensaje['si']}" disabled="true">
+							</p:selectBooleanCheckbox>
+						</div>																				
+					</div>
+
+					<p:fieldset toggleable="true" legend="#{mensaje['extracto']}" collapsed="true" style="margin-top:20px; background-color: #{tramExp.tipoTramite.colorTramite}; border-width:5px; border-style:double">
+					<div>
+						<div class="celda-form">
+							<p:outputLabel value="#{mensaje['indicador.extracto.expediente']}" style="display: inline-block;  margin-right: 0.5em;" />
+							<p:selectBooleanCheckbox value="#{tramiteExpediente.detalleExpdteTramMappedBy.extractoExpediente}" 
+								itemLabel="#{mensaje['si']}" disabled="true" />
+						</div>
+						<p:commandButton icon="pi pi-replay" id="activarExtractoC007" actionListener="#{datosTramiteExpedienteBean.activarExtractos(tramiteExpediente)}"  value="#{mensaje['activarextantec']}"
+							update="formFormularioExpedientes,formFormularioExpedientes:tabViewPestanasExpediente,formFormularioExpedientes:tabViewPestanasExpediente:listadoTramitesExpediente,formFormularioExpedientes:panelActualizadoCabecera" rendered="#{tramiteExpediente.finalizado and empty tramiteExpediente.detalleExpdteTramMappedBy.textoExtractoExpediente}"> 
+						</p:commandButton>		
+						
+					</div>
+					<div>
+						<div class="celda-form-block">
+							<p:inputTextarea rows="6" value="#{tramiteExpediente.detalleExpdteTramMappedBy.textoExtractoExpediente}"
+								style="width:100%" disabled="true" />
+						</div>
+					</div>
+					</p:fieldset>
+				
+					<p:fieldset toggleable="true" legend="#{mensaje['antecedentes']}" rendered="false" collapsed="true" style="margin-top:20px; background-color: #{tramExp.tipoTramite.colorTramite}; border-width:5px; border-style:double">
+					<div>
+						<div class="celda-form">
+							<p:outputLabel value="#{mensaje['indicador.antecedentes.expediente']}" style="display: inline-block;  margin-right: 0.5em;" />
+							<p:selectBooleanCheckbox value="#{tramiteExpediente.detalleExpdteTramMappedBy.antecedentesExpediente}" 
+								itemLabel="#{mensaje['si']}" disabled="true" />
+						</div>
+						<p:commandButton icon="pi pi-replay" id="activarAntedecentesC007" actionListener="#{datosTramiteExpedienteBean.activarAntecedentes(tramiteExpediente)}"  value="#{mensaje['activarextantec']}"
+							update="formFormularioExpedientes,formFormularioExpedientes:tabViewPestanasExpediente,formFormularioExpedientes:tabViewPestanasExpediente:listadoTramitesExpediente,formFormularioExpedientes:panelActualizadoCabecera" rendered="#{tramiteExpediente.finalizado and empty tramiteExpediente.detalleExpdteTramMappedBy.textoAntecedentesExpediente}"> 
+						</p:commandButton>		
+					</div>
+					<div>
+						<div class="celda-form-block">
+							<p:inputTextarea rows="6" value="#{tramiteExpediente.detalleExpdteTramMappedBy.textoAntecedentesExpediente}"
+								style="width:100%" disabled="true" />
+						</div>
+					</div>
+					</p:fieldset>
+				
+				</p:outputPanel>
+				<!-- FIN CAMPOS ASOCIADOS AL COMPORTAMIENTO C007 -->
+				
+				<!-- CAMPOS ASOCIADOS AL COMPORTAMIENTO C008 -->
+				<p:outputPanel rendered="#{tramiteExpediente.tipoTramite.comportamiento == 'C008'}">
+					<div>
+						<div class="celda-form">
+							<p:outputLabel for="tipoAdmision8EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('tipoAdmision',tramiteExpediente)}"/>
+							<p:inputText id="tipoAdmision8EvolExp" size="50" value="#{tramiteExpediente.detalleExpdteTramMappedBy.valorTipoAdmision.descripcion}" disabled="true"/>	
+						</div> 
+						
+						<div class="celda-form">
+							<p:outputLabel for="valDomMotivoInad8EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('motivoInadmision',tramiteExpediente)}" rendered="#{tramiteExpediente.tipoTramite.codigo == 'ACNOADM'}"/>
+							<p:inputText id="valDomMotivoInad8EvolExp" size="50" value="#{tramiteExpediente.detalleExpdteTramMappedBy.valorMotivoInadmision.descripcion}" disabled="true" rendered="#{tramiteExpediente.tipoTramite.codigo == 'ACNOADM'}"/>
+						</div> 	
+						<div class="celda-form">
+							<p:outputLabel for="checkImposicionMedidas8EvolExp" value="#{mensaje['imposicion.medidas']}" rendered="#{tramiteExpediente.tipoTramite.codigo == 'ACNOADM'}" />
+							<p:selectBooleanCheckbox id="checkImposicionMedidas8EvolExp" value="#{tramiteExpediente.detalleExpdteTramMappedBy.imposicionMedidas}" 
+								itemLabel="#{mensaje['si']}" disabled="true" rendered="#{tramiteExpediente.tipoTramite.codigo == 'ACNOADM'}">
+							</p:selectBooleanCheckbox>
+						</div>													    					
+						<div class="celda-form">
+							<p:outputLabel for="fechaInforme8EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('fechaInforme',tramiteExpediente)}" rendered="#{tramiteExpediente.tipoTramite.codigo != 'ACADMHE'}"/>
+							<p:inputText id="fechaInforme8EvolExp" value="#{tramiteExpediente.detalleExpdteTramMappedBy.fechaInforme}" disabled="true" rendered="#{tramiteExpediente.tipoTramite.codigo != 'ACADMHE'}">
+								<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+							</p:inputText>						
+						</div>
+						<div class="celda-form">
+							<p:outputLabel for="checkInstructorApi8EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('api',tramiteExpediente)}" rendered="#{(tramiteExpediente.detalleExpdteTramMappedBy.expediente.valorTipoExpediente.codigo == 'RCO') and !(tramiteExpediente.detalleExpdteTramMappedBy.tramiteExpediente.tipoTramite.codigo == 'ACNOADM')}" />
+							<p:selectBooleanCheckbox id="checkInstructorApi8EvolExp" value="#{tramiteExpediente.detalleExpdteTramMappedBy.api}" rendered="#{(tramiteExpediente.detalleExpdteTramMappedBy.expediente.valorTipoExpediente.codigo == 'RCO') and !(tramiteExpediente.detalleExpdteTramMappedBy.tramiteExpediente.tipoTramite.codigo == 'ACNOADM')}" 
+								itemLabel="#{mensaje['si']}" disabled="true">
+							</p:selectBooleanCheckbox>
+						</div>													
+					</div>
+				</p:outputPanel>
+				<!-- FIN CAMPOS ASOCIADOS AL COMPORTAMIENTO C008 -->				
+				
+				<!-- CAMPOS ASOCIADOS AL COMPORTAMIENTO C009 -->
+				<p:outputPanel rendered="#{tramiteExpediente.tipoTramite.comportamiento == 'C009'}">
+					<div>
+						<div class="celda-form">
+							<p:outputLabel for="tipoInteresado9EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('tipoInteresado',tramiteExpediente)}"/>
+							<p:inputText id="tipoInteresado9EvolExp" size="50" value="#{tramiteExpediente.detalleExpdteTramMappedBy.valorTipoInteresado.descripcion}" disabled="true"/>	
+						</div>     
+							
+						<div class="celda-form">
+							<p:outputLabel rendered="#{tramiteExpediente.detalleExpdteTramMappedBy.valorTipoInteresado.codigo == 'AUTCON'}" for="valDomInteresado9EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('identifInteresado',tramiteExpediente)}"/>
+							<p:inputText rendered="#{tramiteExpediente.detalleExpdteTramMappedBy.valorTipoInteresado.codigo == 'AUTCON'}"
+								id="valDomInteresado9EvolExp" size="50" value="#{tramiteExpediente.detalleExpdteTramMappedBy.valorDominioInteresado.descripcion}" disabled="true"/>
+							
+							<p:outputLabel rendered="#{tramiteExpediente.detalleExpdteTramMappedBy.valorTipoInteresado.codigo == 'SUJOBL'}" for="sujObligadInteresado9EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('identifInteresado',tramiteExpediente)}"/>
+							<p:inputText rendered="#{tramiteExpediente.detalleExpdteTramMappedBy.valorTipoInteresado.codigo == 'SUJOBL'}"
+								id="sujObligadInteresado9EvolExp" size="50" value="#{tramiteExpediente.detalleExpdteTramMappedBy.sujetosObligadosInteresado.descripcion}" disabled="true"/>
+							
+							<p:outputLabel rendered="#{tramiteExpediente.detalleExpdteTramMappedBy.valorTipoInteresado.codigo == 'DPD' or tramiteExpediente.detalleExpdteTramMappedBy.valorTipoInteresado.codigo == 'PERS'}" for="persInteresado9EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('identifInteresado',tramiteExpediente)}"/>
+							<p:inputText rendered="#{tramiteExpediente.detalleExpdteTramMappedBy.valorTipoInteresado.codigo == 'DPD' or tramiteExpediente.detalleExpdteTramMappedBy.valorTipoInteresado.codigo == 'PERS'}"
+								id="persInteresado9EvolExp" size="50" value="#{tramiteExpediente.detalleExpdteTramMappedBy.personasInteresado.nombreAp}" disabled="true"/>	
+						</div> 	
+					</div>
+					<div>
+						<div class="celda-form">
+							<p:outputLabel for="canalSalida9EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('canalSalida',tramiteExpediente)}"/>
+							<p:inputText id="canalSalida9EvolExp" size="50" value="#{tramiteExpediente.detalleExpdteTramMappedBy.valorCanalSalida.descripcion}" disabled="true"/>
+						</div> 
+	                    <div class="celda-form">
+	                      	<p:outputLabel for="datosCanalSalida9EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('datosCanalSalida',tramiteExpediente)}" />
+							<p:inputText id="datosCanalSalida9EvolExp" size="40" value="#{tramiteExpediente.detalleExpdteTramMappedBy.datosCanalSalida}" disabled="true"/>	
+	                     </div>		                        
+						<div class="celda-form">
+							<p:outputLabel for="fechaEnvio9EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('fechaEnvio',tramiteExpediente)}"/>
+							<p:inputText id="fechaEnvio9EvolExp" value="#{tramiteExpediente.detalleExpdteTramMappedBy.fechaEnvio}" disabled="true">
+								<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+							</p:inputText>						
+						</div>
+					</div>	
+					<div>
+						<div class="celda-form">
+							<p:outputLabel for="fechaNotif9EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('fechaNotificacion',tramiteExpediente)}"/>
+							<p:inputText id="fechaNotif9EvolExp" value="#{tramiteExpediente.detalleExpdteTramMappedBy.fechaNotificacion}" disabled="true">
+								<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+							</p:inputText>						
+						</div>
+						<div class="celda-form">
+							<p:outputLabel  value="#{datosEvolucionExpedienteBean.metadatosExpediente('notifInfructuosa',tramiteExpediente)}" />
+							<p:inputText size="50" value="#{tramiteExpediente.detalleExpdteTramMappedBy.valorResultadoNotificacion.descripcion}" disabled="true"/>	
+						</div>	
+						<div class="celda-form">
+							<p:outputLabel for="fechaRespuesta9EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('fechaRespuesta',tramiteExpediente)}"/>
+							<p:inputText id="fechaRespuesta9EvolExp" value="#{tramiteExpediente.detalleExpdteTramMappedBy.fechaRespuesta}" disabled="true">
+								<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+							</p:inputText>						
+						</div>		
+						<div class="celda-form">
+							<p:outputLabel for="tipoPlazo9EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('tipoPlazo',tramiteExpediente)}"/>
+							<p:inputText id="tipoPlazo9EvolExp" size="50" value="#{tramiteExpediente.detalleExpdteTramMappedBy.valorTipoPlazo.descripcion}" disabled="true"/>	
+						</div>   															
+					</div>	
+					<div>
+						<div class="celda-form">
+			   				<p:outputLabel for="plazo9EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('plazo',tramiteExpediente)}" />
+							<p:inputNumber id="plazo9EvolExp" maxValue="999999999" size="10" decimalPlaces="0" disabled="true"
+								value="#{tramiteExpediente.detalleExpdteTramMappedBy.plazo}"/>
+						</div>
+						<div class="celda-form">
+							<p:outputLabel for="fechaLimite9EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('fechaLimite',tramiteExpediente)}"/>
+							<p:inputText id="fechaLimite9EvolExp" value="#{tramiteExpediente.detalleExpdteTramMappedBy.fechaLimite}" disabled="true">
+								<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+							</p:inputText>						
+						</div>	
+						<div class="celda-form">
+							<p:outputLabel for="checkAfectaPlazo9EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('afectaPlazos',tramiteExpediente)}" />
+							<p:selectBooleanCheckbox id="checkAfectaPlazo9EvolExp" value="#{tramiteExpediente.detalleExpdteTramMappedBy.afectaPlazos}" 
+								itemLabel="#{mensaje['si']}" disabled="true">
+							</p:selectBooleanCheckbox>
+						</div>																			
+					</div>
+
+					<p:fieldset toggleable="true" legend="#{mensaje['extracto']}" collapsed="true" style="margin-top:20px; background-color: #{tramExp.tipoTramite.colorTramite}; border-width:5px; border-style:double">
+					<div>
+						<div class="celda-form">
+							<p:outputLabel value="#{mensaje['indicador.extracto.expediente']}" style="display: inline-block;  margin-right: 0.5em;" />
+							<p:selectBooleanCheckbox value="#{tramiteExpediente.detalleExpdteTramMappedBy.extractoExpediente}" 
+								itemLabel="#{mensaje['si']}" disabled="true" />
+						</div>
+						<p:commandButton icon="pi pi-replay" id="activarExtractoC009" actionListener="#{datosTramiteExpedienteBean.activarExtractos(tramiteExpediente)}"  value="#{mensaje['activarextantec']}"
+							update="formFormularioExpedientes,formFormularioExpedientes:tabViewPestanasExpediente,formFormularioExpedientes:tabViewPestanasExpediente:listadoTramitesExpediente,formFormularioExpedientes:panelActualizadoCabecera" rendered="#{tramiteExpediente.finalizado and empty tramiteExpediente.detalleExpdteTramMappedBy.textoExtractoExpediente}"> 
+						</p:commandButton>		
+						
+					</div>
+					<div>
+						<div class="celda-form-block">
+							<p:inputTextarea rows="6" value="#{tramiteExpediente.detalleExpdteTramMappedBy.textoExtractoExpediente}"
+								style="width:100%" disabled="true" />
+						</div>
+					</div>
+					</p:fieldset>
+				
+					<p:fieldset toggleable="true" legend="#{mensaje['antecedentes']}" collapsed="true" style="margin-top:20px; background-color: #{tramExp.tipoTramite.colorTramite}; border-width:5px; border-style:double">
+					<div>
+						<div class="celda-form">
+							<p:outputLabel value="#{mensaje['indicador.antecedentes.expediente']}" style="display: inline-block;  margin-right: 0.5em;" />
+							<p:selectBooleanCheckbox value="#{tramiteExpediente.detalleExpdteTramMappedBy.antecedentesExpediente}" 
+								itemLabel="#{mensaje['si']}" disabled="true" />
+						</div>
+						<p:commandButton icon="pi pi-replay" id="activarAntedecentesC009" actionListener="#{datosTramiteExpedienteBean.activarAntecedentes(tramiteExpediente)}"  value="#{mensaje['activarextantec']}"
+							update="formFormularioExpedientes,formFormularioExpedientes:tabViewPestanasExpediente,formFormularioExpedientes:tabViewPestanasExpediente:listadoTramitesExpediente,formFormularioExpedientes:panelActualizadoCabecera" rendered="#{tramiteExpediente.finalizado and empty tramiteExpediente.detalleExpdteTramMappedBy.textoAntecedentesExpediente}"> 
+						</p:commandButton>				
+					</div>
+					<div>
+						<div class="celda-form-block">
+							<p:inputTextarea rows="6" value="#{tramiteExpediente.detalleExpdteTramMappedBy.textoAntecedentesExpediente}"
+								style="width:100%" disabled="true" />
+						</div>
+					</div>
+					</p:fieldset>
+												
+				</p:outputPanel>
+				<!-- FIN CAMPOS ASOCIADOS AL COMPORTAMIENTO C009 -->		
+				
+				
+				<!-- CAMPOS ASOCIADOS AL COMPORTAMIENTO C010 -->
+				<p:outputPanel rendered="#{tramiteExpediente.tipoTramite.comportamiento == 'C010'}">
+					<div>
+						<div class="celda-form">
+							<p:outputLabel for="fechaInforme10EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('fechaInforme',tramiteExpediente)}"/>
+							<p:inputText id="fechaInforme10EvolExp" value="#{tramiteExpediente.detalleExpdteTramMappedBy.fechaInforme}" disabled="true">
+								<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+							</p:inputText>						
+						</div>																			
+						<div class="celda-form">
+							<p:outputLabel for="propuestaApiEvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('propuestaApi',tramiteExpediente)}"/>
+							<p:inputText id="propuestaApiEvolExp" size="50" value="#{tramiteExpediente.detalleExpdteTramMappedBy.valorDominioPropuestaApi.descripcion}" disabled="true"/>	
+						</div> 																		
+					</div>								
+				</p:outputPanel>
+				<!-- FIN CAMPOS ASOCIADOS AL COMPORTAMIENTO C010 -->
+				
+				<!-- CAMPOS ASOCIADOS AL COMPORTAMIENTO C012 -->
+				<p:outputPanel rendered="#{tramiteExpediente.tipoTramite.comportamiento == 'C012'}">
+					<div>
+						<div class="celda-form">
+							<p:outputLabel for="fechaResolucion12EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('fechaResolucion',tramiteExpediente)}"/>
+							<p:inputText id="fechaResolucion12EvolExp" value="#{tramiteExpediente.detalleExpdteTramMappedBy.fechaResolucion}" disabled="true">
+								<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+							</p:inputText>						
+						</div>	
+						<div class="celda-form">
+							<p:outputLabel for="sentidoResolucion12EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('sentidoResolucion',tramiteExpediente)}"/>
+							<p:inputText id="sentidoResolucion12EvolExp" size="50" value="#{tramiteExpediente.detalleExpdteTramMappedBy.valorSentidoResolucion.descripcion}" disabled="true"/>	
+						</div>
+						<div class="celda-form">
+							<p:outputLabel for="tipoResolucion12EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('tipoResolucion',tramiteExpediente)}"/>
+							<p:inputText id="tipoResolucion12EvolExp" size="50" value="#{tramiteExpediente.detalleExpdteTramMappedBy.valorTipoResolucion.descripcion}" disabled="true"/>	
+						</div>								
+						<div class="celda-form">
+	                      	<p:outputLabel for="numResolcion12EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('numResolucion',tramiteExpediente)}" />
+							<p:inputText id="numResolcion12EvolExp" size="30" value="#{tramiteExpediente.detalleExpdteTramMappedBy.numResolucion}" disabled="true"/>	
+	                     </div>
+						<div class="celda-form">
+							<p:outputLabel for="checkImposicionMedidas12EvolExp" value="#{mensaje['imposicion.medidas']}" rendered="#{tramiteExpediente.detalleExpdteTramMappedBy.expediente.valorTipoExpediente.codigo != 'RCO'}" />
+							<p:selectBooleanCheckbox id="checkImposicionMedidas12EvolExp" value="#{tramiteExpediente.detalleExpdteTramMappedBy.imposicionMedidas}" 
+								itemLabel="#{mensaje['si']}" disabled="true" rendered="#{tramiteExpediente.detalleExpdteTramMappedBy.expediente.valorTipoExpediente.codigo != 'RCO'}">
+							</p:selectBooleanCheckbox>
+						</div>		                     																													
+					</div>								
+				</p:outputPanel>
+				<!-- FIN CAMPOS ASOCIADOS AL COMPORTAMIENTO C012 -->						
+				
+				<!-- CAMPOS ASOCIADOS AL COMPORTAMIENTO C013 -->
+				<p:outputPanel rendered="#{tramiteExpediente.tipoTramite.comportamiento == 'C013'}">
+					<div>
+						<div class="celda-form">
+							<p:outputLabel for="tipoInteresado13EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('tipoInteresado',tramiteExpediente)}"/>
+							<p:inputText id="tipoInteresado13EvolExp" size="50" value="#{tramiteExpediente.detalleExpdteTramMappedBy.valorTipoInteresado.descripcion}" disabled="true"/>	
+						</div>     
+							
+						<div class="celda-form">
+							<p:outputLabel rendered="#{tramiteExpediente.detalleExpdteTramMappedBy.valorTipoInteresado.codigo == 'AUTCON'}" for="valDomInteresado13EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('identifInteresado',tramiteExpediente)}"/>
+							<p:inputText rendered="#{tramiteExpediente.detalleExpdteTramMappedBy.valorTipoInteresado.codigo == 'AUTCON'}"
+								id="valDomInteresado13EvolExp" size="50" value="#{tramiteExpediente.detalleExpdteTramMappedBy.valorDominioInteresado.descripcion}" disabled="true"/>
+							
+							<p:outputLabel rendered="#{tramiteExpediente.detalleExpdteTramMappedBy.valorTipoInteresado.codigo == 'SUJOBL'}" for="sujObligadInteresado13EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('identifInteresado',tramiteExpediente)}"/>
+							<p:inputText rendered="#{tramiteExpediente.detalleExpdteTramMappedBy.valorTipoInteresado.codigo == 'SUJOBL'}"
+								id="sujObligadInteresado13EvolExp" size="50" value="#{tramiteExpediente.detalleExpdteTramMappedBy.sujetosObligadosInteresado.descripcion}" disabled="true"/>
+							
+							<p:outputLabel rendered="#{tramiteExpediente.detalleExpdteTramMappedBy.valorTipoInteresado.codigo == 'DPD' or tramiteExpediente.detalleExpdteTramMappedBy.valorTipoInteresado.codigo == 'PERS'}" for="persInteresado13EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('identifInteresado',tramiteExpediente)}"/>
+							<p:inputText rendered="#{tramiteExpediente.detalleExpdteTramMappedBy.valorTipoInteresado.codigo == 'DPD' or tramiteExpediente.detalleExpdteTramMappedBy.valorTipoInteresado.codigo == 'PERS'}"
+								id="persInteresado13EvolExp" size="50" value="#{tramiteExpediente.detalleExpdteTramMappedBy.personasInteresado.nombreAp}" disabled="true"/>	
+						</div> 	
+					</div>
+					<div>
+						<div class="celda-form">
+							<p:outputLabel for="canalSalida13EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('canalSalida',tramiteExpediente)}"/>
+							<p:inputText id="canalSalida13EvolExp" size="50" value="#{tramiteExpediente.detalleExpdteTramMappedBy.valorCanalSalida.descripcion}" disabled="true"/>
+						</div> 
+	                    <div class="celda-form">
+	                      	<p:outputLabel for="datosCanalSalida13EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('datosCanalSalida',tramiteExpediente)}" />
+							<p:inputText id="datosCanalSalida13EvolExp" size="40" value="#{tramiteExpediente.detalleExpdteTramMappedBy.datosCanalSalida}" disabled="true"/>	
+	                     </div>		                        
+						<div class="celda-form">
+							<p:outputLabel for="fechaEnvio13EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('fechaEnvio',tramiteExpediente)}"/>
+							<p:inputText id="fechaEnvio13EvolExp" value="#{tramiteExpediente.detalleExpdteTramMappedBy.fechaEnvio}" disabled="true">
+								<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+							</p:inputText>						
+						</div>
+					</div>	
+					<div>
+						<div class="celda-form">
+							<p:outputLabel for="fechaNotif13EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('fechaNotificacion',tramiteExpediente)}"/>
+							<p:inputText id="fechaNotif13EvolExp" value="#{tramiteExpediente.detalleExpdteTramMappedBy.fechaNotificacion}" disabled="true">
+								<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+							</p:inputText>						
+						</div>
+						<div class="celda-form">
+							<p:outputLabel  value="#{datosEvolucionExpedienteBean.metadatosExpediente('notifInfructuosa',tramiteExpediente)}" />
+							<p:inputText size="50" value="#{tramiteExpediente.detalleExpdteTramMappedBy.valorResultadoNotificacion.descripcion}" disabled="true"/>	
+						</div>	
+						<div class="celda-form">
+							<p:outputLabel for="fechaAcreditacion13EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('fechaAcreditacion',tramiteExpediente)}"/>
+							<p:inputText id="fechaAcreditacion13EvolExp" value="#{tramiteExpediente.detalleExpdteTramMappedBy.fechaAcreditacion}" disabled="true">
+								<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+							</p:inputText>						
+						</div>		
+						<div class="celda-form">
+							<p:outputLabel for="tipoPlazo13EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('tipoPlazo',tramiteExpediente)}"/>
+							<p:inputText id="tipoPlazo13EvolExp" size="50" value="#{tramiteExpediente.detalleExpdteTramMappedBy.valorTipoPlazo.descripcion}" disabled="true"/>	
+						</div>   															
+					</div>	
+					<div>
+						<div class="celda-form">
+			   				<p:outputLabel for="plazo13EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('plazo',tramiteExpediente)}" />
+							<p:inputNumber id="plazo13EvolExp" maxValue="999999999" size="10" decimalPlaces="0" disabled="true"
+								value="#{tramiteExpediente.detalleExpdteTramMappedBy.plazo}"/>
+						</div>
+						<div class="celda-form">
+							<p:outputLabel for="fechaLimite13EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('fechaLimite',tramiteExpediente)}"/>
+							<p:inputText id="fechaLimite13EvolExp" value="#{tramiteExpediente.detalleExpdteTramMappedBy.fechaLimite}" disabled="true">
+								<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+							</p:inputText>						
+						</div>
+						<div class="celda-form">
+							<p:outputLabel for="checkAcreditaCumplimiento13EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('acreditaCumplimiento',tramiteExpediente)}" />
+							<p:selectBooleanCheckbox id="checkAcreditaCumplimiento13EvolExp" value="#{tramiteExpediente.detalleExpdteTramMappedBy.acreditaCumplimiento}" 
+								itemLabel="#{mensaje['si']}" disabled="true">
+							</p:selectBooleanCheckbox>
+						</div>																				
+					</div>
+
+					<p:fieldset toggleable="true" legend="#{mensaje['extracto']}" collapsed="true" style="margin-top:20px; background-color: #{tramExp.tipoTramite.colorTramite}; border-width:5px; border-style:double">
+					<div>
+						<div class="celda-form">
+							<p:outputLabel value="#{mensaje['indicador.extracto.expediente']}" style="display: inline-block;  margin-right: 0.5em;" />
+							<p:selectBooleanCheckbox value="#{tramiteExpediente.detalleExpdteTramMappedBy.extractoExpediente}" 
+								itemLabel="#{mensaje['si']}" disabled="true" />
+						</div>
+						<p:commandButton icon="pi pi-replay" id="activarExtractoC013" actionListener="#{datosTramiteExpedienteBean.activarExtractos(tramiteExpediente)}"  value="#{mensaje['activarextantec']}"
+							update="formFormularioExpedientes,formFormularioExpedientes:tabViewPestanasExpediente,formFormularioExpedientes:tabViewPestanasExpediente:listadoTramitesExpediente,formFormularioExpedientes:panelActualizadoCabecera" rendered="#{tramiteExpediente.finalizado and empty tramiteExpediente.detalleExpdteTramMappedBy.textoExtractoExpediente}"> 
+						</p:commandButton>		
+						
+					</div>
+					<div>
+						<div class="celda-form-block">
+							<p:inputTextarea rows="6" value="#{tramiteExpediente.detalleExpdteTramMappedBy.textoExtractoExpediente}"
+								style="width:100%" disabled="true" />
+						</div>
+					</div>
+					</p:fieldset>
+				
+					<p:fieldset toggleable="true" legend="#{mensaje['antecedentes']}" rendered="false" collapsed="true" style="margin-top:20px; background-color: #{tramExp.tipoTramite.colorTramite}; border-width:5px; border-style:double">
+					<div>
+						<div class="celda-form">
+							<p:outputLabel value="#{mensaje['indicador.antecedentes.expediente']}" style="display: inline-block;  margin-right: 0.5em;" />
+							<p:selectBooleanCheckbox value="#{tramiteExpediente.detalleExpdteTramMappedBy.antecedentesExpediente}" 
+								itemLabel="#{mensaje['si']}" disabled="true" />
+						</div>
+						<p:commandButton icon="pi pi-replay" id="activarAntedecentesC013" actionListener="#{datosTramiteExpedienteBean.activarAntecedentes(tramiteExpediente)}"  value="#{mensaje['activarextantec']}"
+							update="formFormularioExpedientes,formFormularioExpedientes:tabViewPestanasExpediente,formFormularioExpedientes:tabViewPestanasExpediente:listadoTramitesExpediente,formFormularioExpedientes:panelActualizadoCabecera" rendered="#{tramiteExpediente.finalizado and empty tramiteExpediente.detalleExpdteTramMappedBy.textoAntecedentesExpediente}"> 
+						</p:commandButton>		
+					</div>
+					<div>
+						<div class="celda-form-block">
+							<p:inputTextarea rows="6" value="#{tramiteExpediente.detalleExpdteTramMappedBy.textoAntecedentesExpediente}"
+								style="width:100%" disabled="true" />
+						</div>
+					</div>
+					</p:fieldset>
+												
+				</p:outputPanel>
+				<!-- FIN CAMPOS ASOCIADOS AL COMPORTAMIENTO C013 -->							
+				
+				<!-- CAMPOS ASOCIADOS AL COMPORTAMIENTO C002 -->
+				<p:outputPanel rendered="#{tramiteExpediente.tipoTramite.comportamiento == 'C002'}">
+					<div>
+						<div class="celda-form">
+							<p:outputLabel for="tipoInteresado2EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('tipoInteresado',tramiteExpediente)}"/>
+							<p:inputText id="tipoInteresado2EvolExp" size="50" value="#{tramiteExpediente.detalleExpdteTramMappedBy.valorTipoInteresado.descripcion}" disabled="true"/>	
+						</div>     
+							
+						<div class="celda-form">
+							<p:outputLabel rendered="#{tramiteExpediente.detalleExpdteTramMappedBy.valorTipoInteresado.codigo == 'AUTCON'}" for="valDomInteresado2EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('identifInteresado',tramiteExpediente)}"/>
+							<p:inputText rendered="#{tramiteExpediente.detalleExpdteTramMappedBy.valorTipoInteresado.codigo == 'AUTCON'}"
+								id="valDomInteresado2EvolExp" size="50" value="#{tramiteExpediente.detalleExpdteTramMappedBy.valorDominioInteresado.descripcion}" disabled="true"/>
+							
+							<p:outputLabel rendered="#{tramiteExpediente.detalleExpdteTramMappedBy.valorTipoInteresado.codigo == 'SUJOBL'}" for="sujObligadInteresado2EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('identifInteresado',tramiteExpediente)}"/>
+							<p:inputText rendered="#{tramiteExpediente.detalleExpdteTramMappedBy.valorTipoInteresado.codigo == 'SUJOBL'}"
+								id="sujObligadInteresado2EvolExp" size="50" value="#{tramiteExpediente.detalleExpdteTramMappedBy.sujetosObligadosInteresado.descripcion}" disabled="true"/>
+							
+							<p:outputLabel rendered="#{tramiteExpediente.detalleExpdteTramMappedBy.valorTipoInteresado.codigo == 'DPD' or tramiteExpediente.detalleExpdteTramMappedBy.valorTipoInteresado.codigo == 'PERS'}" for="persInteresado2EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('identifInteresado',tramiteExpediente)}"/>
+							<p:inputText rendered="#{tramiteExpediente.detalleExpdteTramMappedBy.valorTipoInteresado.codigo == 'DPD' or tramiteExpediente.detalleExpdteTramMappedBy.valorTipoInteresado.codigo == 'PERS'}"
+								id="persInteresado2EvolExp" size="50" value="#{tramiteExpediente.detalleExpdteTramMappedBy.personasInteresado.nombreAp}" disabled="true"/>	
+						</div> 	
+					</div>  				
+					<div>
+						<div class="celda-form">
+							<p:outputLabel for="fechaInforme2EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('fechaInforme',tramiteExpediente)}"/>
+							<p:inputText id="fechaInforme2EvolExp" value="#{tramiteExpediente.detalleExpdteTramMappedBy.fechaInforme}" disabled="true">
+								<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+							</p:inputText>						
+						</div>																			
+					</div>								
+				</p:outputPanel>
+				<!-- FIN CAMPOS ASOCIADOS AL COMPORTAMIENTO C002 -->													
+				
+
+			<ui:include src="compTramites/formEvolucionExpediente_C003.xhtml">
+				<ui:param name="tramiteExpediente" value="#{tramiteExpediente}" />
+			</ui:include>
+			
+			<ui:include src="compTramites/formEvolucionExpediente_C004.xhtml">
+				<ui:param name="tramiteExpediente" value="#{tramiteExpediente}" />
+			</ui:include>
+			
+			<ui:include src="compTramites/formEvolucionExpediente_C011.xhtml">
+				<ui:param name="tramiteExpediente" value="#{tramiteExpediente}" />
+			</ui:include>
+					
+			<ui:include src="compTramites/formEvolucionExpediente_C014.xhtml">
+				<ui:param name="tramiteExpediente" value="#{tramiteExpediente}" />
+			</ui:include>
+				
+			<ui:include src="compTramites/formEvolucionExpediente_C017.xhtml">
+				<ui:param name="tramiteExpediente" value="#{tramiteExpediente}" />
+			</ui:include>
+				
+				
+				<!-- CAMPOS ASOCIADOS AL COMPORTAMIENTO C015 -->
+				<p:outputPanel rendered="#{tramiteExpediente.tipoTramite.comportamiento == 'C015'}">
+					<div>
+						<div class="celda-form">
+							<p:outputLabel for="fechaEnvio15EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('fechaEnvio',tramiteExpediente)}"/>
+							<p:inputText id="fechaEnvio15EvolExp" value="#{tramiteExpediente.detalleExpdteTramMappedBy.fechaEnvio}" disabled="true">
+								<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+							</p:inputText>						
+						</div>
+						<div class="celda-form">
+							<p:outputLabel for="fechaRespuestaEvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('fechaRespuesta',tramiteExpediente)}"/>
+							<p:inputText id="fechaRespuestaEvolExp" value="#{tramiteExpediente.detalleExpdteTramMappedBy.fechaRespuesta}" disabled="true">
+								<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+							</p:inputText>						
+						</div>
+					</div>
+				</p:outputPanel>
+				<!-- FIN CAMPOS ASOCIADOS AL COMPORTAMIENTO C015 -->
+	
+	
+					<!-- CAMPOS ASOCIADOS AL COMPORTAMIENTO C018 -->
+				<p:outputPanel rendered="#{tramiteExpediente.tipoTramite.comportamiento == 'C018'}">
+					<div>
+						<div class="celda-form">
+							<p:outputLabel for="tipoInteresado18EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('tipoInteresado',tramiteExpediente)}"/>
+							<p:inputText id="tipoInteresado18EvolExp" size="50" value="#{tramiteExpediente.detalleExpdteTramMappedBy.valorTipoInteresado.descripcion}" disabled="true"/>	
+						</div>     
+							
+						<div class="celda-form">
+							<p:outputLabel rendered="#{tramiteExpediente.detalleExpdteTramMappedBy.valorTipoInteresado.codigo == 'AUTCON'}" for="valDomInteresado5EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('identifInteresado',tramiteExpediente)}"/>
+							<p:inputText rendered="#{tramiteExpediente.detalleExpdteTramMappedBy.valorTipoInteresado.codigo == 'AUTCON'}"
+								id="valDomInteresado18EvolExp" size="50" value="#{tramiteExpediente.detalleExpdteTramMappedBy.valorDominioInteresado.descripcion}" disabled="true"/>
+							
+							<p:outputLabel rendered="#{tramiteExpediente.detalleExpdteTramMappedBy.valorTipoInteresado.codigo == 'SUJOBL'}" for="sujObligadInteresado5EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('identifInteresado',tramiteExpediente)}"/>
+							<p:inputText rendered="#{tramiteExpediente.detalleExpdteTramMappedBy.valorTipoInteresado.codigo == 'SUJOBL'}"
+								id="sujObligadInteresado18EvolExp" size="50" value="#{tramiteExpediente.detalleExpdteTramMappedBy.sujetosObligadosInteresado.descripcion}" disabled="true"/>
+							
+							<p:outputLabel rendered="#{tramiteExpediente.detalleExpdteTramMappedBy.valorTipoInteresado.codigo == 'DPD' or tramiteExpediente.detalleExpdteTramMappedBy.valorTipoInteresado.codigo == 'PERS'}" for="persInteresado5EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('identifInteresado',tramiteExpediente)}"/>
+							<p:inputText rendered="#{tramiteExpediente.detalleExpdteTramMappedBy.valorTipoInteresado.codigo == 'DPD' or tramiteExpediente.detalleExpdteTramMappedBy.valorTipoInteresado.codigo == 'PERS'}"
+								id="persInteresado18EvolExp" size="50" value="#{tramiteExpediente.detalleExpdteTramMappedBy.personasInteresado.nombreAp}" disabled="true"/>	
+						</div> 	
+					</div>   
+					<div>
+						<div class="celda-form">
+							<p:outputLabel for="fechaEntrada018EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('fechaEntrada',tramiteExpediente)}"/>
+							<p:inputText id="fechaEntrada018EvolExp" value="#{tramiteExpediente.detalleExpdteTramMappedBy.fechaEntrada}" disabled="true">
+								<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+							</p:inputText>						
+						</div>
+							<div class="celda-form">
+								<p:outputLabel for="canalEntrada018EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('canalEntrada',tramiteExpediente)}"/>
+								<p:inputText id="canalEntrada018EvolExp" size="50" value="#{tramiteExpediente.detalleExpdteTramMappedBy.valorCanalEntrada.descripcion}" disabled="true"/>
+							</div> 
+	                    <div class="celda-form">
+	                      	<p:outputLabel for="registroEntrada018EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('identifEntrada',tramiteExpediente)}" />
+							<p:inputText id="registroEntrada018EvolExp" size="40" value="#{tramiteExpediente.detalleExpdteTramMappedBy.identifEntrada}" disabled="true"/>	
+	                     </div>		                        
+						
+					</div>
+						<div class="celda-form">
+							<p:outputLabel for="checkAcreditaCumplimiento18EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('acreditaCumplimiento',tramiteExpediente)}" />
+							<p:selectBooleanCheckbox id="checkAcreditaCumplimiento18EvolExp" value="#{tramiteExpediente.detalleExpdteTramMappedBy.acreditaCumplimiento}" 
+								itemLabel="#{mensaje['si']}" disabled="true">
+							</p:selectBooleanCheckbox>
+						</div>
+
+					<p:fieldset toggleable="true" legend="#{mensaje['extracto']}" collapsed="true" style="margin-top:20px; background-color: #{tramExp.tipoTramite.colorTramite}; border-width:5px; border-style:double">
+					<div>
+						<div class="celda-form">
+							<p:outputLabel value="#{mensaje['indicador.extracto.expediente']}" style="display: inline-block;  margin-right: 0.5em;" />
+							<p:selectBooleanCheckbox value="#{tramiteExpediente.detalleExpdteTramMappedBy.extractoExpediente}" 
+								itemLabel="#{mensaje['si']}" disabled="true" />
+						</div>
+						<p:commandButton icon="pi pi-replay" id="activarExtractoC018" actionListener="#{datosTramiteExpedienteBean.activarExtractos(tramiteExpediente)}"  value="#{mensaje['activarextantec']}"
+							update="formFormularioExpedientes,formFormularioExpedientes:tabViewPestanasExpediente,formFormularioExpedientes:tabViewPestanasExpediente:listadoTramitesExpediente,formFormularioExpedientes:panelActualizadoCabecera" rendered="#{tramiteExpediente.finalizado and empty tramiteExpediente.detalleExpdteTramMappedBy.textoExtractoExpediente}"> 
+						</p:commandButton>		
+						
+					</div>
+					<div>
+						<div class="celda-form-block">
+							<p:inputTextarea rows="6" value="#{tramiteExpediente.detalleExpdteTramMappedBy.textoExtractoExpediente}"
+								style="width:100%" disabled="true" />
+						</div>
+					</div>
+					</p:fieldset>
+				
+					<p:fieldset toggleable="true" legend="#{mensaje['antecedentes']}" collapsed="true" style="margin-top:20px; background-color: #{tramExp.tipoTramite.colorTramite}; border-width:5px; border-style:double">
+					<div>
+						<div class="celda-form">
+							<p:outputLabel value="#{mensaje['indicador.antecedentes.expediente']}" style="display: inline-block;  margin-right: 0.5em;" />
+							<p:selectBooleanCheckbox value="#{tramiteExpediente.detalleExpdteTramMappedBy.antecedentesExpediente}" 
+								itemLabel="#{mensaje['si']}" disabled="true" />
+						</div>
+						<p:commandButton icon="pi pi-replay" id="activarAntedecentesC018" actionListener="#{datosTramiteExpedienteBean.activarAntecedentes(tramiteExpediente)}"  value="#{mensaje['activarextantec']}"
+							update="formFormularioExpedientes,formFormularioExpedientes:tabViewPestanasExpediente,formFormularioExpedientes:tabViewPestanasExpediente:listadoTramitesExpediente,formFormularioExpedientes:panelActualizadoCabecera" rendered="#{tramiteExpediente.finalizado and empty tramiteExpediente.detalleExpdteTramMappedBy.textoAntecedentesExpediente}"> 
+						</p:commandButton>		
+					</div>
+					<div>
+						<div class="celda-form-block">
+							<p:inputTextarea rows="6" value="#{tramiteExpediente.detalleExpdteTramMappedBy.textoAntecedentesExpediente}"
+								style="width:100%" disabled="true" />
+						</div>
+					</div>
+					</p:fieldset>
+	
+				</p:outputPanel>
+				<!-- FIN CAMPOS ASOCIADOS AL COMPORTAMIENTO C018 -->
+				
+				<!-- CAMPOS ASOCIADOS AL COMPORTAMIENTO C019 -->
+				<p:outputPanel rendered="#{tramiteExpediente.tipoTramite.comportamiento == 'C019'}">
+					<div>
+						<div class="celda-form">
+							<p:outputLabel for="tipoAdmision19EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('tipoAdmision',tramiteExpediente)}"/>
+							<p:inputText id="tipoAdmision19EvolExp" size="50" value="#{tramiteExpediente.detalleExpdteTramMappedBy.valorTipoAdmision.descripcion}" disabled="true"/>	
+						</div> 
+						
+						<div class="celda-form">
+							<p:outputLabel for="valDomMotivoInad19EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('motivoInadmision',tramiteExpediente)}"/>
+							<p:inputText id="valDomMotivoInad19EvolExp" size="50" value="#{tramiteExpediente.detalleExpdteTramMappedBy.valorMotivoInadmision.descripcion}" disabled="true"/>
+						</div>
+						<div class="celda-form">
+							<p:outputLabel for="checkInstructorApi19EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('api',tramiteExpediente)}" rendered="#{tramiteExpediente.detalleExpdteTramMappedBy.expediente.valorTipoExpediente.codigo == 'RCO'}" />
+							<p:selectBooleanCheckbox id="checkInstructorApi19EvolExp" value="#{tramiteExpediente.detalleExpdteTramMappedBy.api}" rendered="#{tramiteExpediente.detalleExpdteTramMappedBy.expediente.valorTipoExpediente.codigo == 'RCO'}" 
+								itemLabel="#{mensaje['si']}" disabled="true">
+							</p:selectBooleanCheckbox>
+						</div>	
+						<div class="celda-form">
+							<p:outputLabel for="valDomInstructorApi19EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('instructorAPI',tramiteExpediente)}" rendered="#{tramiteExpediente.detalleExpdteTramMappedBy.expediente.valorTipoExpediente.codigo == 'RCO'}"/>
+							<p:inputText id="valDomInstructorApi19EvolExp" size="50" value="#{tramiteExpediente.detalleExpdteTramMappedBy.valorInstructorAPI.descripcion}" disabled="true" rendered="#{tramiteExpediente.detalleExpdteTramMappedBy.expediente.valorTipoExpediente.codigo == 'RCO'}"/>
+						</div> 													
+					</div>
+				</p:outputPanel>
+				<!-- FIN CAMPOS ASOCIADOS AL COMPORTAMIENTO C019 -->				
+						
+					
+				<!-- CAMPOS ASOCIADOS AL COMPORTAMIENTO C016 -->
+				<p:outputPanel rendered="#{tramiteExpediente.tipoTramite.comportamiento == 'C016'}">
+					<div>
+						<div class="celda-form">
+							<p:outputLabel for="firmante16EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('firmante',tramiteExpediente)}"/>
+							<p:inputText id="firmante16EvolExp" size="50" value="#{tramiteExpediente.detalleExpdteTramMappedBy.firmante.getNombreAp()}" disabled="true"/>	
+						</div>
+						<div class="celda-form">
+							<p:outputLabel for="tipoFirma16EvolExp" rendered = "false" value="#{datosEvolucionExpedienteBean.metadatosExpediente('tipoFirma',tramiteExpediente)}"/>
+							<p:inputText id="tipoFirma16EvolExp" size="50" rendered = "false" value="#{tramiteExpediente.detalleExpdteTramMappedBy.valorDominioTipoFirma.descripcion}" disabled="true"/>	
+						</div>						     					
+						<div class="celda-form">
+							<p:outputLabel for="fechaEnvio16EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('fechaEnvio',tramiteExpediente)}"/>
+							<p:inputText id="fechaEnvio16EvolExp" value="#{tramiteExpediente.detalleExpdteTramMappedBy.fechaEnvio}" disabled="true">
+								<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+							</p:inputText>						
+						</div>
+						<div class="celda-form">
+							<p:outputLabel for="fechaFirmar16EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('fechaFirma',tramiteExpediente)}"/>
+							<p:inputText id="fechaFirmar16EvolExp" value="#{tramiteExpediente.detalleExpdteTramMappedBy.fechaFirma}" disabled="true">
+								<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+							</p:inputText>						
+						</div>
+					</div>
+				</p:outputPanel>
+				<!-- FIN CAMPOS ASOCIADOS AL COMPORTAMIENTO C016 -->				
+
+				<!-- CAMPOS ASOCIADOS AL COMPORTAMIENTO C020 -->
+				<p:outputPanel rendered="#{tramiteExpediente.tipoTramite.comportamiento == 'C020'}">
+
+						<div class="celda-form">
+							<p:outputLabel for="fechaInforme20EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('fechaInforme',tramiteExpediente)}"/>
+							<p:inputText id="fechaInforme20EvolExp" value="#{tramiteExpediente.detalleExpdteTramMappedBy.fechaInforme}" disabled="true">
+								<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+							</p:inputText>						
+						</div>																			
+								
+				</p:outputPanel>
+				<!-- FIN CAMPOS ASOCIADOS AL COMPORTAMIENTO C020 -->
+				
+				<!-- CAMPOS ASOCIADOS AL COMPORTAMIENTO C021 -->
+				<p:outputPanel rendered="#{tramiteExpediente.tipoTramite.comportamiento == 'C021'}">
+
+					<p:fieldset toggleable="true" legend="#{mensaje['antecedentes']}" collapsed="true" style="margin-top:20px; background-color: #{tramExp.tipoTramite.colorTramite}; border-width:5px; border-style:double">
+					<div>
+						<div class="celda-form">
+							<p:outputLabel value="#{mensaje['indicador.antecedentes.expediente']}" style="display: inline-block;  margin-right: 0.5em;" />
+							<p:selectBooleanCheckbox value="#{tramiteExpediente.detalleExpdteTramMappedBy.antecedentesExpediente}" 
+								itemLabel="#{mensaje['si']}" disabled="true" />
+						</div>
+						<p:commandButton icon="pi pi-replay" id="activarAntedecentesC021" actionListener="#{datosTramiteExpedienteBean.activarAntecedentes(tramiteExpediente)}"  value="#{mensaje['activarextantec']}"
+							update="formFormularioExpedientes,formFormularioExpedientes:tabViewPestanasExpediente,formFormularioExpedientes:tabViewPestanasExpediente:listadoTramitesExpediente,formFormularioExpedientes:panelActualizadoCabecera" rendered="#{tramiteExpediente.finalizado and empty tramiteExpediente.detalleExpdteTramMappedBy.textoAntecedentesExpediente}"> 
+						</p:commandButton>		
+					</div>
+					<div>
+						<div class="celda-form-block">
+							<p:inputTextarea rows="6" value="#{tramiteExpediente.detalleExpdteTramMappedBy.textoAntecedentesExpediente}"
+								style="width:100%" disabled="true" />
+						</div>
+					</div>
+				</p:fieldset>
+									
+				</p:outputPanel>
+				<!-- FIN CAMPOS ASOCIADOS AL COMPORTAMIENTO C021 -->
+				<!-- CAMPOS ASOCIADOS AL COMPORTAMIENTO C024 -->
+				<p:outputPanel rendered="#{tramiteExpediente.tipoTramite.comportamiento == 'C024'}">
+					<div>
+						<div class="celda-form">
+							<p:outputLabel for="fechaResolucion24EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('fechaResolucion',tramiteExpediente)}"/>
+							<p:inputText id="fechaResolucion24EvolExp" value="#{tramiteExpediente.detalleExpdteTramMappedBy.fechaResolucion}" disabled="true">
+								<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+							</p:inputText>						
+						</div>	
+						<div class="celda-form">
+							<p:outputLabel for="sentidoResolucion24EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('sentidoResolucion',tramiteExpediente)}"/>
+							<p:inputText id="sentidoResolucion24EvolExp" size="50" value="#{tramiteExpediente.detalleExpdteTramMappedBy.valorSentidoResolucion.descripcion}" disabled="true"/>	
+						</div>								
+						<div class="celda-form">
+	                      	<p:outputLabel for="numResolcion24EvolExp" value="#{datosEvolucionExpedienteBean.metadatosExpediente('numResolucion',tramiteExpediente)}" />
+							<p:inputText id="numResolcion24EvolExp" size="30" value="#{tramiteExpediente.detalleExpdteTramMappedBy.numResolucion}" disabled="true"/>	
+	                     </div>																												
+					</div>								
+				</p:outputPanel>
+				<!-- FIN CAMPOS ASOCIADOS AL COMPORTAMIENTO C012 -->		
+	
+				<p:fieldset toggleable="true" legend="#{mensaje['observaciones']}" collapsed="true" style="margin-top:20px; background-color: #{tramExp.tipoTramite.colorTramite}; border-width:5px; border-style:double">
+				<div>
+					<div class="celda-form-block">
+						<p:inputTextarea rows="6" id="observacionesEvolExp" value="#{tramiteExpediente.observaciones.texto}" disabled="true" maxlength="4000" style="width:100%; "/>								
+					</div>
+				</div>
+				</p:fieldset>
+				
+			  <p:spacer height="10" />
+				
+				<p:outputPanel rendered="#{datosTramiteExpedienteBean.muestraListadoFirmas(tramiteExpediente.id) == true}"
+					styleClass="panel-firm-tramite panel-firm-tramite-evol-#{tramiteExpediente.id}">
+					<ui:include src="listadoFirmas.xhtml">
+					<!-- Por alguna razón tramiteExpediente.id vale null aquí. Por suerte el id jsf no se usa. -->
+						<ui:param name="id" value="#{datosTramiteExpedienteBean.getIdTablaListadoFirmEvol(tramiteExpediente.id)}" />
+						<ui:param name="css_class" value="tabla-firmas-#{tramiteExpediente.id}" />
+						<ui:param name="value"
+							value="#{datosTramiteExpedienteBean.getLazyFirmasTramite(tramiteExpediente.id)}" />
+						<ui:param name="es_listado_tramite" value="#{true}" />
+						<ui:param name="es_listado_evolucion" value="#{true}" />
+					</ui:include>
+				</p:outputPanel>
+				
+				<p:spacer height="10" />
+				
+				<p:outputPanel rendered="#{datosTramiteExpedienteBean.muestraListadoNotificaciones(tramiteExpediente.id) == true}"
+					styleClass="panel-notif-tramite panel-notif-tramite-evol-#{tramiteExpediente.id}">
+					<ui:include src="listadoNotificaciones.xhtml">
+					<!-- Por alguna razón tramiteExpediente.id vale null aquí. Por suerte el id jsf no se usa. -->
+						<ui:param name="id" value="#{datosTramiteExpedienteBean.getIdTablaListadoNotifEvol(tramiteExpediente.id)}" />
+						<ui:param name="css_class" value="tabla-notificaciones-#{tramiteExpediente.id}" />
+						<ui:param name="value"
+							value="#{datosTramiteExpedienteBean.getLazyNotificacionesTramite(tramiteExpediente.id)}" />
+						<ui:param name="es_listado_tramite" value="#{true}" />
+						<ui:param name="es_listado_evolucion" value="#{true}" />
+					</ui:include>
+				</p:outputPanel>
+				<p:spacer height="10" /> 	
+				
+				<p:spacer height="10" />
+
+				<p:outputPanel 
+					styleClass="panel-documentos panel-docs-tramite panel-docs-tramite-#{tramiteExpediente.id}">
+					<ui:include src="listadoCategoriasTram.xhtml">
+						<ui:param name="idTablaCatTram" value="#{datosExpedientesDocumentosBean.getIdTablaListadoCategoriasDoc(tramiteExpediente.id)}" />
+						<ui:param name="css_class_cat_tram" value="tabla-categorias-tram-#{tramiteExpediente.id}" />
+						<ui:param name="value"
+							value="#{datosExpedientesDocumentosBean.getCategoriasTramite(tramiteExpediente.id)}" />
+						<ui:param name="es_listado_tramite" value="#{true}" />
+						<ui:param name="es_listado_evolucion" value="#{true}" />
+					</ui:include>
+				</p:outputPanel>
+				
+				<p:spacer height="10" /> 	
+			
+				<div class="botonera-form ui-g-12 ui-md-12" align="right">
+					<p:commandButton icon="pi pi-replay" id="rehabilitarTramite" actionListener="#{datosTramiteExpedienteBean.rehabilitarTramite(tramiteExpediente)}"  value="#{mensaje['rehabilitar']}"
+						update="formFormularioExpedientes,formFormularioExpedientes:tabViewPestanasExpediente,formFormularioExpedientes:tabViewPestanasExpediente:listadoTramitesExpediente,formFormularioExpedientes:panelActualizadoCabecera" rendered="#{tramiteExpediente.finalizado == true and datosTramiteExpedienteBean.permisoRehabTramite == true and datosTramiteExpedienteBean.tieneTramSupFinalizado(tramiteExpediente) == false}">
+						<p:confirm header="#{mensaje['confirmar.operacion']}"
+					message="#{mensaje['preguntar.rehabilitar.tramite']}"
+					icon="pi pi-info-circle" /> 
+					</p:commandButton>		
+				</div>	
+			</p:rowExpansion>		
+		</p:dataTable>		
+		
+	</p:outputPanel>				
+				
+</ui:composition>
+</html>

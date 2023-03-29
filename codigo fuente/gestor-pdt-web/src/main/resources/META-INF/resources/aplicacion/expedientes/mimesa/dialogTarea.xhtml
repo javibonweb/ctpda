@@ -1,0 +1,397 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:c="http://java.sun.com/jstl/core"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:sec="https://joinfaces.org/security"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+    xmlns:fu="http://joinfaces.org/functions">
+
+<ui:composition>
+
+	<p:dialog id="dialogTarea"
+		header="#{datosExpedientesTareasBean.tituloDialogo}" modal="true"
+	 	widgetVar="dialogTarea"
+	 	contentWidth="100%" contentHeight="100%" width="865" height="600" >
+		
+			<c:set var="bean" value="#{datosExpedientesTareasBean}" />
+			<c:set var="tarea" value="#{bean.tarea}" />
+			<c:set var="tarea_editable" value="#{bean.formEditable}" />
+			
+		<div style="wi dth: 800px">
+
+			<p:outputPanel style="float:right" rendered="#{not tarea_editable and tarea.activa and not tarea.esTareaCerrada and bean.permisoEditarTarea}">
+				<p:commandButton id="editarTarea2"
+					widgetVar="editarTarea2" icon="pi pi-pencil"
+					action="#{bean.editarTarea(tarea.id)}"
+					update="@form:dialogTarea" >
+				</p:commandButton>
+				<p:tooltip for="editarTarea2" value="#{mensaje['editar.tarea']}"
+						showEffect="fade" hideEffect="fade" position="top" showDelay="500" />			
+			</p:outputPanel>
+			
+			<div class="celda-form">
+				<p:outputLabel for="numExpedienteTarea"
+					value="#{mensaje['numero.expediente']}" />
+				<p:inputText id="numExpedienteTarea" disabled="true"
+					value="#{bean.expediente.numExpediente}" size="15" maxlength="15" />
+			</div>
+
+			<div class="celda-form">
+				<p:outputLabel for="nombreExpedienteTarea"
+					value="#{mensaje['nombre.expediente']}" />
+				<p:inputText id="nombreExpedienteTarea" disabled="true"
+					value="#{bean.expediente.nombreExpediente}" size="50" maxlength="50" />
+			</div>
+			
+			<div class="celda-form">
+					<p:outputLabel for="motivoExpedienteTarea" value="#{mensaje['motivo.expediente']}" rendered="#{not empty bean.expediente.motivo}"/>				
+				<p:inputTextarea rows="4" cols="80" id="motivoExpedienteTarea" autoResize="false"
+					value="#{bean.expediente.motivo}"
+					readonly="true"  rendered="#{not empty bean.expediente.motivo}">
+				</p:inputTextarea>					
+			</div>
+
+			<div class="celda-form">
+				<p:outputLabel for="nombreTramiteTarea"
+					value="#{mensaje['tramite']}" />
+				<p:inputText id="nombreTramiteTarea" disabled="true"
+					value="#{bean.descTramite}" size="40" />
+			</div>
+   
+			<div class="celda-form">
+				<p:outputLabel for="nombreDocumentoTarea"
+					value="#{mensaje['documento']}" />
+				<p:inputText id="nombreDocumentoTarea" disabled="true"
+					value="#{bean.nombreDocumento}" size="45" />
+			</div>           
+
+  		<div style="width:47.5em">
+			<div class="celda-form">
+				<p:outputLabel value="#{mensaje['tipo.tarea']} *"
+					for="tiposTarea" />
+				<p:selectOneMenu id="tiposTarea" disabled="#{not bean.esAlta}"
+					value="#{bean.idCfgTareaSeleccionada}"
+					style="min-width: 150px;">
+					<f:selectItem itemLabel="#{mensaje['seleccione.una.opcion']}" itemValue="" />
+					<f:selectItems
+						value="#{bean.listaTiposTareas}"
+						var="t" itemLabel="#{fu:ptoSusp(t.descripcion)}" itemValue="#{t.id}">
+					</f:selectItems>
+					<p:ajax listener="#{bean.cargarDatosCfgTarea}" update="@(.campos-cfgtarea)" />
+				</p:selectOneMenu>
+			</div>
+
+			<div class="celda-form">
+				<p:outputLabel value="#{mensaje['responsable.tarea']} *"
+					for="responsablesTramitacionTarea" />
+				<p:selectOneMenu id="responsablesTramitacionTarea" styleClass="campos-cfgtarea"
+					disabled="#{not tarea_editable or not bean.responsableHabilitado}"
+					value="#{bean.idResponsableTramitacionTareaSeleccionado}"
+					style="min-width: 150px;">
+					<f:selectItem itemLabel="#{mensaje['seleccione.una.opcion']}" itemValue="" />
+					<f:selectItems
+						value="#{bean.listaResponsablesTramitacionTarea}"
+						var="r" itemLabel="#{fu:ptoSusp(r.descripcion)}" itemValue="#{r.id}">
+					</f:selectItems>
+					<p:ajax listener="#{bean.cambiarResponsableSeleccionado}" update="otrosBotonesTarea" />				
+				</p:selectOneMenu>
+			</div>
+			
+			<div class="celda-form">
+				<p:outputLabel for="descTarea"
+					value="#{mensaje['descripcion']} *" />
+				<p:inputText id="descTarea" styleClass="campos-cfgtarea"
+					disabled="#{not tarea_editable or not bean.descripcionHabilitada}"
+					value="#{tarea.descripcion}" size="50" maxlength="50" />
+			</div>           
+		
+			<div class="celda-form">
+				<p:outputLabel for="descAbrevTarea"
+					value="#{mensaje['descripcion.abreviada']}" />
+				<p:inputText id="descAbrevTarea" styleClass="campos-cfgtarea"
+					disabled="#{not tarea_editable or not bean.descripcionHabilitada}"
+					value="#{tarea.descripcionAbrev}" size="15" maxlength="15" />
+			</div>           
+
+ 			<div>
+			<div class="celda-form">
+				<p:outputLabel for="fechaInicioTarea"
+					value="#{mensaje['fecha.inicio.tarea']} *" />
+				<p:datePicker id="fechaInicioTarea"
+					value="#{tarea.fechaInicio}" size="10" disabled="#{tarea.id != null or not tarea_editable}"
+					locale="es" monthNavigator="true" pattern="dd/MM/yyyy"
+					converterMessage="#{mensaje['formato.fecha.invalido']}" mask="#{tarea.id == null}">
+					<p:ajax listener="#{bean.refrescarFechaLimite}" update="fechaLimiteTarea" />	
+				</p:datePicker>
+				<p:message for="fechaInicioTarea"/>
+			</div>
+
+ 			<div class="celda-form">
+				<p:outputLabel for="fechaLimiteTarea"
+					value="#{mensaje['fecha.limite.tarea']}" />
+					<p:datePicker id="fechaLimiteTarea" styleClass="campos-cfgtarea"
+						disabled="#{not tarea_editable or not bean.fechaLimiteHabilitada}"
+						value="#{tarea.fechaLimite}" size="10"
+						locale="es" monthNavigator="true" pattern="dd/MM/yyyy"
+						converterMessage="#{mensaje['formato.fecha.invalido']}" mask="#{tarea_editable and bean.fechaLimiteHabilitada}"/>
+					<p:message for="fechaLimiteTarea"/>
+			</div>
+ 			
+			<div class="celda-form">
+				<p:outputLabel for="checkTareaUrgente" value="#{mensaje['urgente']}" />
+				<p:selectBooleanCheckbox id="checkTareaUrgente" value="#{tarea.urgente}" disabled="#{not tarea_editable}"/>
+			</div>
+			
+			</div>
+
+			<div class="celda-form">
+				<p:outputLabel for="observacionesTarea" value="#{mensaje['observaciones']}" />
+				<p:inputTextarea rows="6" cols="70" id="observacionesTarea" maxlength="4000"
+					readonly="#{not tarea_editable}"
+					counter="observacionesTareaCuenta" counterTemplate="#{mensaje['counter.template']}"
+					value="#{tarea.observaciones.texto}" autoResize="false" />
+				<div class="contador-char"><h:outputText id="observacionesTareaCuenta" /></div>
+			</div>	
+			<p:outputPanel styleClass="celda-form" rendered="#{bean.mostrarIndicaciones}">
+				<p:outputLabel for="indicacionesSigTarea" value="#{mensaje['indicaciones.tarea']}" />
+				<p:inputTextarea rows="6" cols="70" id="indicacionesSigTarea" maxlength="4000"
+					readonly="#{not tarea_editable}"
+					counter="indicacionesSigTareaCuenta"  counterTemplate="#{mensaje['counter.template']}"
+					value="#{tarea.indicacionesSiguiente}" autoResize="false"/>
+				<div class="contador-char"><h:outputText value="#{mensaje['indicaciones.nota']}" /></div>
+				<div class="contador-char"><h:outputText id="indicacionesSigTareaCuenta" /></div>
+			</p:outputPanel>	
+ 
+ 			<div>
+ 			<div class="celda-form">
+				<p:outputLabel for="usuAltaTarea"
+					value="#{mensaje['usuario.alta.tarea']} *" />
+				<p:inputText id="usuAltaTarea" disabled="true"
+					value="#{bean.nombreUsuarioAlta}" size="45" />
+			</div>
+
+	 		<div class="celda-form">
+				<p:outputLabel for="tipoAltaTarea" value="#{mensaje['tipo.alta.tarea']}" />
+				<p:selectOneRadio id="tipoAltaTarea" disabled="true"
+					value="#{tarea.tipoAlta}">
+					<f:selectItem itemLabel="#{mensaje['tipo.alta.tarea.manual']}"     itemValue="M" />
+					<f:selectItem itemLabel="#{mensaje['tipo.alta.tarea.automatica']}" itemValue="A" />
+				</p:selectOneRadio>
+			</div>	
+ 			</div>
+
+ 			<p:outputPanel rendered="#{tarea.esTareaCerrada}">
+ 			<div class="celda-form">
+				<p:outputLabel for="fechaCierreTarea"
+					value="#{mensaje['fecha.de.cierre.tarea']}" />
+				<p:datePicker id="fechaCierreTarea"
+					value="#{tarea.fechaCierre}" size="10" disabled="true"
+					locale="es" pattern="dd/MM/yyyy" />
+					<p:message for="fechaCierreTarea"/>
+			</div>
+
+ 			<div class="celda-form">
+				<p:outputLabel for="usuCierreTarea"
+					value="#{mensaje['usuario.cierre.tarea']}" />
+				<p:inputText id="usuCierreTarea" disabled="true"
+					value="#{bean.nombreUsuarioCierre}" size="45" />
+			</div>
+ 			</p:outputPanel>
+	
+ 
+		</div>
+		
+				<p:outputPanel id="panelListadoTareasDependencia" rendered="#{tarea.esTareaDependiente}">
+					<p:spacer height="15" />
+					
+					<p:staticMessage severity="error" detail="#{mensaje['aviso.tareas.relacionadas']}" style="margin: 0" />
+					
+					<p:dataTable var="t" id="listaTareasDependencia" widgetVar="listaTareasDependencia"
+						value="#{tarea.dependencias}" paginator="true"
+						paginatorTemplate=" {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+						rows="5"
+						currentPageReportTemplate="#{mensaje['paginador.template']}"
+						selectionMode="single"
+						rowKey="#{t.id}" paginatorPosition="bottom">
+						
+<!-- 						<f:facet name="header"> -->
+<!-- 					<p:staticMessage severity="error" detail="#{mensaje['aviso.tareas.relacionadas']}" style="margin: 0" /> -->
+<!-- 						</f:facet> -->
+
+						<p:column headerText="#{mensaje['fecha.limite']}" width="100">
+							<h:outputText value="#{t.fechaLimite}" >
+								<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+							</h:outputText>
+						</p:column>
+							
+						<p:column headerText="#{mensaje['tipo.tarea']}" width="150">
+							<h:outputText value="#{t.valorTipoTarea.descripcion}" />
+						</p:column>
+						
+						<p:column headerText="#{mensaje['tarea']}" sortBy="#{t.descripcion}" width="150">
+							<h:outputText value="#{t.descripcion}" />
+						</p:column>
+						
+						<p:column headerText="#{mensaje['responsable']}">
+							<h:outputText value="#{t.responsableTramitacion.descripcion}" />
+						</p:column>						
+
+					</p:dataTable>
+				</p:outputPanel>
+				
+				<p:outputPanel id="panelListadoTareasCerrar" rendered="#{bean.esAlta and not empty bean.listaTareasCierreAuto}">
+					<p:spacer height="15" />
+					
+					<p:staticMessage severity="error" detail="#{mensaje['tareas.cerrar.auto']}" style="margin: 0" />
+										
+					<p:dataTable var="t" id="listaTareasCerrar" widgetVar="listaTareasCerrar"
+						value="#{bean.listaTareasCierreAuto}" paginator="false"
+						selection="#{bean.selectedTareasCierreAuto}" rowKey="#{t.id}"
+						>
+						
+<!-- 						<f:facet name="header"> -->
+<!-- 					<p:staticMessage severity="error" detail="#{mensaje['tareas.cerrar.auto']}" style="margin: 0" /> -->
+<!-- 						</f:facet> -->
+
+            			<p:column selectionMode="multiple" style="width:16px;text-align:center"/>
+						<p:column headerText="#{mensaje['fecha.limite']}" width="100">
+							<h:outputText value="#{t.fechaLimite}" >
+								<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+							</h:outputText>
+						</p:column>
+							
+						<p:column headerText="#{mensaje['tipo.tarea']}" width="150">
+							<h:outputText value="#{t.valorTipoTarea.descripcion}" />
+						</p:column>
+						
+						<p:column headerText="#{mensaje['tarea']}" sortBy="#{t.descripcion}" width="150">
+							<h:outputText value="#{t.descripcion}" />
+						</p:column>
+						
+						<p:column headerText="#{mensaje['responsable']}">
+							<h:outputText value="#{t.responsableTramitacion.descripcion}" />
+						</p:column>						
+
+					</p:dataTable>
+				</p:outputPanel>
+				
+				
+				
+	    <div class="botonera-form" align="right">
+			<p:commandButton icon="pi pi-save" widgetVar="btnGuardarTarea"
+				id="btnGuardarTarea" value="#{mensaje['guardar']}"
+				rendered="#{tarea_editable}"
+				action="#{bean.previoGuardarTarea}"
+				update="@(.listado_tareas)"
+				oncomplete="if(args.saved) PF('dialogTarea').hide()" >
+			</p:commandButton>
+			
+			<p:commandButton icon="pi pi-times" process="@this"
+				id="btnCancelarTarea" value="#{mensaje['cancelar']}"
+				rendered="#{tarea_editable}"
+				oncomplete="PF('dialogTarea').hide()" >
+				<p:confirm header="#{mensaje['confirmar.operacion']}"
+					message="#{mensaje['pregunta.confirma.cancelar']}"
+					icon="pi pi-info-circle" />
+			</p:commandButton>
+			
+			<p:commandButton icon="pi pi-times" process="@this" immediate="true"
+				id="btnCerrarTarea" value="#{mensaje['cerrar']}"
+				rendered="#{not tarea_editable}"
+				oncomplete="PF('dialogTarea').hide()" >
+			</p:commandButton>
+			
+			<p:outputPanel id="otrosBotonesTarea" style="float:right">
+			
+				<p:commandButton icon="pi pi-ban"
+					id="btnRechazarTarea" value="#{mensaje['rechazar.tarea']}"
+					rendered="#{tarea_editable and not bean.esAlta and not tarea.cambiaResponsable and bean.usuarioEsResponsable and not tarea.aviso}"
+					actionListener="#{bean.abrirRechazarTarea}" immediate="true" process="@this"
+					oncomplete="if(args.open) PF('dialogRechazarTarea').show();" 
+					update="@form:dialogRechazarTarea" />
+					
+				<p:commandButton icon="pi pi-check-square"
+					id="btnFinalizarTarea" value="#{mensaje['finalizar.tarea']}"
+					rendered="#{tarea_editable and not bean.esAlta and not tarea.cambiaResponsable}"
+					actionListener="#{bean.cerrarTarea}"
+					oncomplete="if(args.saved){ PF('dialogTarea').hide(); actualizar_documentos(); }" 
+					update="@(.listado_tareas)">
+					<p:confirm header="#{mensaje['confirmar.operacion']}"
+						message="#{mensaje['pregunta.confirma.finalizar.tarea']}"
+						icon="pi pi-info-circle" />
+						
+				</p:commandButton>
+			</p:outputPanel>
+		</div>
+		
+	</div>
+	
+	</p:dialog>
+
+
+	<p:confirmDialog id="confirmarCierreTareasAuto" rendered="#{tarea_editable}"
+	                 widgetVar="confirmarCierreTareasAuto"
+	                 header="#{mensaje['confirmar.operacion']}"
+	                 closable="true">
+		<f:facet name="message">
+		       <h:outputFormat id="textoConfirmarCierreTareasAuto"
+		       		value="#{ (1 == bean.selectedTareasCierreAuto.size())? mensaje['aviso.tareas.cerrar.auto.1'] : mensaje['aviso.tareas.cerrar.auto']}" escape="false">
+   					<f:param value="#{bean.selectedTareasCierreAuto.size()}" />
+		       </h:outputFormat>
+		</f:facet>			             
+	
+		<div class="botonera-form" align="right">
+			<p:commandButton value="#{mensaje['si']}" process="@this"
+	                    action="#{bean.guardarTarea}"
+						oncomplete="if(args.saved){ PF('confirmarCierreTareasAuto').hide(); PF('dialogTarea').hide(); actualizar_documentos(); }" 
+						update="@(.listado_tareas), @(.panelResultadosBusquedaObservacionesExpedientes)"/>
+	
+	   		<p:commandButton value="#{mensaje['no']}"
+	                     onclick="PF('confirmarCierreTareasAuto').hide()"
+	                     type="button" />
+		</div>
+	    
+	</p:confirmDialog>
+
+
+	<p:dialog id="dialogRechazarTarea"
+		header="#{mensaje['rechazar.tarea']}" modal="true"
+	 	widgetVar="dialogRechazarTarea"
+	 	contentWidth="100%" contentHeight="100%" >
+		
+		<h:outputText value="#{mensaje['aviso.motivo.rechazo']} *" for="txtMotivoRechazo" />
+		<br/>
+		<div>
+			<div class="celda-form">
+				<p:outputLabel value="#{mensaje['motivo.rechazo']} *" for="txtMotivoRechazo" />
+				<p:inputTextarea counter="cntMotivoRechazo" counterTemplate="#{mensaje['counter.template']}" rows="4" cols="65" id="txtMotivoRechazo" maxlength="250" value="#{bean.motivoRechazo}" autoResize="false"/>
+			</div>
+			<div class="contador-char"><h:outputText id="cntMotivoRechazo" /></div>
+		</div>
+			
+	    <div class="botonera-form" align="right">
+			<p:commandButton icon="pi pi-save"
+				id="btnAceptarRechazoTarea" value="#{mensaje['aceptar']}"
+				actionListener="#{bean.rechazarTarea()}"
+				oncomplete="if(args.saved){ PF('dialogRechazarTarea').hide(); PF('dialogTarea').hide(); actualizar_documentos(); }" 
+				update="@(.listado_tareas)">
+			</p:commandButton>
+			<p:commandButton icon="pi pi-times" process="@this" immediate="true"
+				id="btnCancelarRechazoTarea" value="#{mensaje['cancelar']}"
+				oncomplete="PF('dialogRechazarTarea').hide()" >
+				<p:confirm header="#{mensaje['confirmar.operacion']}"
+					message="#{mensaje['pregunta.confirma.cancelar']}"
+					icon="pi pi-info-circle" />
+			</p:commandButton>
+			
+		</div>
+	
+	</p:dialog>
+
+</ui:composition>
+</html>

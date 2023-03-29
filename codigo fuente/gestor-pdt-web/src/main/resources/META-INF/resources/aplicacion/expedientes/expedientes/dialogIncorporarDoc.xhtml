@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:c="http://java.sun.com/jstl/core"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:sec="https://joinfaces.org/security"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+    xmlns:fu="http://joinfaces.org/functions">
+
+<ui:composition>
+
+	<p:dialog id="dialogSubirDocumentos"
+		rendered="#{incorporarDocumentosBean.permisoSubir and editable and !esAlta}"
+		header="#{mensaje['subir.documentos']}" modal="true"
+	 	widgetVar="dialogSubirDocumentos" >
+		<div>
+		
+		<!-- IMPORTANTE: FileUpload no maneja bien AjaxStatus y el reloj de espera se queda colgado. Hay que poner global "false" para que lo ignore. -->
+		<!-- https://github.com/primefaces/primefaces/issues/6912 -->
+	        <p:fileUpload listener="#{incorporarDocumentosBean.handleFileUpload}" global="false" 
+				label="#{mensaje['seleccionar.ficheros']}" uploadLabel="#{mensaje['subir.seleccionados']}" cancelLabel="#{mensaje['vaciar.lista']}"
+	        	mode="advanced" multiple="true" sequential="false" dragDropSupport="true" sizeLimit="#{20 * 1024 * 1024}" fileLimit="20"
+				update="messagesFormularioSubir" 
+	            allowTypes="/(\.|\/)(#{incorporarDocumentosBean.extensionesPermitidas})$/"
+	            
+				invalidFileMessage="#{mensaje['extension.no.permitida']}: #{incorporarDocumentosBean.strExtensionesPermitidas}."
+				invalidSizeMessage="#{mensaje['tam.maximo.superado']} (20Mb): "
+				fileLimitMessage="#{mensaje['limite.ficheros.superado']} (20)."
+				
+				oncomplete="PF('dialogSubirDocumentos').hide();updateListaIncorporar();"
+			 />
+		
+			<!-- oncomplete sigue refrescando en cada fichero, no al final de toddo, pero parece que haciéndolo así no se pierden ficheros al subir. -->
+			<!-- Actualizamos el diálogo entero para que se muestre centrado. Al refrescar se oculta, hay que hacer show(). -->
+			<p:remoteCommand name="updateListaIncorporar" process="@none" update="dialogIncorporarDocs" oncomplete="PF('dialogIncorporarDocs').show();" />
+		
+			<p:messages for="messagesFormularioSubir"
+				id="messagesFormularioSubir" showDetail="true" closable="true">
+			</p:messages>
+	    </div>
+	 </p:dialog>
+
+	<!-- DIALOGO INCORPORAR DOCUMENTOS -->
+	<p:dialog id="dialogIncorporarDocs"
+		rendered="#{incorporarDocumentosBean.permisoIncorporar and editable and !esAlta}"
+		header="#{incorporarDocumentosBean.cabeceraDialog}" modal="true"
+		widgetVar="dialogIncorporarDocs">
+		
+		<p:messages for="messagesFormularioIncorporar"
+			id="messagesFormularioIncorporar" showDetail="true" closable="true">
+			<p:autoUpdate />
+		</p:messages>
+
+	        <p:outputPanel id="listaDocumentosIncorporar">
+	        
+			    
+			    <p:outputPanel rendered="#{not empty incorporarDocumentosBean.listaDocumentosIncorporar}">
+			    <div class="botonera-form" align="right">					
+					<p:spacer width="2em" />
+					<h:outputText value="(Documentos en lista: #{fn:length(incorporarDocumentosBean.listaDocumentosIncorporar)})" />
+				</div>
+				<p:spacer height="20" />
+								
+				<ui:include src="listaDocumentosIncorporar.xhtml">
+					<ui:param name="dialog" value="dialogIncorporarDocs" />
+					<ui:param name="operacion" value="incorporar" />
+					<ui:param name="bean" value="#{incorporarDocumentosBean}" />
+					<ui:param name="listaDocumentos" value="#{incorporarDocumentosBean.listaDocumentosIncorporar}" />
+					<ui:param name="listaTiposDocumentos" value="#{incorporarDocumentosBean.listaTiposDocumentos}" />
+				</ui:include>
+				
+				<div class="botonera-form" align="right">
+					<p:commandButton icon="pi pi-check"
+						id="btnAceptarSubida" value="#{mensaje['aceptar']}"
+						actionListener="#{incorporarDocumentosBean.finalizarIncorporacion}"
+						oncomplete="if(args.saved){ PF('dialogIncorporarDocs').hide(); actualizar_documentos(); }" >
+					</p:commandButton>
+					<p:commandButton icon="pi pi-times" process="@this"
+						id="btnCancelarSubida2" value="#{mensaje['cancelar']}"
+						oncomplete="PF('dialogIncorporarDocs').hide()" >
+						<p:confirm header="#{mensaje['confirmar.operacion']}"
+							message="#{mensaje['pregunta.confirma.cancelar']}"
+							icon="pi pi-info-circle" />
+					</p:commandButton>
+				</div>
+
+				</p:outputPanel>
+				
+		    </p:outputPanel>
+
+	</p:dialog>
+
+
+</ui:composition>
+</html>

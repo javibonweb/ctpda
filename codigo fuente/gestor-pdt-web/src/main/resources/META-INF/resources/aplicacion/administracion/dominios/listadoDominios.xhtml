@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+				xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:pe="http://primefaces.org/ui/extensions"                
+                xmlns:sec="https://joinfaces.org/security">
+ 
+<ui:composition template="#{navegacionBean.get('TEMPLATE_LAYOUT_GENERICO')}">  
+                
+    <ui:define name="content" >
+	                
+	<script>
+	function clickBotonFila(tablaId, id , elemId){
+		$("div[id='" + tablaId+"'] "       //tabla (id jsf completo)
+			+ "tr[data-rk='" + id + "'] "  //fila (id = rowkey del datatable)
+			+ "[id$=':" + elemId+ "']")    //botón (solo la terminación del id jsf)
+			.click();
+	}
+	</script>     
+    
+    <c:set var="editable" value="${dominioBean.formEditable}"  />
+    
+		<h:form id="formBuscadorDominios">
+
+			<p:messages for="messagesListado" id="messagesListado" showDetail="true" closable="true">
+	            <p:autoUpdate/>
+	        </p:messages>	
+        			
+			<p:panel header="#{mensaje['gestion.dominios']}">
+			<p:fieldset legend="#{mensaje['filtros.busqueda']}" id="bloqueFiltroBusqueda" toggleable="true" toggleSpeed="250">       		
+			
+			
+			<p:outputPanel id="panelFiltro">
+				<div>
+					<div class="celda-form">
+						<p:outputLabel for="descripcion_filtro" value="#{mensaje['descripcion']}"/>
+						<p:inputText id="descripcion_filtro" maxlength="250" size="30" value="#{dominioBean.descripcionFiltro}"/>
+					</div>			
+					<div class="celda-form">
+						<p:outputLabel for="nivel_anidamiento_max_filtro" value="#{mensaje['nivel.anidamiento.max']}"/>
+						<p:inputText id="nivel_anidamiento_max_filtro" maxlength="3" size="3" value="#{dominioBean.nivelAnidamientoMaxFiltro}"/>
+						<p:keyFilter regEx="/[0-9]/i"  for="nivel_anidamiento_max_filtro"  preventPaste="true"/>
+					</div>
+					<div class="celda-form">
+						<p:outputLabel for="check_bloqueado_filtro" value="#{mensaje['bloqueado']}"></p:outputLabel>
+						<p:selectBooleanCheckbox id="check_bloqueado_filtro" value="#{dominioBean.bloqueadoFiltro}" 
+							itemLabel="#{mensaje['si']}"/>
+					</div>
+					<div class="celda-form">
+						<p:outputLabel for="check_punto_menu_filtro" value="#{mensaje['punto.menu']}"/>
+						<p:selectBooleanCheckbox id="check_punto_menu_filtro" value="#{dominioBean.puntoMenuFiltro}" 
+							itemLabel="#{mensaje['si']}"/>
+					</div>
+				</div>
+				
+				<div class="botonera-form">
+					<p:commandButton id="filtrar" icon="pi pi-filter" value="#{mensaje['filtrar']}" 
+						update="@form,formBuscadorDominios:tablaDominio,formBuscadorDominios:descripcion_filtro,formBuscadorDominios:nivel_anidamiento_max_filtro,formBuscadorDominios:check_bloqueado_filtro,formBuscadorDominios:check_punto_menu_filtro"
+						onstart="PF('tablaDominio').paginator.setPage(0);"/>
+					<p:commandButton id="limpiarFiltro" icon="pi pi-filter-slash" value="#{mensaje['limpiar.filtro']}" 
+						actionListener="#{dominioBean.limpiarFiltro()}"
+						update="@form,formBuscadorDominios:tablaDominio,formBuscadorDominios:descripcion_filtro,formBuscadorDominios:nivel_anidamiento_max_filtro,formBuscadorDominios:check_bloqueado_filtro,formBuscadorDominios:check_punto_menu_filtro" 
+						onstart="PF('tablaDominio').paginator.setPage(0);"/>						
+				</div>		
+			</p:outputPanel>
+			</p:fieldset>
+			
+			<p:spacer height="1" />
+			
+			<!-- PANEL CON LOS RESULTADOS DE BUSQUEDA -->
+			<p:outputPanel id="panelTabla" toggleable="true" toggleSpeed="250">
+				<p:dataTable var="dominio" id="tablaDominio" widgetVar="tablaDominio"
+					value="#{dominioBean.lazyModel}" rows="10" 
+					paginator="true" paginatorPosition="bottom"
+					paginatorTemplate=" {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+					rowsPerPageTemplate="10,20,50,100"
+					currentPageReportTemplate="#{mensaje['paginador.template']}"
+					selectionMode="single" 
+					selection="#{dominioBean.selectedDominio}" rowKey="#{dominio.id}">
+		
+					<p:ajax 
+				        event="rowDblselect"
+				        listener="#{dominioBean.onDomRowDblClkSelect}"
+				        global="false"
+				        oncomplete="clickBotonFila(this.source, args.id, 'consultaDominio');">
+					</p:ajax>
+					
+					
+					
+					<p:column headerText="#{mensaje['descripcion']}" 
+						sortBy="#{dominio.descripcion}">
+               			<h:outputText value="#{dominio.descripcion}"/>
+					</p:column>
+
+					<p:column headerText="#{mensaje['nivel.anidamiento.max']}"  
+						sortBy="#{dominio.nivelAnidamientoMaximo}">
+               			<h:outputText value="#{dominio.nivelAnidamientoMaximo}"/>
+					</p:column>
+
+					<p:column headerText="#{mensaje['bloqueado']}"  
+						sortBy="#{dominio.bloqueado}">
+               			<h:outputText value="No" rendered="#{dominio.bloqueado == false}"/>
+			    		<h:outputText value="Si" rendered="#{dominio.bloqueado == true}"/>               			
+					</p:column>
+					
+					<p:column headerText="#{mensaje['punto.menu']}"  
+						sortBy="#{dominio.puntoMenu}">
+               			<h:outputText value="No" rendered="#{dominio.puntoMenu == false}"/>
+			    		<h:outputText value="Si" rendered="#{dominio.puntoMenu == true}"/>               			
+					</p:column>
+					
+					<p:column headerText="#{mensaje['acciones']}">
+						<p:commandButton id="consultaDominio"  rendered="#{dominioBean.permisoListValDom == true}"
+							icon="pi pi-eye" action="#{dominioBean.onConsultar(dominio)}" immediate="true">
+							<f:param name="id" value="#{dominio.id}" />
+    					</p:commandButton>
+					</p:column>
+				</p:dataTable>
+			</p:outputPanel>			
+			</p:panel>
+			<br/>
+			<p:commandButton id="volver" value="#{mensaje['volver']}"
+				actionListener="#{volverBean.migaPanVolver()}"
+				oncomplete="document.location.href='#{request.contextPath}/aplicacion/bienvenido.xhtml'">
+			</p:commandButton>
+		</h:form>	
+		
+	</ui:define>
+    
+</ui:composition>
+
+</html>

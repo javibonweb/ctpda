@@ -1,0 +1,688 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:c="http://java.sun.com/jstl/core"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:sec="https://joinfaces.org/security">
+
+<ui:composition>
+
+	<p:messages for="messagesFormularioListadoSujetosObligados"
+		id="messagesFormularioListadoDatosSujetosObligados" showDetail="true"
+		closable="true">
+		<p:autoUpdate />
+	</p:messages>
+
+	<!-- PANEL EXPEDIENTES DATOS SUJETOS -->
+
+	<div>
+		<p:commandButton id="filtrarSujetosExp"
+			value="#{mensaje['buscar.sujeto']}" icon="pi pi-search"
+			actionListener="#{datosExpedientesDatosSujetosBean.abrirBuscadorSujetos()}"
+			update="formFormularioExpedientes:tabViewPestanasExpediente:descripcionFiltro,formFormularioExpedientes:tabViewPestanasExpediente:sujetosObligadosSuperiorFiltro,
+				formFormularioExpedientes:tabViewPestanasExpediente:tipoAgrupacionFiltro,
+				formFormularioExpedientes:tabViewPestanasExpediente:tablaSujetosFiltro,
+				formFormularioExpedientes:tabViewPestanasExpediente:dialogSujetoExp"
+			rendered="#{editable and datosExpedientesDatosSujetosBean.permisoBusExpSujObl == true and !(datosExpedientesDatosSujetosBean.listaSujetosObligadosExpedientes.size() eq 1)}" 
+			style="margin-bottom: 5px;" />
+	</div>
+
+	<!-- TABLA DATOS SUJETOS EXPEDIENTES -->
+	<p:outputPanel id="panelResultadosBusquedaSujetosExpedientes">
+		<p:dataTable var="sujetosObligadosExpedientes"
+			id="tablaSujetosExpedientes"
+			value="#{datosExpedientesDatosSujetosBean.lazyModelSujetosExpedientes}"
+			rendered="#{datosExpedientesDatosSujetosBean.expedientes.id!=null}"
+			paginator="true"
+			paginatorTemplate=" {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+			rowsPerPageTemplate="10,20,50,100" rows="10"
+			currentPageReportTemplate="#{mensaje['paginador.template']}"
+			selectionMode="single"
+			sortBy="#{sujetosObligadosExpedientes.principal}"
+			sortOrder="ascending"
+			selection="#{datosExpedientesDatosSujetosBean.selectedExpedientesSujetos}"
+			rowKey="#{sujetosObligadosExpedientes.id}" paginatorPosition="bottom">
+			<p:ajax event="rowSelect" global="false"
+						listener="#{datosExpedientesDatosSujetosBean.onRowSelect}"
+						update="formFormularioExpedientes:tabViewPestanasExpediente:bloqueDelegProtDatSujOblExp" />
+						
+			<p:column headerText="#{mensaje['principal']}" width="90px"
+				sortBy="#{sujetosObligadosExpedientes.principal}">
+				<p:selectBooleanCheckbox
+					value="#{sujetosObligadosExpedientes.principal}" disabled="#{!editable}">
+					
+					<p:ajax
+						listener="#{datosExpedientesDatosSujetosBean.cambioCheckPrincipal(sujetosObligadosExpedientes)}"
+						update="formFormularioExpedientes:expedienteSujetoObligado,formFormularioExpedientes:panelActualizadoCabecera" />
+				</p:selectBooleanCheckbox>
+			</p:column>
+			<p:column headerText="#{mensaje['descripcion']}"
+				sortBy="#{sujetosObligadosExpedientes.sujetosObligados.descripcion}">
+				<h:outputText
+					value="#{sujetosObligadosExpedientes.sujetosObligados.descripcion}" />
+			</p:column>
+			<p:column headerText="#{mensaje['motivos.relacion']}"
+				sortBy="#{sujetosObligadosExpedientes.valoresRelacionExpSuj.descripcion}">
+				<h:outputText
+					value="#{sujetosObligadosExpedientes.valoresRelacionExpSuj.descripcion}" />
+			</p:column>
+			<p:column headerText="#{mensaje['dpd']}" rendered="#{datosExpedientesDatosSujetosBean.mostrarDpd}" visible="false"
+				sortBy="#{sujetosObligadosExpedientes.personas.nombreRazonsocial}">
+				<h:outputText
+					value="#{sujetosObligadosExpedientes.personas.nombreAp}" />
+			</p:column>
+			<p:column headerText="#{mensaje['acciones']}" rendered="#{editable}" width="90px">
+				<p:commandButton id="editarSujetoExp" icon="pi pi-pencil"
+					rendered="#{editable and datosExpedientesDatosSujetosBean.permisoEditExpSujObl == true}"
+					actionListener="#{datosExpedientesDatosSujetosBean.abrirAsignarMotRela(sujetosObligadosExpedientes,sujetosObligados)}"
+					update="formFormularioExpedientes:tabViewPestanasExpediente:dialogAsignarMotRelaSujetos,formFormularioExpedientes:panelActualizadoCabecera" />
+				<p:commandButton id="eliminarSujetoExp" icon="pi pi-trash"
+					rendered="#{editable and datosExpedientesDatosSujetosBean.permisoDelExpSujObl == true}"
+					actionListener="#{datosExpedientesDatosSujetosBean.eliminarSujetosObligados(sujetosObligadosExpedientes)}"
+					update="formFormularioExpedientes:tabViewPestanasExpediente:tablaSujetosExpedientes,formFormularioExpedientes:panelActualizadoCabecera">
+					<p:confirm header="#{mensaje['confirmar.operacion']}"
+						message="#{mensaje['pregunta.confirma.eliminar']}"
+						icon="pi pi-info-circle" />
+				</p:commandButton>				
+				<p:commandButton id="consultarSujetoExp" icon="pi pi-eye"
+					rendered="#{editable and datosExpedientesDatosSujetosBean.permisoEditExpSujObl == true and datosExpedientesBean.numerosSaltos!=2}"
+					action="#{datosExpedientesBean.onConsultarSujetos(sujetosObligadosExpedientes.id)}"/>
+				<p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true">
+					<div class="botonera-form" align="right">
+						<p:commandButton value="#{mensaje['si']}" type="button" styleClass="ui-confirmdialog-yes" />
+						<p:commandButton value="#{mensaje['no']}" type="button" styleClass="ui-confirmdialog-no ui-button-flat" />
+					</div>					
+				</p:confirmDialog>
+			</p:column>
+		</p:dataTable>
+	</p:outputPanel>
+	
+	<!-- TABLA DATOS SUJETOS EXPEDIENTES CON ID EXPEDIENTE NULO-->
+	<p:outputPanel id="panelResultadosBusquedaSujetosExpedienteNulo">
+		<p:dataTable var="sujetosObligadosExpedientes"
+			id="tablaSujetosExpedientesExpNulo"
+			rendered="#{datosExpedientesDatosSujetosBean.expedientes.id==null}"
+			value="#{datosExpedientesDatosSujetosBean.listaSujetosObligadosExpedientes}"
+			paginator="true"
+			paginatorTemplate=" {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+			rowsPerPageTemplate="10,20,50,100" rows="10"
+			currentPageReportTemplate="#{mensaje['paginador.template']}"
+			selectionMode="single"
+			sortBy="#{sujetosObligadosExpedientes.principal}"
+			sortOrder="ascending"
+			selection="#{datosExpedientesDatosSujetosBean.selectedExpedientesSujetos}"
+			rowKey="#{sujetosObligadosExpedientes.id}" paginatorPosition="bottom">
+			<p:ajax event="rowSelect" global="false"
+						listener="#{datosExpedientesDatosSujetosBean.onRowSelect}"
+						update="formFormularioExpedientes:tabViewPestanasExpediente:bloqueDelegProtDatSujOblExp" />
+			<p:column headerText="#{mensaje['principal']}"
+				sortBy="#{sujetosObligadosExpedientes.principal}" width="90px">
+				<p:selectBooleanCheckbox
+					value="#{sujetosObligadosExpedientes.principal}" disabled="#{!editable}">
+					
+					<p:ajax
+						listener="#{datosExpedientesDatosSujetosBean.cambioCheckPrincipal(sujetosObligadosExpedientes)}"
+						update="formFormularioExpedientes:expedienteSujetoObligado,formFormularioExpedientes:panelActualizadoCabecera" />
+				</p:selectBooleanCheckbox>
+			</p:column>
+			<p:column headerText="#{mensaje['descripcion']}"
+				sortBy="#{sujetosObligadosExpedientes.sujetosObligados.descripcion}">
+				<h:outputText
+					value="#{sujetosObligadosExpedientes.sujetosObligados.descripcion}" />
+			</p:column>
+			<p:column headerText="#{mensaje['motivos.relacion']}"
+				sortBy="#{sujetosObligadosExpedientes.valoresRelacionExpSuj.descripcion}">
+				<h:outputText
+					value="#{sujetosObligadosExpedientes.valoresRelacionExpSuj.descripcion}" />
+			</p:column>
+			<p:column headerText="#{mensaje['dpd']}" rendered="#{datosExpedientesDatosSujetosBean.mostrarDpd}" visible="false"
+				sortBy="#{sujetosObligadosExpedientes.personas.nombreRazonsocial}">
+				<h:outputText
+					value="#{sujetosObligadosExpedientes.personas.nombreAp}" />
+			</p:column>
+			<p:column headerText="#{mensaje['acciones']}" rendered="#{editable}" width="70px">
+				<p:commandButton id="editarSujetoExp" icon="pi pi-pencil"
+					rendered="#{editable}"
+					actionListener="#{datosExpedientesDatosSujetosBean.abrirAsignarMotRela(sujetosObligadosExpedientes,sujetosObligados)}"
+					update="formFormularioExpedientes:tabViewPestanasExpediente:dialogAsignarMotRelaSujetos,formFormularioExpedientes:panelActualizadoCabecera" />
+				<p:commandButton id="eliminarSujetoSinExp" icon="pi pi-trash"
+					rendered="#{editable}"
+					actionListener="#{datosExpedientesDatosSujetosBean.eliminarSujetosObligados(sujetosObligadosExpedientes)}"
+					update="formFormularioExpedientes:tabViewPestanasExpediente:tablaSujetosExpedientesExpNulo,formFormularioExpedientes:panelActualizadoCabecera,														
+							formFormularioExpedientes:tabViewPestanasExpediente:panelResultadosBusquedaSujetosExpedienteNulo,
+							formFormularioExpedientes:expedienteSujetoObligado,formFormularioExpedientes:anidamientoSujetoObligado,formFormularioExpedientes:panelExpedientes,
+							formFormularioExpedientes:tabViewPestanasExpediente:bloqueDelegProtDatSujOblExp">
+					<p:confirm header="#{mensaje['confirmar.operacion']}"
+						message="#{mensaje['pregunta.confirma.eliminar']}"
+						icon="pi pi-info-circle" />
+				</p:commandButton>
+				<p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true">
+					<div class="botonera-form" align="right">
+						<p:commandButton value="#{mensaje['si']}" type="button" styleClass="ui-confirmdialog-yes" />
+						<p:commandButton value="#{mensaje['no']}" type="button" styleClass="ui-confirmdialog-no ui-button-flat" />
+					</div>					
+				</p:confirmDialog>
+			</p:column>
+		</p:dataTable>
+	</p:outputPanel>
+	
+	
+	
+	<!-- DATOS DEL DELEGADO PROTECCIÓN DATOS -->
+	<p:spacer height="5" />
+	
+		<p:panel id="bloqueDelegProtDatSujOblExp" collapsed="#{datosExpedientesDatosSujetosBean.plegado}" toggleable="true" toggleableHeader="true" rendered="#{datosExpedientesDatosSujetosBean.mostrarDpd}">
+
+		<f:facet name="header">
+			<h:outputText id="panelBloqueDelegProtDatSujOblExp" value="#{mensaje['datos.dpd']}" />
+		</f:facet>
+		
+		<p:outputPanel>
+			<p:outputPanel >
+				<div>
+					<div class="celda-form">
+						<p:outputLabel for="nombreRazonSocialSujOblig" value="#{mensaje['nombre.razonsocial']}" />
+						<p:inputText id="nombreRazonSocialSujOblig" size="30" disabled="true"
+							value="#{datosExpedientesDatosSujetosBean.sujObligNombreRazonsocial}" />
+					</div>
+					<div class="celda-form">
+						<p:outputLabel for="apellidosSujOblig" value="#{mensaje['apellidos']}" />
+						<p:inputText id="apellidosSujOblig" size="50" disabled="true"
+							value="#{datosExpedientesDatosSujetosBean.sujObligApellidos}" />
+					</div>
+				</div>
+				<div>
+					<div class="celda-form">
+						<p:outputLabel for="telefonoSujOblog" value="#{mensaje['telefono']}" />
+						<p:inputText id="telefonoSujOblog" size="50" disabled="true"
+							value="#{datosExpedientesDatosSujetosBean.sujObligTelefono}" />
+					</div>
+					<div class="celda-form">
+						<p:outputLabel for="emailSujOblig" value="#{mensaje['email']}" />
+						<p:inputText id="emailSujOblig" size="50" disabled="true"
+							value="#{datosExpedientesDatosSujetosBean.sujObligEmail}" />
+					</div>
+					<div class="celda-form">
+					<p:outputPanel styleClass="celda-form">
+						<p:outputLabel for="dpdSujOblig" value="#{mensaje['es.dpd']}" />
+						<p:selectBooleanCheckbox id="dpdSujOblig" disabled="true"
+							value="#{datosExpedientesDatosSujetosBean.sujObligDpd}"
+							itemLabel="#{mensaje['si']}" />
+					</p:outputPanel>				
+				</div>	
+					
+				</div>
+			</p:outputPanel>
+		</p:outputPanel>	
+	</p:panel>
+
+<p:panel id="bloqueDelegProtDat" collapsed="#{datosExpedientesDatosSujetosBean.plegado}" toggleable="true" toggleableHeader="true" rendered="false">
+
+		<f:facet name="header">
+			<h:outputText id="panelBloqueDelegProtDat" value="#{mensaje['datos.dpd']}" />
+		</f:facet>
+		
+		<p:outputPanel>
+			<div class="celda-form" align="right">	  				
+	  				<p:commandButton id="buscarDpd"
+						value="#{mensaje['buscar.persona']}" icon="pi pi-search"
+						rendered="#{editable and datosExpedientesDatosSujetosBean.permisoBusExpSujOblDpd == true}"
+						disabled="#{datosExpedientesDatosSujetosBean.sujetosObligadosExpedientesSeleccionado == null}"
+						actionListener="#{datosExpedientesDatosSujetosBean.abrirBuscadorPersonas()}"
+						update="nombreRazonSocialFiltroDpd, cifnifFiltroDpd, tablaPersonasFiltroDpd,
+						formFormularioExpedientes:tabViewPestanasExpediente:dialogPersonaDpd">
+						<p:ajax  listener="#{datosExpedientesDatosGeneralesBean.actualizarSessionExpedientes}" />
+						</p:commandButton>
+
+
+					<p:commandButton id="quitarDpd" 
+						value="#{mensaje['quitar']}" icon="pi pi-trash" rendered="#{editable and datosExpedientesDatosSujetosBean.permisoDelExpSujOblDpd == true and (datosExpedientesDatosSujetosBean.sujetosObligadosExpedientesSeleccionado.personas != null)}"						 
+						
+						actionListener="#{datosExpedientesDatosSujetosBean.quitarPersonaDpd()}" 
+						update="formFormularioExpedientes:tabViewPestanasExpediente:bloqueDelegProtDat, formFormularioExpedientes:tabViewPestanasExpediente:tablaSujetosExpedientes,formFormularioExpedientes:panelActualizadoCabecera" 
+					/>
+					
+					<p:commandButton id="consultarDpd" 
+						value="#{mensaje['ver.persona']}" icon="pi pi-eye" 
+						rendered="#{editable and datosExpedientesDatosSujetosBean.permisoDelExpSujOblDpd == true and (datosExpedientesDatosSujetosBean.sujetosObligadosExpedientesSeleccionado.personas != null) and datosExpedientesBean.numerosSaltos!=2}"						 
+						action="#{datosExpedientesBean.onConsultarSujetosDpd(datosExpedientesDatosSujetosBean.personas.id)}"  
+					/>
+					
+			</div>
+			<p:outputPanel rendered="#{datosExpedientesDatosSujetosBean.sujetosObligadosExpedientesSeleccionado.personas.esPF}" >
+				<div>
+					<div class="celda-form">
+		  				<p:outputLabel for="valorTipoPersonaDpd" value="#{mensaje['tipo.persona']}:" />
+						<p:inputText id="valorTipoPersonaDpd" size="8" disabled="true"
+							value="#{datosExpedientesDatosSujetosBean.personas.valorTipoPersona.descripcion}" />
+					</div>
+					<div class="celda-form">
+						<p:outputLabel for="nombreDpd" value="#{mensaje['nombre']}" />
+						<p:inputText id="nombreDpd" size="30" disabled="true"
+							value="#{datosExpedientesDatosSujetosBean.personas.nombreRazonsocial}" />
+					</div>
+					<div class="celda-form">
+						<p:outputLabel for="primerApellDpd" value="#{mensaje['primer.apellido']}" />
+						<p:inputText id="primerApellDpd" size="30" disabled="true"
+							value="#{datosExpedientesDatosSujetosBean.personas.primerApellido}" />
+					</div>
+					<div class="celda-form">
+						<p:outputLabel for="segundoApellDpd" value="#{mensaje['segundo.apellido']}" />
+						<p:inputText id="segundoApellDpd" size="30" disabled="true"
+							value="#{datosExpedientesDatosSujetosBean.personas.segundoApellido}" />
+					</div>
+				</div>
+				<div>
+					<div class="celda-form">
+						<p:outputLabel for="inicialesDpd" value="#{mensaje['iniciales']}" />
+						<p:inputText id="inicialesDpd" size="5" disabled="true"
+							value="#{datosExpedientesDatosSujetosBean.personas.iniciales}" />
+					</div>
+					<div class="celda-form">
+						<p:outputLabel for="tipoIdentificadorDpd" value="#{mensaje['tipo.identificador']}" />
+						<p:inputText id="tipoIdentificadorDpd" size="10" disabled="true"
+							value="#{datosExpedientesDatosSujetosBean.personas.valorTipoIdentificador.descripcion}" />
+					</div>
+					<div class="celda-form">
+						<p:outputLabel for="nifCifDpd" value="#{mensaje['identificador']}" />
+						<p:inputText id="nifCifDpd" size="10" disabled="true"
+							value="#{datosExpedientesDatosSujetosBean.personas.nifCif}" />
+					</div>
+					<div class="celda-form">
+						<p:outputLabel for="sexoDpd" value="#{mensaje['sexo']}" />
+						<p:inputText id="sexoDpd" disabled="true"
+							value="#{datosExpedientesDatosSujetosBean.personas.valorSexo.descripcion}" />
+					</div>
+				</div>
+			</p:outputPanel>
+			<p:outputPanel rendered="#{!datosExpedientesDatosSujetosBean.sujetosObligadosExpedientesSeleccionado.personas.esPF}" >
+				<div class="celda-form">
+	  				<p:outputLabel for="valorTipoPersonaDpdPj" value="#{mensaje['tipo.persona']}:" />
+					<p:inputText id="valorTipoPersonaDpdPj" size="8" disabled="true"
+						value="#{datosExpedientesDatosSujetosBean.personas.valorTipoPersona.descripcion}" />
+				</div>
+				<div class="celda-form">
+					<p:outputLabel for="nombreDpdPj" value="#{mensaje['nombre']}" />
+					<p:inputText id="nombreDpdPj" size="30" disabled="true"
+						value="#{datosExpedientesDatosSujetosBean.personas.nombreRazonsocial}" />
+				</div>
+				<div class="celda-form">
+					<p:outputLabel for="nifCifDpdPj" value="#{mensaje['identificador']}" />
+					<p:inputText id="nifCifDpdPj" size="10" disabled="true"
+						value="#{datosExpedientesDatosSujetosBean.personas.nifCif}" />
+				</div>
+			</p:outputPanel>
+			<div>
+				<div class="celda-form">
+					<p:outputLabel for="direccionDpd" value="#{mensaje['direccion']}" />
+					<p:inputText id="direccionDpd" size="60" disabled="true"
+						value="#{datosExpedientesDatosSujetosBean.personas.direccion}" />
+				</div>
+			</div>
+			<div>
+				<div class="celda-form">
+					<p:outputLabel for="paisDpd" value="#{mensaje['pais']}" />
+					<p:inputText id="paisDpd" 
+						value="#{datosExpedientesDatosSujetosBean.personas.pais.descripcion}" 
+						disabled="true" />
+				</div>
+				<div class="celda-form">
+					<p:outputLabel for="codigoPostalDpd" value="#{mensaje['codigo.postal']}" />
+					<p:inputText id="codigoPostalDpd" size="5"
+						value="#{datosExpedientesDatosSujetosBean.personas.codigoPostal}" 
+						disabled="true" />
+				</div>
+				<div class="celda-form">
+					<p:outputLabel for="provinciaDpd" value="#{mensaje['provincia']}" />
+					<p:inputText id="provinciaDpd"
+						value="#{datosExpedientesDatosSujetosBean.personas.provincia.descripcion}"
+						disabled="true" />
+				</div>
+				<div class="celda-form">
+					<p:outputLabel for="localidadDpd" value="#{mensaje['localidad']}" />
+					<p:inputText id="localidadDpd"
+						value="#{datosExpedientesDatosSujetosBean.personas.localidad.descripcion}"
+						disabled="true" />
+				</div>
+				<div class="celda-form">
+					<p:outputLabel for="descMunicipioDpd" value="#{mensaje['municipio']}" />
+					<p:inputText id="descMunicipioDpd"
+						value="#{datosExpedientesDatosSujetosBean.personas.descripcionMunicipio}"
+						disabled="true" />
+				</div>
+			</div>
+			<div>
+				<div class="celda-form">
+					<p:outputLabel for="telefonoFijoDpd" value="#{mensaje['telefono.fijo']}" />
+					<p:inputText id="telefonoFijoDpd"
+						size="10" disabled="true"
+						value="#{datosExpedientesDatosSujetosBean.personas.telefonoFijo}" />
+				</div>
+				<div class="celda-form">
+					<p:outputLabel for="telefonoMovilDpd" value="#{mensaje['telefono.movil']}" />
+					<p:inputText id="telefonoMovilDpd"
+						size="10" disabled="true"
+						value="#{datosExpedientesDatosSujetosBean.personas.telefonoMovil}" />
+				</div>
+				<div class="celda-form">
+					<p:outputLabel for="emailDpd" value="#{mensaje['email']}" />
+					<p:inputText id="emailDpd" 
+						size="20" disabled="true"
+						value="#{datosExpedientesDatosSujetosBean.personas.email}" />
+				</div>
+				<div class="celda-form">
+					<p:outputLabel for="viaComunicacionDpd" value="#{mensaje['via.comunicacion']}" />
+					<p:inputText id="viaComunicacionDpd" disabled="true" size="30"
+						value="#{datosExpedientesDatosSujetosBean.personas.valorViaComunicacion.descripcion}" />
+				</div>
+			</div>
+		</p:outputPanel>	
+	</p:panel>
+
+	<!-- DIALOGO FILTROS SUJETO -->
+	<p:dialog id="dialogSujetoExp" header="#{datosExpedientesDatosSujetosBean.cabeceraBuscadorSujeto}"
+		widgetVar="dialogSujetoExp" closable="true" resizable="false"
+		draggable="true" modal="true" responsive="true" 
+		contentWidth="100%" contentHeight="100%" width="1200" height="500">
+		<p:fieldset legend="#{mensaje['filtros.busqueda']}"
+			id="bloqueFiltroBusquedaDialogSujetos" toggleable="true"
+			toggleSpeed="250">
+			<div>
+				<div class="celda-form">
+					<p:outputLabel for="descripcionFiltro"
+						value="#{mensaje['descripcion']}" />
+					<p:inputText id="descripcionFiltro"
+						value="#{datosExpedientesDatosSujetosBean.descripcionFiltro}"
+						maxlength="100" size="35" />
+				</div>
+				<div class="celda-form">
+					<p:outputLabel value="#{mensaje['sujeto.obligado.superior']}"
+						for="sujetosObligadosSuperiorFiltro" />
+					<p:selectOneMenu id="sujetosObligadosSuperiorFiltro"
+						value="#{datosExpedientesDatosSujetosBean.sujetosObligadosSupIdFiltro}"
+						style="width: 350px;"
+						filter="true"
+						title="">
+						<f:selectItem itemLabel="#{mensaje['todos']}" itemValue="" />
+						<f:selectItems
+							value="#{datosExpedientesDatosSujetosBean.listaSujetosObligadosSup}"
+							var="sujObliSupList" itemLabel="#{sujObliSupList.descripcion}"
+							widgetVar="comboFiltroSujetosObligadosSuperior"
+							itemValue="#{sujObliSupList.id}" />
+					</p:selectOneMenu>
+				</div>
+				<div class="celda-form">
+					<p:outputLabel value="#{mensaje['tipo.agrupacion']}"
+						for="tipoAgrupacionFiltro" />
+					<p:selectOneMenu id="tipoAgrupacionFiltro"
+						value="#{datosExpedientesDatosSujetosBean.tipoAgrupacionIdFiltro}"
+						style="width: 300px;" >
+						<f:selectItem itemLabel="#{mensaje['todos']}" itemValue="" />
+						<f:selectItems
+							value="#{datosExpedientesDatosSujetosBean.listaTipoAgrupaciones}"
+							var="tipAgrupSupList"
+							itemLabel="#{tipAgrupSupList.descripcion}"
+							widgetVar="comboFiltroTipoAgrupaciones"
+							itemValue="#{tipAgrupSupList.id}" />
+					</p:selectOneMenu>
+				</div>
+			</div>
+
+			<div class="botonera-form">
+				<p:commandButton id="filtrarSujetos" value="#{mensaje['filtrar']}"
+					icon="pi pi-filter"
+					update="tablaSujetosFiltro"
+					onstart="PF('sujetosObligadosWV').paginator.setPage(0);" />
+				<p:commandButton id="limpiarFiltroSujetos"
+					value="#{mensaje['limpiar.filtro']}"
+					actionListener="#{datosExpedientesDatosSujetosBean.limpiarFiltro()}"
+					icon="pi pi-filter-slash"
+					onstart="PF('sujetosObligadosWV').paginator.setPage(0);"
+					update="descripcionFiltro,
+						sujetosObligadosSuperiorFiltro,
+						tipoAgrupacionFiltro,
+						tablaSujetosFiltro" />
+				<div class="celda-form" style="float:right">
+					<p:commandButton icon="pi pi-times" process="@this"
+						id="cancelarBusqSujeto" value="#{mensaje['cancelar']}"
+						oncomplete="PF('dialogSujetoExp').hide()" >
+					</p:commandButton>
+				</div>
+			</div>
+		</p:fieldset>
+
+		<p:outputPanel id="panelResultadosBusquedaSujetos">
+			<!-- TABLA DATOS SUJETO -->
+			<p:dataTable var="sujetosObligados" id="tablaSujetosFiltro"
+				value="#{datosExpedientesDatosSujetosBean.lazyModelSujetos}"
+				paginator="true"
+				paginatorTemplate=" {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+				rowsPerPageTemplate="10,20,50,100" rows="10"
+				currentPageReportTemplate="#{mensaje['paginador.template']}"
+				selectionMode="single"
+				sortBy="#{datosExpedientesDatosSujetosBean.defaultOrdenList}"
+				sortOrder="ascending"
+				rowKey="#{sujetosObligados.id}"
+				paginatorPosition="bottom" widgetVar="sujetosObligadosWV">
+				
+				<p:column sortBy="#{sujetosObligados.nivelAnidamiento}" visible="false">
+					<h:outputText value="#{sujetosObligados.nivelAnidamiento}" />
+				</p:column>
+				<p:column sortBy="#{sujetosObligados.ordenVisualizacion}" visible="false" >
+					<h:outputText value="#{sujetosObligados.ordenVisualizacion}" />
+				</p:column>
+				<p:column sortBy="#{sujetosObligados.descripcion}" visible="false">
+					<h:outputText value="#{sujetosObligados.descripcion}" />
+				</p:column>			
+				
+				<p:column headerText="#{mensaje['descripcion']}" sortBy="#{sujetosObligados.descripcion}">
+					<h:outputText value="#{sujetosObligados.descripcion}" />
+				</p:column>
+				<p:column headerText="#{mensaje['nivel.anidamiento']}" sortBy="#{sujetosObligados.nivelAnidamiento}" width="170px">
+					<h:outputText value="#{sujetosObligados.nivelAnidamiento}" />
+				</p:column>
+				<p:column headerText="#{mensaje['sujeto.obligado.superior']}" sortBy="#{sujetosObligados.sujetosObligadosPadre.descripcion}">
+					<h:outputText value="#{sujetosObligados.sujetosObligadosPadre.descripcion}" />
+				</p:column>
+				<p:column headerText="#{mensaje['acciones']}" rendered="#{editable}" style="width: 170px;">
+					<p:commandButton id="botonAsignarMotivoRelacionSujetos"
+						icon="pi pi-plus-circle"
+						actionListener="#{datosExpedientesDatosSujetosBean.abrirAsignarMotRela(sujetosObligadosExpedientes,sujetosObligados)}"
+						update="formFormularioExpedientes:tabViewPestanasExpediente:comboValorRelacion, formFormularioExpedientes:tabViewPestanasExpediente:dialogAsignarMotRelaSujetos,formFormularioExpedientes:panelActualizadoCabecera" />
+
+					<p:commandButton id="botonSujetoObligadoSuperior"
+						rendered="#{datosExpedientesDatosSujetosBean.isSujetoObligadoPadre(sujetosObligados)}"
+						icon="pi pi-arrow-down"
+						actionListener="#{datosExpedientesDatosSujetosBean.asignarSujetoObligadoSup(sujetosObligados)}"
+						update="formFormularioExpedientes:tabViewPestanasExpediente:tipoAgrupacionFiltro, formFormularioExpedientes:tabViewPestanasExpediente:sujetosObligadosSuperiorFiltro,
+							formFormularioExpedientes:tabViewPestanasExpediente:tablaSujetosFiltro,formFormularioExpedientes:tabViewPestanasExpediente:descripcionFiltro"
+						onstart="PF('sujetosObligadosWV').paginator.setPage(0);"
+						title="#{mensaje['filtrar.sujeto.superior']}" />
+				</p:column>
+			</p:dataTable>
+		</p:outputPanel>
+	</p:dialog>
+
+	<!-- DIALOGO ASIGNAR MOTIVO RELACION -->
+	<p:dialog id="dialogAsignarMotRelaSujetos"
+		header="#{datosExpedientesDatosSujetosBean.cabeceraDialogoMotivoRelacion}"
+		widgetVar="dialogAsignarMotRelaSujetos">
+		<p:messages for="messagesFormularioAsignarSujetos"
+			id="messagesFormularioAsignarSujetos" showDetail="true"
+			closable="true">
+			<p:autoUpdate />
+		</p:messages>
+		
+		<div class="celda-form">
+			<p:outputLabel for="descripcionSujeto"
+				value="#{mensaje['descripcion']}" />
+			<p:inputText id="descripcionSujeto"
+				value="#{datosExpedientesDatosSujetosBean.sujetosObligadosConDescripcion}"
+				disabled="true" size="50"
+				title="#{datosExpedientesDatosSujetosBean.sujetosObligadosConDescripcion}" />
+		</div>
+		
+			<div>
+				<div class="celda-form">
+					<p:outputLabel for="comboValorRelacionSujetos"
+						value="#{mensaje['motivo.relacion']} *" />
+					<p:selectOneMenu id="comboValorRelacionSujetos"
+						value="#{datosExpedientesDatosSujetosBean.selectedNuevoMotivoRelacionId}"
+						filter="true">
+						<f:selectItem itemLabel="Seleccione una opción"
+							itemValue="#{sujetosObligadosExpedientes.valoresRelacionExpSuj.id}" />
+						<f:selectItems
+							value="#{datosExpedientesDatosSujetosBean.listaValoresMotivosRelacionSujetosExpediente}"
+							var="motiRelaList" itemLabel="#{motiRelaList.descripcion}"
+							widgetVar="comboValorRelacionSujetos"
+							itemValue="#{motiRelaList.id}" />
+					</p:selectOneMenu>
+				</div>
+			</div>
+	
+		
+		<p:fieldset id="bloqueDatosDPD"
+			legend="#{mensaje['datos.del.dpd']}" styleClass="ui-g"
+			toggleable="true" toggleSpeed="250">
+				<div class="celda-form">
+					<p:outputPanel styleClass="celda-form">
+						<p:outputLabel for="dpdSujeto" value="#{mensaje['es.dpd']}" />
+						<p:selectBooleanCheckbox id="dpdSujeto"
+							value="#{datosExpedientesDatosSujetosBean.sujObligDpd}"
+							itemLabel="#{mensaje['si']}"/>
+					</p:outputPanel>				
+				</div>				
+			<div>	
+				<div class="celda-form">
+					<p:outputLabel for="nombreRazonSocialSujeto"
+						value="#{mensaje['nombre.razonsocial']}" />
+					<p:inputText id="nombreRazonSocialSujeto"
+						value="#{datosExpedientesDatosSujetosBean.sujObligNombreRazonsocial}"
+						size="50" maxlength="100"/>
+				</div>
+				<div class="celda-form">
+					<p:outputLabel for="apellidosSujeto"
+						value="#{mensaje['apellidos']}" />
+					<p:inputText id="apellidosSujeto"
+						value="#{datosExpedientesDatosSujetosBean.sujObligApellidos}"
+						size="50" maxlength="200"/>
+				</div>										
+			</div>
+			<div>
+				<div class="celda-form">
+					<p:outputLabel for="telefonoSujeto"
+						value="#{mensaje['telefono']}" />
+					<p:inputText id="telefonoSujeto"
+						value="#{datosExpedientesDatosSujetosBean.sujObligTelefono}"
+						size="50" maxlength="50"/>
+				</div>
+				<div class="celda-form">
+					<p:outputLabel for="emailSujeto"
+						value="#{mensaje['email']}" />
+					<p:inputText id="emailSujeto"
+						value="#{datosExpedientesDatosSujetosBean.sujObligEmail}"
+						size="50" maxlength="50"/>
+				</div>
+			</div>
+
+			</p:fieldset>
+
+			
+			<div class="botonera-form" align="right">
+				<p:commandButton icon="pi pi-save" id="asignarMotRelaSujetos"
+					value="#{mensaje['guardar']}"
+					actionListener="#{datosExpedientesDatosSujetosBean.asignarMotRelaSujetoExpediente()}"
+					update="formFormularioExpedientes:tabViewPestanasExpediente:panelResultadosBusquedaSujetosExpedienteNulo,panelResultadosBusquedaSujetosExpedientes,formFormularioExpedientes:tabViewPestanasExpediente:tablaSujetosExpedientesExpNulo,
+							formFormularioExpedientes:expedienteSujetoObligado,formFormularioExpedientes:anidamientoSujetoObligado,formFormularioExpedientes:panelExpedientes,
+							formFormularioExpedientes:tabViewPestanasExpediente:bloqueDelegProtDatSujOblExp">
+				</p:commandButton>
+				<p:commandButton icon="pi pi-times" process="@this"
+						id="cancelarAltaSujeto" value="#{mensaje['cancelar']}"
+						oncomplete="PF('dialogAsignarMotRelaSujetos').hide()" >
+				</p:commandButton>
+			</div>
+			
+	</p:dialog>
+
+	<!-- DIALOGO PERSONA DPD -->
+	<p:dialog id="dialogPersonaDpd"
+		header="#{datosExpedientesDatosSujetosBean.cabeceraBuscadorSujetoDpd}" widgetVar="dialogPersonaDpd"
+		closable="true" resizable="false" draggable="true" modal="true" responsive="true" 
+		contentWidth="100%" contentHeight="100%" width="1200" height="500">
+		<p:fieldset legend="#{mensaje['filtros.busqueda']}"
+			id="bloqueFiltroBusquedaDialogDpd" toggleable="true" toggleSpeed="250" >
+			<div>
+				<div class="celda-form">
+					<p:outputLabel for="nombreRazonSocialFiltroDpd"
+						value="#{mensaje['nombre.razon.social']}" />
+					<p:inputText id="nombreRazonSocialFiltroDpd"
+						value="#{datosExpedientesDatosSujetosBean.nombreRazonSocialFiltro}"
+						maxlength="100" size="35" />
+				</div>
+				<div class="celda-form">
+					<p:outputLabel for="cifnifFiltroDpd" value="#{mensaje['identificador']}" />
+					<p:inputText id="cifnifFiltroDpd"
+						value="#{datosExpedientesDatosSujetosBean.cifnifFiltro}"
+						maxlength="9" size="10" />
+				</div>
+			</div>
+
+			<div class="botonera-form">
+			<p:commandButton id="altaPersonapd"
+					value="#{mensaje['nueva.persona']}" icon="pi pi-plus"
+					rendered="#{datosExpedientesDatosPersonasBean.permisoNewExpPer == true and datosExpedientesBean.numerosSaltos!=2}"
+					action="#{datosExpedientesBean.altaPersonaDpd(datosExpedientesDatosSujetosBean.sujetosObligadosExpedientesSeleccionado)}" />
+			
+				<p:commandButton id="filtrarDpd" value="#{mensaje['filtrar']}"
+					icon="pi pi-filter"
+					update="nombreRazonSocialFiltroDpd,
+					cifnifFiltroDpd,
+					tablaPersonasFiltroDpd"
+					onstart="PF('personasWV').paginator.setPage(0);" />
+				<p:commandButton id="limpiarFiltroDpd"
+					value="#{mensaje['limpiar.filtro']}"
+					actionListener="#{datosExpedientesDatosSujetosBean.limpiarFiltroPersDpd()}"
+					icon="pi pi-filter-slash"
+					update="nombreRazonSocialFiltroDpd,
+					cifnifFiltroDpd,
+					tablaPersonasFiltroDpd"
+					onstart="PF('personasWV').paginator.setPage(0);" />
+			</div>
+		</p:fieldset>
+		<p:outputPanel id="panelResultadosBusquedaPersonasDpd">
+			<!-- TABLA DATOS PERSONA -->
+			<p:dataTable var="personas" id="tablaPersonasFiltroDpd"
+				value="#{datosExpedientesDatosSujetosBean.lazyModelPersonas}"
+				paginator="true"
+				paginatorTemplate=" {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+				rowsPerPageTemplate="10,20,50,100" rows="10"
+				currentPageReportTemplate="#{mensaje['paginador.template']}"
+				selectionMode="single" sortBy="#{personas.id}"
+				sortOrder="ascending" rowKey="#{personas.id}"
+				paginatorPosition="bottom"
+				widgetVar="personasWV">
+				<p:column headerText="#{mensaje['nombre.razon.social']}"
+					sortBy="#{personas.nombreRazonsocial}">
+					<h:outputText value="#{personas.nombreAp}" />
+				</p:column>
+				<p:column headerText="#{mensaje['identificador']}"
+					sortBy="#{personas.nifCif}">
+					<h:outputText value="#{personas.nifCif}" />
+				</p:column>
+				<p:column headerText="#{mensaje['acciones']}" rendered="#{editable}" width="70px">
+					<p:commandButton id="botonAsignarPersonaDpd"
+						icon="pi pi-plus-circle"
+						actionListener="#{datosExpedientesDatosSujetosBean.asignarPersonaDpd(personas)}"					
+						update="formFormularioExpedientes:tabViewPestanasExpediente:bloqueDelegProtDat,formFormularioExpedientes:tabViewPestanasExpediente:tablaSujetosExpedientesExpNulo,
+							formFormularioExpedientes:tabViewPestanasExpediente:tablaSujetosExpedientes,formFormularioExpedientes:panelActualizadoCabecera" />
+				</p:column>     
+			</p:dataTable>
+		</p:outputPanel>
+	</p:dialog>
+	
+</ui:composition>
+</html>

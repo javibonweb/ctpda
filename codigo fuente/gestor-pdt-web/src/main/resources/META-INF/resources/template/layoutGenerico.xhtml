@@ -1,0 +1,229 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:c="http://java.sun.com/jstl/core"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<f:view locale="#{localeSwitcher.locale}" contentType="text/html">
+	
+	<style>	
+		body {
+			margin:0;
+		}
+		#cabeceraSuperior {
+			top: 0;
+			left: 8px;
+			right: 8px;
+	   		position: fixed;
+	   		z-index:100;
+	   		background-color: #ffffff;
+		}
+		#panelMenu {
+			top: 132px;
+			left:0;
+			bottom:0;
+	  		position: fixed;	
+		}	
+		#panelMenu .inner {
+			height:100%;
+			overflow-x: hidden;
+	  		overflow-y: auto;
+		}	
+		#panelContenido {
+			margin-top: 114px;
+	 		float: right;
+		}	
+		#panelContenido .inner {
+			top: 0;
+			bottom:0;
+			height:100%;
+			margin-top:0;
+			overflow-x: hidden;
+	  		overflow-y: auto;
+		}	
+	</style>
+
+
+	<h:head>
+		<title>#{mensaje['nombre.organismo']}</title>
+	
+		<ui:insert name="header">
+			<ui:include src="header.xhtml" />
+		</ui:insert>
+	</h:head>
+
+
+	<h:body id="body">
+	
+		<script type="text/javascript">
+			function clickCerrarSesion() {
+				$([id$='cerrarSesion']).parent().click();
+			}
+		</script>
+	
+		<!-- *********** AVISOS DE INACTIVIDAD  ***************  -->
+		<!-- Para el timeout 60000 es un minuto -->
+		<!-- Aviso a los tiempoInactividad, si mueve el ratón continúa la sesión. tiempoInactividad indicado en los distintos properties -->
+	 	<p:idleMonitor timeout="#{propiedadesEntorno.tiempoInactividad}">
+	         <p:ajax event="idle" listener="#{loginBean.logOutExpirado('INACTIVIDAD')}" oncomplete="PF('dialogMessagesInactividad').show()" />
+	     </p:idleMonitor>
+		<p:dialog id="dialogMessagesInactividad" header="Aviso de inactividad" widgetVar="dialogMessagesInactividad"
+			showEffect="fade" closable="false" hideEffect="fade" global="true" modal="true">
+			<div>
+				<h:outputText value="#{mensaje['idle.message1']} " />
+				<h:outputText value="#{mensaje['idle.message2']} " />
+			</div>
+		</p:dialog>.
+	
+		<style type="text/css">
+		    .loading-icon {
+		       font-size: 3rem;
+		    }
+		</style>
+
+    	<p:ajaxStatus onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()"/>
+
+	    <p:dialog widgetVar="statusDialog" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+	        <div class="p-text-center status-div">
+	            <i class="pi pi-spin pi-spinner loading-icon" aria-hidden="true"></i>
+	        </div>
+	    </p:dialog>
+
+
+		<header id="cabeceraSuperior">
+			<ui:include src="#{navegacionBean.get('CABECERA_WEB')}" />				
+			<ui:include src="_cabecera_usuario.xhtml" />
+		</header>
+
+		
+		<div id="cuerpo">
+			<aside id="panelMenu" style="#{sesionBean.menuOculto? 'display:none' : ''}" class="ui-g-2 ui-md-2" aria-label="Menú lateral">
+				<div class="inner">
+					<h:form id="menuForm">
+						<ui:insert name="menu">
+							<ui:include src="menu.xhtml" />
+						</ui:insert>
+					</h:form>
+				</div>
+			</aside>
+						
+			<div id="panelContenido" class="#{sesionBean.menuOculto? 'ui-g-12 ui-md-12' : 'ui-g-10 ui-md-10'}">
+				<div class="ui-g inner">
+					<script>
+					//Los div de menú y contenido tienen que tener su atributo id
+					function toggleMenu(){
+						var menu = $('#panelMenu')
+						var cont = $('#panelContenido')
+						
+						if(menu.is(":hidden")){
+							menu.show();
+							cont.removeClass('ui-g-12')
+							cont.removeClass('ui-md-12')						
+							cont.addClass('ui-g-10')
+							cont.addClass('ui-md-10')
+						} else {
+							menu.hide();
+							cont.addClass('ui-g-12')
+							cont.addClass('ui-md-12')	
+							cont.removeClass('ui-g-10')
+							cont.removeClass('ui-md-10')						
+						}
+					}
+					</script>
+					
+
+					<!-- Nombre corto para el growl -->	
+					<c:set var="growl"  value=":growlForm:growl"  />
+	
+					<div class="ui-g-12 ui-g-nopad">
+					
+						<p:outputPanel id="layoutCentral">
+							<h:form prependId="false" id="growlForm">
+								<p:growl id="growl" showDetail="true" showSummary="false"
+								 	sticky="false" life="10000" >
+									<h:outputScript>
+							            $("#growl_container").effect("shake", { times:1});
+							        </h:outputScript>
+								</p:growl>
+							</h:form>
+							<ui:insert name="content" />							
+						</p:outputPanel>
+					</div>						
+				</div>
+			</div>
+
+		</div>
+
+		<h:outputScript>
+		//<![CDATA[
+		//aplicarAlineacionesTablas();
+		
+		function resetPaginatorDataTables(base) {
+			var widgets = findWidgets(base);
+				
+			//Es más facil iterar todos los widgets
+			for(var i=0; i< widgets.length; ++i) {
+				var w = widgets[i];
+				
+				if(w.paginator){
+					w.paginator.setPage(0);
+					console.log('reseteado paginator de ' + w.id)
+				}
+			}
+		}
+		
+		function findWidgets(base){
+			//TODO Mejora: usar base como un selector jquery
+				//buscar como prefijo de id
+				//si no, como selector general
+				//iterar el resultado y buscar cada elemento en PrimeFaces.widgets
+			
+			/*
+			var jqbase;
+			//probamos base como sufijo de id
+			jqbase = $("[id$='" + base + "']")
+			
+			if(jqbase.length ==0){
+				//probamos base como selector jquery general
+				jqbase = $(base)
+			}
+			
+			if(jqbase.length == 0 ){
+				continue;
+			}
+			
+			//base = jqbase.get(0).id
+			*/
+			
+			var found = [];
+			
+			//Muy ineficiente. Las mejoras vendrían por aquí.
+			for(const wname in PrimeFaces.widgets){
+				var w = PrimeFaces.widgets[wname];
+				
+				if(!w || (base && w.id.indexOf(base) != 0)){
+					continue;
+				}
+				
+				found.push(w);			
+			}
+			
+			return found;			
+		}
+		
+        function actualizar_documentos(){         	
+       		if(typeof(PF_actualizar_documentos) !== "undefined"){
+        		PF_actualizar_documentos();
+        	}        	
+        }
+        
+                
+		//]]>		
+        </h:outputScript>
+
+
+
+	</h:body>
+</f:view>
+</html>

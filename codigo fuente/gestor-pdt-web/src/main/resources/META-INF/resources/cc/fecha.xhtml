@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+    <!-- EJEMPLO DE COMPONENTE REUTILIZABLE  -->
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:cc="http://xmlns.jcp.org/jsf/composite"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+
+<!-- AÚN EN PRUEBAS
+
+Para añadirlo a una página:
+
+    xmlns:cc="http://xmlns.jcp.org/jsf/composite/cc"
+
+	<cc:fecha id="(nombre)" disabled="#{...}"
+		value="#{...}" >
+		<p:ajax  ... /> (event debe ser "change"; se puede omitir)
+	</cc:fecha>
+
+-->
+
+    <!-- INTERFACE -->
+    <cc:interface>
+        <cc:attribute name="value" required="true"  />
+        <cc:attribute name="disabled" default="false"/>
+		<cc:clientBehavior name="change" event="change" targets="fecha" default="true" />
+    </cc:interface>
+
+    <!-- IMPLEMENTATION -->
+    <cc:implementation>
+		<p:datePicker id="fecha" disabled="#{cc.attrs.disabled}"
+			value="#{cc.attrs.value}" locale="es"
+			monthNavigator="true" pattern="dd/MM/yyyy" 
+			showButtonBar="true" readonlyInput="true"
+			converterMessage="#{mensaje['formato.fecha.invalido']}"
+			mask="#{!cc.attrs.disabled}">
+		</p:datePicker>
+		<p:message for="fecha" />
+   </cc:implementation>
+</html>

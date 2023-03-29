@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+				xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:pe="http://primefaces.org/ui/extensions"                
+                xmlns:sec="https://joinfaces.org/security">
+ 
+<ui:composition template="#{navegacionBean.get('TEMPLATE_LAYOUT_GENERICO')}">  
+                
+    <ui:define name="content" >
+	                
+	<script>
+	function clickBotonFila(tablaId, id , elemId){
+		$("div[id='" + tablaId+"'] "       //tabla (id jsf completo)
+			+ "tr[data-rk='" + id + "'] "  //fila (id = rowkey del datatable)
+			+ "[id$=':" + elemId+ "']")    //botón (solo la terminación del id jsf)
+			.click();
+	}
+	</script>     
+    
+    <c:set var="editable" value="${personasBean.formEditable}"  />
+    
+		<h:form id="formBuscador">
+
+			<p:messages for="messagesListado" id="messagesListado" showDetail="true" closable="true">
+	            <p:autoUpdate/>
+	        </p:messages>	
+        			
+			<p:panel header="#{mensaje['gestion.personas']}">
+			
+			<p:fieldset legend="#{mensaje['filtros.busqueda']}" id="bloqueFiltroBusqueda" toggleable="true" toggleSpeed="250">       		
+					<div>
+						<div class="celda-form">
+							<p:outputLabel for="nombre_razonsocial">#{mensaje['nombre.razonsocial']}</p:outputLabel>
+							<p:inputText id="nombre_razonsocial" maxlength="100" size="30" value="#{personasBean.nombreRazonSocialFiltro}"/>
+						</div>						
+						<div class="celda-form">
+							<p:outputLabel for="primer_apellido" styleClass="p-d -block">#{mensaje['primer.apellido']}</p:outputLabel>
+							<p:inputText id="primer_apellido" maxlength="100" size="30" value="#{personasBean.primerApellidoFiltro}"/>
+						</div>
+						<div class="celda-form">
+							<p:outputLabel for="segundo_apellido" styleClass="p- d-block">#{mensaje['segundo.apellido']}</p:outputLabel>
+							<p:inputText id="segundo_apellido" maxlength="100" size="30" value="#{personasBean.segundoApellidoFiltro}"/>
+						</div>
+						<div class="celda-form">
+							<p:outputLabel for="nif_cif" styleClass="p- d-block">#{mensaje['identificador']}</p:outputLabel>
+							<p:inputText id="nif_cif" maxlength="9" size="10" value="#{personasBean.nifCifFiltro}"/>
+						</div>
+					</div>
+				
+					<div class="botonera-form">
+							<p:commandButton id="nuevapersona" icon="pi pi-plus" value="#{mensaje['nueva.persona']}" action="#{personasBean.onCrear}" rendered="#{personasBean.permisoNewPers == true}"/>
+							<p:commandButton id="filtrar" icon="pi pi-filter" value="#{mensaje['filtrar']}" 
+								update="@form,formBuscador:tablaPersona,formBuscador:nombre_razonsocial,formBuscador:primer_apellido,formBuscador:segundo_apellido,formBuscador:nif_cif"
+								onstart="PF('tablaPersona').paginator.setPage(0);"/>
+							<p:commandButton id="limpiarFiltro" icon="pi pi-filter-slash" value="#{mensaje['limpiar.filtro']}" 
+								actionListener="#{personasBean.limpiarFiltro()}"
+								update="@form,formBuscador:tablaPersona,formBuscador:nombre_razonsocial,formBuscador:primer_apellido,formBuscador:segundo_apellido,formBuscador:nif_cif"
+								onstart="PF('tablaPersona').paginator.setPage(0);" />	
+					</div>		
+				</p:fieldset>
+			
+			<p:outputPanel id="panelTabla" toggleable="true" toggleSpeed="250">
+				<p:dataTable var="personas" id="tablaPersona" widgetVar="tablaPersona"
+					value="#{personasBean.lazyModel}" rows="10" 
+					paginator="true" paginatorPosition="bottom"
+					paginatorTemplate=" {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+					rowsPerPageTemplate="10,20,50,100"
+					currentPageReportTemplate="#{mensaje['paginador.template']}"
+					selectionMode="single" 
+					selection="#{personasBean.selectedPersonas}" rowKey="#{personas.id}">
+		
+					<p:ajax 
+				        event="rowDblselect"
+				        listener="#{personasBean.onPersRowDblClkSelect}"
+				        global="false"
+				        oncomplete="clickBotonFila(this.source, args.id, 'consultaPersona');">
+					</p:ajax>
+					
+					
+					
+					<p:column headerText="#{mensaje['nombre.razonsocial']}" 
+						sortBy="#{personas.nombreRazonsocial}">
+               			<h:outputText value="#{personas.nombreRazonsocial}"/>
+					</p:column>
+
+					<p:column headerText="#{mensaje['primer.apellido']}"  
+						sortBy="#{personas.primerApellido}">
+               			<h:outputText value="#{personas.primerApellido}"/>
+					</p:column>
+
+					<p:column headerText="#{mensaje['segundo.apellido']}"  
+						sortBy="#{personas.segundoApellido}">
+               			<h:outputText value="#{personas.segundoApellido}"/>
+					</p:column>
+					<p:column headerText="#{mensaje['identificador']}"  
+						sortBy="#{personas.nifCif}">
+               			<h:outputText value="#{personas.nifCif}"/>
+					</p:column>
+					
+					<p:column headerText="#{mensaje['acciones']}">
+						<p:commandButton id="consultaPersona" rendered="#{personasBean.permisoConsPers == true}"
+							icon="pi pi-eye" action="#{personasBean.onConsulta(personas.id)}" immediate="true">
+    					</p:commandButton>
+    					
+						<p:commandButton id="edicionPersona" widgetVar="edicionPersona" rendered="#{personasBean.permisoEditPers == true}"
+							icon="pi pi-pencil" action="#{personasBean.onEdita(personas.id)}" immediate="true">
+    					</p:commandButton>
+            						
+						<p:commandButton id="deleteButton" rendered="#{editable and personas.activa and personasBean.permisoDesacPers == true}"
+							icon="pi pi-times"
+							actionListener="#{personasBean.deletePersonas(personas)}" >
+							<p:confirm header="#{mensaje['confirmar.operacion']}" message="#{mensaje['pregunta.confirma.eliminar']}" icon="pi pi-info-circle"/>
+						</p:commandButton>
+							
+						<p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true">
+							<div class="botonera-form" align="right">
+								<p:commandButton value="#{mensaje['si']}" type="button" styleClass="ui-confirmdialog-yes" />
+						        <p:commandButton value="#{mensaje['no']}" type="button" styleClass="ui-confirmdialog-no ui-button-flat"/>
+							</div>									
+						</p:confirmDialog>							
+							
+					</p:column>
+				</p:dataTable>
+			</p:outputPanel>
+			</p:panel>
+			<br/>
+			<p:commandButton id="volver" value="#{mensaje['volver']}"
+				actionListener="#{volverBean.migaPanVolver()}"
+				oncomplete="document.location.href='#{request.contextPath}/aplicacion/bienvenido.xhtml'">
+			</p:commandButton>	
+		</h:form>	
+		
+	</ui:define>
+    
+</ui:composition>
+
+</html>

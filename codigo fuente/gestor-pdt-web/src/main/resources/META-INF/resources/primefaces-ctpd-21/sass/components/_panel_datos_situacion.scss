@@ -1,0 +1,74 @@
+@import '../abstracts/variables';
+@import '../abstracts/functions';
+
+
+//#
+#datosSituacionPanel {
+	background-color: $ui-bg-color-header;
+	color: $ui-fc-header;
+	font-family: $header-font-stack;
+	font-weight: bold;
+}
+
+#datosSituacionPanel div {
+	/*padding: 2px 8px 2px 8px;*/
+	padding: 0.2em;
+}
+
+#datosSituacionPanel .celda {
+	padding-top: 0.2em;
+	margin: 0px 0.3em;
+	display: block;
+}
+
+#datosSituacionPanel .aviso-fecha-base{
+    border-radius: 3px;
+	/*padding: px 8px 2px 8px;*/
+}
+
+#datosSituacionPanel .aviso-fecha-base .texto{
+}
+
+#datosSituacionPanel .aviso-fecha-base .icono{
+	/*background: url("/javax.faces.resource/messages/messages.png.xhtml?ln=primefaces&v=10.0.0") no-repeat;*/
+	background: resource_jsf("messages/", "messages.png") no-repeat;
+    background-position: -100px 0;
+    border-radius: 3px;
+    display: inline-block;
+    margin-right: 3px;
+    margin-top: 3px;
+    height: 16px;
+    width: 16px;
+    float: right;
+}
+
+//#
+#datosSituacionPanel .aviso-fecha-proxima {
+	color: #c09853;
+	background-color: #fcf8e3;
+}
+
+#datosSituacionPanel .aviso-fecha-proxima .icono{
+    background-position: 0 -492px;
+ }
+
+//#
+#datosSituacionPanel .aviso-fecha-inminente {
+	color: #b94a48;
+	background-color: #f2dede;
+}
+#datosSituacionPanel .aviso-fecha-inminente .icono{
+    background-position: 0 -492px;
+} 
+
+//#
+#datosSituacionPanel .aviso-fecha-vencida {
+	color: #ffffff;
+	background-color: #b94a48;
+}
+
+#datosSituacionPanel .aviso-fecha-vencida .icono {
+    background-position: 0 -96px;
+    /*-228px; símbolo 'prohibido' */
+}
+

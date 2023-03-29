@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:c="http://java.sun.com/jstl/core"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:sec="https://joinfaces.org/security"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+    xmlns:fu="http://joinfaces.org/functions">
+
+<ui:composition>
+
+	<p:dialog id="dialogVincularDocs"
+		rendered="#{vincularDocumentosBean.permisoVincular and editable and !esAlta}"
+		header="#{vincularDocumentosBean.cabeceraDialog}" modal="true"
+	 	widgetVar="dialogVincularDocs" >
+		
+		<p:outputPanel id="controlesBusquedaVincular">
+		    <div class="celda-form">
+				<p:outputLabel for="filtroNumExpDoc"
+					value="#{mensaje['numero.expediente']} *" />
+				<div class="ui-inputgroup">
+					<p:inputText id="filtroNumExpDoc" widgetVar="filtroNumExpDoc"
+						value="#{vincularDocumentosBean.filtroNumExpediente}" size="15" maxlength="30"
+						disabled="#{vincularDocumentosBean.deshabilitarBusqueda}" >
+					</p:inputText>
+					<p:commandButton icon="pi pi-pencil"
+						id="btnConsultarNumExpActualFiltro"
+						rendered="#{not vincularDocumentosBean.deshabilitarBusqueda}"
+						actionListener="#{vincularDocumentosBean.aplicarNumExpActual}"
+						process="@this" immediate="true" update="filtroNumExpDoc"
+						>
+						<f:setPropertyActionListener target="#{vincularDocumentosBean.filtroNumExpediente}" 
+							value="#{vincularDocumentosBean.expedienteFormulario.numExpediente}" />
+					</p:commandButton>
+					<p:tooltip for="btnConsultarNumExpActualFiltro" value="#{mensaje['aplicar.numexp.actual']}"
+						showEffect="fade" hideEffect="fade" position="top" showDelay="500" />
+				</div>
+			</div>           
+		    <div class="celda-form">
+				<p:commandButton icon="pi pi-search"
+					id="btnConsultarNumExpFiltro" value="#{mensaje['ver.documentos']}"
+					actionListener="#{vincularDocumentosBean.consultarNumExpediente}"
+					rendered="#{not vincularDocumentosBean.deshabilitarBusqueda}"
+					update="dialogVincularDocs" oncomplete="PF('dialogVincularDocs').show(); if(PF('listaDocumentosVincular')) PF('listaDocumentosVincular').unselectAllRows()">
+				</p:commandButton>
+			</div>
+			<p:outputPanel rendered="#{not empty vincularDocumentosBean.listaDocumentosVincular}" styleClass="celda-form">
+				<h:outputText value="(Documentos en lista: #{fn:length(vincularDocumentosBean.listaDocumentosVincular)})" />
+			</p:outputPanel>
+		</p:outputPanel>
+		<p:spacer height="20" />
+		<div >
+		<p:outputPanel id="panelResultadosVincular" rendered="#{empty vincularDocumentosBean.listaDocumentosVincular}">
+			<p:outputPanel rendered="#{not empty vincularDocumentosBean.expedienteOrigen}" style="width: 800px" >
+				<p:staticMessage rendered="#{0 == vincularDocumentosBean.expedienteOrigen.id}"
+					severity="warn"  detail="#{mensaje['expediente.no.encontrado']}" />
+	
+				<div style="max-height: 700px; overflow-y:scroll">
+				<p:dataTable id="listaDocumentosVincular" widgetVar="listaDocumentosVincular"
+					rendered="#{0 != vincularDocumentosBean.expedienteOrigen.id}"
+					var="docExp" value="#{vincularDocumentosBean.lazyModelDocumentos}" paginator="true"
+					paginatorTemplate=" {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+					currentPageReportTemplate="#{mensaje['paginador.template']}" emptyMessage="#{mensaje['expediente.origen.sin.documentos']}"
+					rowsPerPageTemplate="5,10,20,50,100" rows="10"
+					selection="#{vincularDocumentosBean.documentosSeleccionados}" selectionPageOnly="true"
+					rowKey="#{docExp.id}" paginatorPosition="bottom" >
+	
+					<p:column width="20%" headerText="#{mensaje['tipo.documento']}">
+						<h:outputText value="#{docExp.descripcionTipo}" />
+					</p:column>
+	
+					<p:column headerText="#{mensaje['descripcion']}">
+						<h:outputText value="#{docExp.descripcion}" />
+					</p:column>
+	
+					<p:column width="30px">
+						<f:facet name="header">
+							<h:outputText id="hdrDocVincExt" value="#{mensaje['ext']}" />
+							<p:tooltip for="hdrDocVincExt" value="#{mensaje['extension']}"
+								showEffect="fade" hideEffect="fade" position="top" showDelay="500" />
+						</f:facet>
+						<h:outputText value="#{docExp.extensionFichero}" />
+					</p:column>
+	
+            		<p:column selectionMode="multiple" style="width:16px;text-align:center"/>
+       			</p:dataTable>
+				</div>
+			</p:outputPanel>
+		</p:outputPanel>
+		
+		<p:outputPanel id="listadoSeleccionVincular" rendered="#{not empty vincularDocumentosBean.listaDocumentosVincular}" >
+			<ui:include src="listaDocumentosIncorporar.xhtml">
+				<ui:param name="dialog" value="dialogVincularDocs" />
+				<ui:param name="operacion" value="vincular" />
+				<ui:param name="bean" value="#{vincularDocumentosBean}" />
+				<ui:param name="listaDocumentos" value="#{vincularDocumentosBean.listaDocumentosVincular}" />
+				<ui:param name="listaTiposDocumentos" value="#{vincularDocumentosBean.listaTiposDocumentos}" />
+			</ui:include>
+		
+		</p:outputPanel>
+		
+		
+	    <div class="botonera-form" align="right">
+			<p:commandButton icon="pi pi-check"
+				rendered="#{vincularDocumentosBean.deshabilitarBusqueda and empty vincularDocumentosBean.listaDocumentosVincular and vincularDocumentosBean.lazyModelDocumentos.rowCount gt 0 }"
+				id="btnAplicarDocVinc" value="#{mensaje['aceptar.seleccion']}"
+				actionListener="#{vincularDocumentosBean.recogerDocumentosSeleccionados}"
+				oncomplete="if(args.valid) PF('dialogVincularDocs').show()"
+				>
+<!-- 				update="@form:panelActualizadoCabecera"> -->
+			</p:commandButton>
+			<p:commandButton icon="pi pi-check"
+				id="btnAceptarDocVinc" value="#{mensaje['aceptar']}"
+				rendered="#{vincularDocumentosBean.deshabilitarBusqueda and not empty vincularDocumentosBean.listaDocumentosVincular}"
+				actionListener="#{vincularDocumentosBean.finalizarVinculacion}"
+				oncomplete="if(args.saved){ PF('dialogVincularDocs').hide(); actualizar_documentos(); }" >
+			</p:commandButton>
+			<p:commandButton icon="pi pi-times" process="@this"
+				id="btnCancelarDocVinc" value="#{mensaje['cancelar']}"
+				oncomplete="PF('dialogVincularDocs').hide()" >
+				<p:confirm header="#{mensaje['confirmar.operacion']}"
+					message="#{mensaje['pregunta.confirma.cancelar']}"
+					icon="pi pi-info-circle" />
+			</p:commandButton>
+		</div>
+		
+		
+		</div>
+		
+
+	</p:dialog>
+
+</ui:composition>
+</html>

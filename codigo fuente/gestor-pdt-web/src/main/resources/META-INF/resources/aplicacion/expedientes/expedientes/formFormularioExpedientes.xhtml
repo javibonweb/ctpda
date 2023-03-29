@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:c="http://java.sun.com/jstl/core"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:sec="https://joinfaces.org/security">
+<ui:composition
+	template="#{navegacionBean.get('TEMPLATE_LAYOUT_GENERICO')}">
+	<ui:define name="content">
+
+		<c:set var="editable" value="#{datosExpedientesBean.formEditable}" />
+		<c:set var="esAlta" value="#{datosExpedientesBean.expedientes.id == null}" />
+		
+		<f:param name="idTipoExpediente"
+			value="#{datosExpedientesBean.idTipoExpediente}" />
+
+		<h:form id="formFormularioExpedientes">
+
+			<p:remoteCommand name="PF_actualizar_documentos" update="@(.panel-documentos), @(.control-documentos), @(.panel-tareas), @(.panel-actualizado-cabecera)"
+				action="#{datosExpedientesDocumentosBean.actualizarDocumentos()}" process="@this" />
+
+			<p:messages for="messagesFormulario" id="messagesFormulario"
+				showDetail="true" closable="true">
+				<p:autoUpdate />
+			</p:messages>
+
+			<p:panel id="panelExpedientes">
+				<f:facet name="header" >
+					<h:outputText value="#{mensaje['formulario.expediente']}" rendered="#{!(datosExpedientesBean.expedientes.getValorTipoExpediente().getCodigo() == 'XPC')}" />
+				</f:facet>
+				<f:facet name="header" >
+					<h:outputText value="#{mensaje['formulario.entrada']}" rendered="#{(datosExpedientesBean.expedientes.getValorTipoExpediente().getCodigo() == 'XPC')}" />
+				</f:facet>
+				
+				<!-- NUMERO DE EXPEDIENTE -->
+				<p:outputPanel deferred="true" rendered="#{!(datosExpedientesBean.expedientes.id == null)}" style="height: 3.65em">
+					<p class="ui-widget-content ui-tabs ui-g-12 ui-md-12">
+						<h:outputText style="padding-left: 10px;"
+						value="#{mensaje['numero.expediente']}: "  rendered="#{!(datosExpedientesBean.expedientes.getValorTipoExpediente().getCodigo() == 'XPC')}" />
+						<h:outputText style="padding-left: 10px;"
+						value="#{mensaje['numero.entrada']}: "  rendered="#{(datosExpedientesBean.expedientes.getValorTipoExpediente().getCodigo() == 'XPC')}" />
+
+						<h:outputText
+							value="#{datosExpedientesBean.obtenerCabeceraCTPDA(datosExpedientesBean.expedientes.id)}" style="font-weight:bold" />
+					</p>
+				</p:outputPanel>
+				
+				<!-- PANEL PRINCIPAL EXPEDIENTE -->
+				<p:fieldset id="bloqueExpediente" legend="#{mensaje['expediente.pestania.principal']}" toggleable="true" collapsed="#{datosExpedientesBean.idExp == null}" toggleSpeed="250">
+					<!-- CAMPOS DEL EXPEDIENTE -->
+					<p:outputPanel rendered="#{datosExpedientesBean.mostrarAvisos}" >
+					<table id="avisos">
+					<tr>
+					    <td style="white-space: pre-wrap">
+							<h:outputText
+									value="#{mensaje['aviso.tramitacion.anonima']}" rendered="#{datosExpedientesBean.getTramitacionAnonima()}" style="font-weight:bold;color:red;background-color:yellow" />
+						</td>
+						<td style="white-space: pre-wrap">
+							<h:outputText
+								value="#{mensaje['aviso.abstencion.recusacion']}" rendered="#{datosExpedientesBean.getAbstencionRecusacion()}" style="font-weight:bold;color:white;background-color:green" />
+						</td>
+       				</tr>  
+					</table>					
+					</p:outputPanel>
+
+					<div class="ui-g-12 ui-md-6">
+						<div style="padding:4px">
+							<p:outputLabel
+								for="expedientePersona" value="#{datosExpedientesBean.etiquetaPers}" />
+							<p:inputText id="expedientePersona" style="width:100%"
+								value="#{datosExpedientesBean.persona}" 
+								disabled="true" />
+						</div>
+						<div style="padding:4px">
+							<p:outputLabel
+								for="expedienteRepresentante" value="#{mensaje['representate']}"   rendered="#{datosExpedientesBean.representante != null}"/>
+							<p:inputText id="expedienteRepresentante" style="width:100%"
+								value="#{datosExpedientesBean.representante}" 
+								disabled="true" rendered="#{datosExpedientesBean.representante != null}"/>
+						</div>
+						<div style="padding:4px">
+							<p:outputLabel
+								for="expedienteSujetoObligado" value="#{datosExpedientesBean.etiquetaSuj} - Tiene DPD" rendered="#{datosExpedientesBean.tieneDpd == true}"/>
+							<p:outputLabel
+								for="expedienteSujetoObligado" value="#{datosExpedientesBean.etiquetaSuj}" rendered="#{datosExpedientesBean.tieneDpd != true}"/>								
+							<p:inputText id="expedienteSujetoObligado" style="width:100%"
+								value="#{datosExpedientesBean.sujetoObligado}" 
+								disabled="true" />								
+							<p:spacer height=".5em" />
+							<!-- TABLA DESCENDIENTES -->
+					   		<p:fieldset id="bloqueAnidamientosSujetoObligado" legend="#{mensaje['anidamientos']}" styleClass="ui-g" toggleable="true" toggleSpeed="250" collapsed="true">
+								<p:dataTable var="anidamientoSujetoObligado" id="anidamientoSujetoObligado"
+									value="#{datosExpedientesBean.listaAnidamientosSujetoObligado}"
+									paginator="true"
+									paginatorTemplate=" {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+									rowsPerPageTemplate="10,20,50,100" paginatorPosition="bottom"
+									rows="10"
+									currentPageReportTemplate="#{mensaje['paginador.template']}"
+									paginatorAlwaysVisible="false"
+									selectionMode="single"
+									sortBy="#{anidamientoSujetoObligado.descripcion}"
+									sortOrder="ascending" rowKey="#{anidamientoSujetoObligado.id}">				
+									<p:column >
+										<h:outputText value="#{anidamientoSujetoObligado.descripcion}" />
+									</p:column>
+								</p:dataTable>
+							</p:fieldset>
+						</div>
+						<div class="celda-form">
+							<p:outputLabel for="motivoExpedienteTarea" value="#{mensaje['motivo.expediente']}" rendered="#{not empty datosExpedientesBean.expedientes.motivo}"/>				
+							<p:inputTextarea rows="2" cols="70" id="motivoExpedienteCabcera" autoResize="false"
+								value="#{datosExpedientesBean.expedientes.motivo}"
+								readonly="true"  rendered="#{not empty datosExpedientesBean.expedientes.motivo}">
+							</p:inputTextarea>					
+						</div>
+							
+					</div>
+
+
+					<!-- PANEL DE INFORMACIÓN DEL EXPEDIENTE -->
+					<div class="ui-g-12 ui-md-5 ui-lg-4">
+						<p:card rendered="#{!(datosExpedientesBean.expedientes.id == null)}"
+							style="border-top: 5px solid #86af9a;border-bottom: 1px solid #86af9a;border-left: 1px solid #86af9a;border-right: 1px solid #86af9a;background-color: #e9ebec;"> 
+							<table id="datosExpedientePanel">				
+							  <tr>
+							    <td><h:outputText value="#{mensaje['actualizado']}: " style="font-weight:bold" /></td>
+							    <td><h:outputText id="panelActualizadoCabecera" value="#{datosExpedientesBean.panelActualizado}" styleClass="panel-actualizado-cabecera"/></td>
+							  </tr>			
+							  <tr>
+							    <td><h:outputText value="#{mensaje['situacion']}: " style="font-weight:bold" /></td>
+							    <td><h:outputText id="panelSituacionCabecera" value="#{datosExpedientesBean.panelSituacion}" /></td>
+							  </tr>			  
+							  <tr>
+							    <td><h:outputText value="#{mensaje['subsituacion']}: " style="font-weight:bold" rendered="#{datosExpedientesBean.panelSituacionAdicional != null}"/></td>
+							    <td><h:outputText id="panelSituacionAdicionalCabecera" value="#{datosExpedientesBean.panelSituacionAdicional}" rendered="#{datosExpedientesBean.panelSituacionAdicional != null}"/></td>
+							  </tr>			  
+							  <tr>
+ 								<td><h:outputText id="panelDescSeg1" value="#{datosExpedientesBean.panelDescSeguimiento1}" style="font-weight:bold" rendered="#{datosExpedientesBean.panelDescSeguimiento1 != null}"/></td>
+							    <td><h:outputText id="panelInfSeg1" value="#{datosExpedientesBean.panelInfSeguimiento1} " rendered="#{datosExpedientesBean.panelInfSeguimiento1 != null}" style="font-weight:bold"/></td>
+							  </tr>		
+							    <tr>
+ 								<td><h:outputText id="panelDescSeg2" value="#{datosExpedientesBean.panelDescSeguimiento2}" style="font-weight:bold" rendered="#{datosExpedientesBean.panelDescSeguimiento2 != null}"/></td>
+							    <td><h:outputText id="panelInfSeg2" value="#{datosExpedientesBean.panelInfSeguimiento2} " rendered="#{datosExpedientesBean.panelInfSeguimiento2 != null}" style="font-weight:bold"/></td>
+							  </tr>
+							    <tr>
+ 								<td><h:outputText id="panelDescSeg3" value="#{datosExpedientesBean.panelDescSeguimiento3}" style="font-weight:bold" rendered="#{datosExpedientesBean.panelDescSeguimiento3 != null}"/></td>
+							    <td><h:outputText id="panelInfSeg3" value="#{datosExpedientesBean.panelInfSeguimiento3} " rendered="#{datosExpedientesBean.panelInfSeguimiento3 != null}" style="font-weight:bold"/></td>
+							  </tr>  
+							</table>
+						</p:card>
+					</div>
+					<div class="ui-g-12 ui-md-1 ui-lg-2"></div>
+					
+					<!-- PANEL DE PLAZOS -->
+					<p:outputPanel id="panelPlazos" class="ui-g-12 ui-md-5 ui-lg-4">
+						<p:card id="listPlazos" rendered="#{!(datosExpedientesBean.expedientes.id == null)  and !(datosExpedientesBean.plazosExpdtePanelPlazos.isEmpty())}"
+							style="border-top: 5px solid #86af9a;border-bottom: 1px solid #86af9a;border-left: 1px solid #86af9a;border-right: 1px solid #86af9a;background-color: #e9ebec;"> 
+							<table id="datosPlazosExpedientePanel">
+							<tr>
+							    <td style="white-space: pre-wrap"><h:outputText id="panelPlazosCabecera" />
+									<ui:include src="listadoPlazosExpediente.xhtml" />
+								</td>
+	        				</tr>  
+							</table>
+						</p:card>
+					</p:outputPanel>
+					
+				</p:fieldset>
+
+				<!-- PESTAÑAS DATOS DE EXPEDIENTE -->
+				<div id="divPestanyasExpediente" class="tabViewDatosExpediente">
+			        <p:tabView id="tabViewPestanasExpediente" dynamic="true">
+			            <p:tab id="tabPestanaDatosGenerales">
+			            <!-- ponemos el title como facet para poder asignar un id y asi llamar a click con jQuery -->
+			            	 <f:facet name="title">
+				               <h:outputText id="tituloTabDatosGenerales" value="#{mensaje['datos.generales']}"/>
+				            </f:facet>
+				            <p id="includeDatosGenerales" class="p-m-0">
+			                	<ui:include src="formDatosGeneralesExpedientes.xhtml" />
+			                </p>			                
+        					<p:outputPanel rendered="#{!(datosExpedientesBean.expedientes.id == null)}">
+	        					<p id="includeExpedientesRelacionados" class="p-m-0" >
+									<ui:include src="listadoExpedientesRelacionados.xhtml" />
+	        					</p>
+        					</p:outputPanel>
+		            </p:tab>
+						<p:tab title="#{mensaje['evolucion.expedinte']}" rendered="#{!(datosExpedientesBean.expedientes.id == null) and !(datosExpedientesBean.expedientes.getValorTipoExpediente().getCodigo()=='XPC')}">
+			                <p:outputPanel>
+					            <p id="includeEvolucionExpediente" class="p-m-0">
+				                	<ui:include src="formEvolucionExpediente.xhtml" />
+				                </p>	
+        					</p:outputPanel>
+			            </p:tab>
+			            <p:tab id="tabPestanaTramitacion" rendered="#{!(datosExpedientesBean.expedientes.id == null)}">
+			            	<f:facet name="title">
+				               <h:outputText id="tituloTabTramitacion" value="#{datosExpedientesBean.tituloPestTramita}"/>
+				            </f:facet>
+			                <p id="includeTramiteExpediente" class="p-m-0">
+			                	<ui:include src="formDatosTramiteExpediente.xhtml" />
+			                </p>
+			            </p:tab>
+			            <p:tab title="#{mensaje['documentos']}" rendered="#{!(datosExpedientesBean.expedientes.id == null)}">
+							<p:outputPanel>
+					            <p id="includeDocumentosExpedientes" class="p-m-0">
+				                	<ui:include src="formDocumentosExpedientes.xhtml" />
+				                </p>	
+        					</p:outputPanel>
+			            </p:tab>
+			            <p:tab id="tabPestanaDatosSujetos">
+			            <f:facet name="title">
+				               <h:outputText id="tituloTabSujetos" value="#{datosExpedientesBean.tituloPestSuj}"/>
+				            </f:facet>
+
+			                <p id="includeDatosSujetos" class="p-m-0">
+			                 <ui:include src="listadosDatosSujetosObligados.xhtml" />
+			                </p>
+			            </p:tab>
+			            <p:tab id="tabPestanaDatosPersonas">
+			            <!-- ponemos el title como facet para poder asignar un id y asi llamar a click con jQuery -->
+			            	 <f:facet name="title">
+				               <h:outputText id="tituloTabPersonas" value="#{datosExpedientesBean.tituloPestPers}"/>
+				            </f:facet>
+			                <p id="includeDatosPersonas" class="p-m-0">
+			                    <ui:include src="listadosDatosPersona.xhtml" />
+			                </p>
+			            </p:tab>    
+			            <p:tab id="tabPestanaTareas" rendered="#{(datosExpedientesDatosTareasBean.permisoAccederPestaTarea == true) and (!(datosExpedientesBean.expedientes.id == null))}">
+			            <!-- ponemos el title como facet para poder asignar un id y asi llamar a click con jQuery -->
+			            	 <f:facet name="title">
+				               <h:outputText id="tituloTabTareas" value="#{datosExpedientesBean.tituloPestTareas}"/>
+				            </f:facet>
+			                <p id="includeDatosTareas" class="p-m-0">
+			                    <ui:include src="listadosDatosTareas.xhtml" />
+			                </p>
+			            </p:tab>
+			            <p:tab id="tabPestanaExtractos" rendered="#{!(datosExpedientesBean.expedientes.id == null) and !(datosExpedientesBean.expedientes.getValorTipoExpediente().getCodigo()=='XPC')}" title="#{datosExpedientesBean.tituloPestExtractos}">
+			                <p id="includeDatosExtractos" class="p-m-0">
+			                    <ui:include src="listadoDatosExtractos.xhtml" />
+			                </p>    
+			            </p:tab>
+			            <p:tab id="tabPestanaAntec" rendered="#{!(datosExpedientesBean.expedientes.id == null) and !(datosExpedientesBean.expedientes.getValorTipoExpediente().getCodigo()=='XPC')}" title="#{datosExpedientesBean.tituloPestAntec}">
+		                    <p id="includeDatosAntecedentes" class="p-m-0">
+			                    <ui:include src="listadoDatosAntecedentes.xhtml" />
+			                </p>
+			            </p:tab>
+
+			            <p:tab title="#{mensaje['observaciones']}" rendered="#{!(datosExpedientesBean.expedientes.id == null)}">
+							<p:outputPanel>
+					            <p id="includeObservacionesExpedientes" class="p-m-0">
+				                	<ui:include src="listadoObservacionesExpediente.xhtml" />
+				                </p>	
+        					</p:outputPanel>
+			            </p:tab>			            
+			        </p:tabView>
+				</div>	
+				
+				<!-- BOTONES GUARDAR Y CANCELAR -->
+				<div class="botonera-form" align="right">
+						<p:commandButton icon="pi pi-save" 
+							rendered="#{editable and datosExpedientesBean.expedientes.id == null and datosExpedientesBean.permisoSaveExp == true}"
+							id="saveDatosExpediente" value="#{mensaje['guardar']}"
+							action="#{datosExpedientesBean.saveExpedientes()}"
+							update="formFormularioExpedientes,
+								formFormularioExpedientes:tabViewPestanasExpediente,
+								formFormularioExpedientes:tabViewPestanasExpediente:tabPestanaDatosPersonas,
+								formFormularioExpedientes:tabViewPestanasExpediente:tabPestanaDatosSujetos,
+								formFormularioExpedientes:tabViewPestanasExpediente:panelResultadosBusqueda,
+								formFormularioExpedientes:tabViewPestanasExpediente:panelResultadosBusquedaExpedienteNulo,
+								formFormularioExpedientes:tabViewPestanasExpediente:tablaPersonasExpedientesExpNulo,
+								formFormularioExpedientes:tabViewPestanasExpediente:tablaPersonasExpedientes,
+								formFormularioExpedientes:tabViewPestanasExpediente:panelResultadosBusquedaSujetosExpedientes,
+								formFormularioExpedientes:tabViewPestanasExpediente:panelResultadosBusquedaExpedienteNulo,
+								formFormularioExpedientes:tabViewPestanasExpediente:tablaSujetosExpedientes,
+								formFormularioExpedientes:tabViewPestanasExpediente:tablaSujetosExpedientesExpNulo"/>
+						<p:commandButton icon="pi pi-times" 
+							rendered="#{editable and datosExpedientesBean.expedientes.id == null}"
+							id="cancelarDatosExpediente" value="#{mensaje['cancelar']}" 
+							action="#{datosExpedientesBean.ejecutarVolver()}" >
+							<p:confirm header="#{mensaje['confirmar.operacion']}"
+										message="#{mensaje['pregunta.confirma.cancelar']}"
+										icon="pi pi-info-circle" />
+						</p:commandButton>
+						<p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true" >
+							<div class="botonera-form" align="right">
+								<p:commandButton value="#{mensaje['si']}" type="button" styleClass="ui-confirmdialog-yes" />
+								<p:commandButton value="#{mensaje['no']}" type="button" styleClass="ui-confirmdialog-no ui-button-flat" />
+							</div>							
+						</p:confirmDialog>
+						
+						<p:outputPanel id="panelEditarExpByForm" rendered="#{datosExpedientesBean.permisoEditExp == true and !editable and datosExpedientesBean.numerosSaltos!=2}">
+							<div class="botonera-form" align="right">
+								<p:commandButton id="editarExpByForm" widgetVar="editarExpByForm" icon="pi pi-pencil"
+									action="#{datosExpedientesBean.onEditarByForm(datosExpedientesBean.expedientes.id)}"
+									update="formFormularioExpedientes:tabViewPestanasExpediente:comboTipoSit,formFormularioExpedientes,
+										formFormularioExpedientes:tabViewPestanasExpediente,formFormularioExpedientes:tabViewPestanasExpediente:botonSituacionLibre">
+								</p:commandButton>
+							</div>				
+						</p:outputPanel>
+				</div>
+			</p:panel>
+			
+			<ui:include src="dialogDocumento.xhtml" />
+			<ui:include src="dialogAccesosDocumento.xhtml" />
+			<ui:include src="/aplicacion/expedientes/mimesa/dialogTarea.xhtml" />
+			<ui:include src="dialogExtracto.xhtml" />
+			<ui:include src="dialogAntecedentes.xhtml" />
+			
+			<p:commandButton id="volver" value="#{mensaje['volver']}"
+				action="#{datosExpedientesBean.ejecutarVolver()}" >
+			</p:commandButton>
+
+		</h:form>
+
+        		
+		<ui:include src="abrirEditorDoc.xhtml" />
+        
+	</ui:define>
+</ui:composition>
+</html>

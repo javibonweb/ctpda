@@ -1,0 +1,430 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<!-- Spring IO Platform is the parent of the generated application to be 
+		able to use Spring Boot and all its default configuration -->
+	
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>es.juntadeandalucia.ctpda.gestionpdt</groupId>
+	<artifactId>gestion-pdt</artifactId>
+	<version>0.0.1</version>
+	<name>gestion-pdt</name>
+
+	<packaging>pom</packaging>
+
+	<properties>
+		<java.version>11</java.version>
+		<springboot.version>2.5.5</springboot.version>
+		<maven.compiler.source>11</maven.compiler.source>
+		<maven.compiler.target>11</maven.compiler.target>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<joinfaces.version>4.5.3</joinfaces.version>
+		<maven-model.version>3.8.1</maven-model.version>
+		<gson.version>2.8.7</gson.version>
+
+		<!-- test library versions -->
+		<selenium.version>3.141.59</selenium.version>
+		<htmlunit-driver.version>2.52.0</htmlunit-driver.version>
+		<htmlunit.version>2.52.0</htmlunit.version>
+		<webdrivermanager.version>4.4.3</webdrivermanager.version>
+		<jarchivelib.version>1.1.0</jarchivelib.version>
+
+		<jacoco-maven-plugin.version>0.8.7</jacoco-maven-plugin.version>
+		<!-- jacoco.exclude></jacoco.exclude -->
+		<jacoco.totalLineRate>0.91</jacoco.totalLineRate>
+		<jacoco.packageLineRate>0.90</jacoco.packageLineRate>
+		<jacoco.lineRate>0.37</jacoco.lineRate>
+		<jacoco.totalBranchRate>0.85</jacoco.totalBranchRate>
+		<jacoco.packageBranchRate>0.85</jacoco.packageBranchRate>
+		<jacoco.branchRate>0.00</jacoco.branchRate>
+
+		<!-- check library versions -->
+		<no-package-cycles-enforcer-rule.version>1.0.9</no-package-cycles-enforcer-rule.version>
+		<spotbugs-maven-plugin.version>4.2.3</spotbugs-maven-plugin.version>
+		<findsecbugs-plugin.version>1.11.0</findsecbugs-plugin.version>
+		<findbugs-annotations.version>3.0.1</findbugs-annotations.version>
+		<jdepend-maven-plugin.version>2.0</jdepend-maven-plugin.version>
+		<maven-pmd-plugin.version>3.14.0</maven-pmd-plugin.version>
+		<maven-checkstyle-plugin.version>3.1.2</maven-checkstyle-plugin.version>
+		<checkstyle.version>8.45</checkstyle.version>
+
+		<check.dir>src/checkconfig</check.dir>
+		<checkstyle.dir>${check.dir}/checkstyle</checkstyle.dir>
+		<pmd.dir>${check.dir}/pmd</pmd.dir>
+
+		<pmd.ruleset>${pmd.dir}/pmd-ruleset.xml</pmd.ruleset>
+		<cpd.excludeFromFailureFile />
+		<pmd.excludeFromFailureFile>${check.dir}/pmd/pmd-exclude.properties</pmd.excludeFromFailureFile>
+		<checkstyle.configLocation>${checkstyle.dir}/checkstyle.xml</checkstyle.configLocation>
+		<checkstyle.suppressionsLocation>${checkstyle.dir}/checkstyle-suppressions.xml</checkstyle.suppressionsLocation>
+		<checkstyle.headerLocation>${checkstyle.dir}/checkstyle-header.txt</checkstyle.headerLocation>
+		<checkstyle.excludes />
+		<duplicate-finder-maven-plugin.version>1.5.0</duplicate-finder-maven-plugin.version>
+		<duplicate.ignoredResourcePattern>(about.html|mozilla/public-suffix-list.txt)</duplicate.ignoredResourcePattern>
+		<duplicate.ignoredClassPattern>(META-INF.versions.9.module-info|javax.el.*)</duplicate.ignoredClassPattern>
+
+		<dependency-check-maven.version>6.2.2</dependency-check-maven.version>
+		<sonar-maven-plugin.version>3.9.0.2155</sonar-maven-plugin.version>
+		<log4j2.version>2.17.0</log4j2.version>
+
+	</properties>
+
+	<modules>
+		<module>gestor-pdt-model-core</module>
+		<module>gestor-pdt-model</module>
+		<module>gestor-pdt-persistence-core</module>
+		<module>gestor-pdt-service-core</module>
+		<module>gestor-pdt-web-core</module>
+		<module>gestor-pdt-persistence</module>
+		<module>gestor-pdt-service</module>
+		<module>gestor-pdt-web</module>
+		<module>gestor-pdt-util</module>
+		<module>gestor-pdt-docs</module>
+	</modules>
+
+	<repositories>
+		<!-- PrimeFaces repository -->
+		<repository>
+			<id>prime-repo</id>
+			<name>PrimeFaces Maven Repository</name>
+			<url>https://repository.primefaces.org</url>
+		</repository>
+		<!-- Spring Roo repository -->
+		<repository>
+			<id>spring-roo-repository</id>
+			<name>Spring Roo Repository</name>
+			<url>https://repo.spring.io/spring-roo</url>
+		</repository>
+
+		<repository>
+			<id>maven-central</id>
+			<name>Maven central</name>
+			<url>https://oss.sonatype.org/content/repositories/releases/</url>
+		</repository>
+
+	</repositories>
+	<dependencies>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<!--  log4j version -->		
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-to-slf4j</artifactId>
+			<version>${log4j2.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-api</artifactId>
+			<version>${log4j2.version}</version>
+		</dependency>	
+		
+	</dependencies>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-dependencies</artifactId>
+				<version>${springboot.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.joinfaces</groupId>
+				<artifactId>joinfaces-dependencies</artifactId>
+				<version>${joinfaces.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.maven</groupId>
+				<artifactId>maven-model</artifactId>
+				<version>${maven-model.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.google.code.gson</groupId>
+				<artifactId>gson</artifactId>
+				<version>${gson.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.seleniumhq.selenium</groupId>
+				<artifactId>selenium-java</artifactId>
+				<version>${selenium.version}</version>
+				<scope>test</scope>
+				<exclusions>
+					<exclusion>
+						<groupId>commons-logging</groupId>
+						<artifactId>commons-logging</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>javax.servlet</groupId>
+						<artifactId>javax.servlet-api</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>org.seleniumhq.selenium</groupId>
+				<artifactId>htmlunit-driver</artifactId>
+				<version>${htmlunit-driver.version}</version>
+				<scope>test</scope>
+				<exclusions>
+					<exclusion>
+						<groupId>commons-logging</groupId>
+						<artifactId>commons-logging</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>net.sourceforge.htmlunit</groupId>
+				<artifactId>htmlunit</artifactId>
+				<version>${htmlunit.version}</version>
+				<scope>test</scope>
+				<exclusions>
+					<exclusion>
+						<groupId>commons-logging</groupId>
+						<artifactId>commons-logging</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>io.github.bonigarcia</groupId>
+				<artifactId>webdrivermanager</artifactId>
+				<version>${webdrivermanager.version}</version>
+				<scope>test</scope>
+				<exclusions>
+					<exclusion>
+						<groupId>commons-logging</groupId>
+						<artifactId>commons-logging</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>org.rauschig</groupId>
+				<artifactId>jarchivelib</artifactId>
+				<version>${jarchivelib.version}</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.google.code.findbugs</groupId>
+				<artifactId>findbugs-annotations</artifactId>
+				<version>${findbugs-annotations.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>javax.servlet</groupId>
+				<artifactId>jsp-api</artifactId>
+				<version>2.0</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>javax.servlet</groupId>
+				<artifactId>jstl</artifactId>
+				<version>1.2</version>
+			</dependency>
+			<dependency>
+				<groupId>commons-collections</groupId>
+				<artifactId>commons-collections</artifactId>
+				<version>3.2.2</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+	
+	<profiles>
+		<profile>
+			<id>desarrollo</id>
+			<activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>			
+			<properties>
+		        <activatedProperties>desarrollo</activatedProperties>
+		    </properties>
+		</profile>
+		<profile>
+			<id>integracion</id>
+			<activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>				
+			<properties>
+		        <activatedProperties>integracion</activatedProperties>
+		    </properties>
+		</profile>	
+		<profile>
+			<id>pruebas</id>
+			<activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>				
+			<properties>
+		        <activatedProperties>pruebas</activatedProperties>
+		    </properties>
+		</profile>		
+		<profile>
+			<id>preproduccion</id>
+			<activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>				
+			<properties>
+		        <activatedProperties>preproduccion</activatedProperties>
+		    </properties>
+		</profile>
+		<profile>
+			<id>produccion</id>
+			<activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>				
+			<properties>
+		        <activatedProperties>produccion</activatedProperties>
+		    </properties>
+		</profile>		
+</profiles>		
+	<build>
+		<resources>
+			<resource>
+				<filtering>true</filtering>
+				<directory>src/main/resources</directory>
+			</resource>
+		</resources>	
+	
+		<pluginManagement>
+			<plugins>
+		   
+
+				<!-- Compiler plugin -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<configuration>
+						<source>${java.version}</source>
+						<target>${java.version}</target>
+						<encoding>${project.build.sourceEncoding}</encoding>
+						<useIncrementalCompilation>false</useIncrementalCompilation>
+						<annotationProcessorPaths>
+						<path>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+							<version>1.18.20</version>
+						</path>
+					</annotationProcessorPaths>
+					</configuration>
+				</plugin>
+
+				<!-- AspectJ plugins -->
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>aspectj-maven-plugin</artifactId>
+					<version>${aspectj.plugin.version}</version>
+					<configuration>
+						<source>${java.version}</source>
+						<target>${java.version}</target>
+						<Xlint>ignore</Xlint>
+						<complianceLevel>${java.version}</complianceLevel>
+						<encoding>UTF-8</encoding>
+					</configuration>
+					<executions>
+						<execution>
+							<phase>process-sources</phase>
+							<goals>
+								<goal>compile</goal>
+								<goal>test-compile</goal>
+							</goals>
+						</execution>
+					</executions>
+					<dependencies>
+						<dependency>
+							<groupId>org.aspectj</groupId>
+							<artifactId>aspectjtools</artifactId>
+							<version>${aspectj.version}</version>
+						</dependency>
+					</dependencies>
+				</plugin>
+
+				<!-- Surefire plugin configuration -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<configuration>
+						<excludes>
+							<exclude>**/*_Roo_*</exclude>
+						</excludes>
+					</configuration>
+				</plugin>
+				<!-- Asciidoclet plugin -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-javadoc-plugin</artifactId>
+					<configuration>
+						<additionalparam>
+							--base-dir ${project.basedir}
+							--attribute
+							"projectName=${project.name}"
+							--attribute
+							"projectVersion=${project.version}"
+							--attribute "doctype=book"
+						</additionalparam>
+						<dependencySourceIncludes>
+							<dependencySourceInclude>${project.groupId}:*</dependencySourceInclude>
+						</dependencySourceIncludes>
+						<doclet>org.asciidoctor.Asciidoclet</doclet>
+						<docletArtifact>
+							<groupId>org.asciidoctor</groupId>
+							<artifactId>asciidoclet</artifactId>
+							<version>${asciidoclet.version}</version>
+						</docletArtifact>
+						<includeDependencySources>true</includeDependencySources>
+						<linksource>true</linksource>
+						<links>
+							<link>http://docs.oracle.com/javase/${java.version}/docs/api/</link>
+							<link>http://docs.oracle.com/javaee/${java.product.version}/api/</link>
+							<link>http://docs.spring.io/spring-framework/docs/${spring.version}/javadoc-api/</link>
+							<link>http://docs.spring.io/spring-boot/docs/${spring-boot.version}/api/</link>
+							<link>http://fasterxml.github.io/jackson-core/javadoc/2.8/</link>
+							<link>http://fasterxml.github.io/jackson-databind/javadoc/2.8</link>
+							<link>http://cxf.apache.org/javadoc/latest-3.1.x/</link>
+						</links>
+						<overview>src/main/java/overview.adoc</overview>
+						<show>private</show>
+						<source>${java.version}</source>
+					</configuration>
+				</plugin>
+				
+				<plugin>
+					<groupId>com.querydsl</groupId>
+					<artifactId>querydsl-maven-plugin</artifactId>
+					<executions>
+						<execution>
+							<id>generate-qtypes</id>
+							<phase>generate-sources</phase>
+							<goals>
+								<goal>jpa-export</goal>
+							</goals>
+							<configuration>
+								<targetFolder>target/generated-sources/java</targetFolder>
+						<!-- Linea añadida para permitir getters @Transient en las clases Entity -->
+								<handleMethods>false</handleMethods>
+								<packages>
+									<package>org.springframework.data.jpa.domain.support</package>
+									<package>es.ja.ctpd.gestionpd.model</package>
+								</packages>
+							</configuration>
+						</execution>
+						<execution>
+							<id>compile-qtypes</id>
+							<goals>
+								<goal>compile</goal>
+							</goals>
+							<configuration>
+								<sourceFolder>target/generated-sources/java</sourceFolder>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<groupId>org.codehaus.cargo</groupId>
+					<artifactId>cargo-maven2-plugin</artifactId>
+					<version>1.6.4</version>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+</project>

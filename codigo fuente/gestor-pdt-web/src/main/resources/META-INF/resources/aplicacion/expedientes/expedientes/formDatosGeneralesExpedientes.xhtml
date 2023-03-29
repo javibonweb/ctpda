@@ -1,0 +1,784 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:c="http://java.sun.com/jstl/core"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:sec="https://joinfaces.org/security"
+    xmlns:fu="http://joinfaces.org/functions">
+
+<ui:composition>
+
+		<!-- PANEL DIALOG EXPEDIENTES DATOS GENERALES -->
+		<p:fieldset id="bloqueDatosGeneralesExpedientes"
+			legend="#{mensaje['datos.generales']}" styleClass="ui-g"
+			toggleable="true" toggleSpeed="250">
+			<!-- CAMPOS VISIBLES PARA CUALQUIER TIPO DE EXPEDIENTES -->
+			<p:outputPanel>
+				<div>	
+					<div class="celda-form">
+						<p:outputLabel for="comboTipoExp"
+							value="#{mensaje['tipo.expediente']}" rendered="#{!(datosExpedientesDatosGeneralesBean.expedientes.getValorTipoExpediente().getCodigo()=='XPC')}" />
+						<p:selectOneMenu id="comboTipoExp"
+							value="#{datosExpedientesDatosGeneralesBean.selectedNuevoTipoExpedienteId}"
+							disabled="true" filter="true">
+							<f:selectItem
+								itemLabel="#{mensaje['seleccionar.tipo.expediente']}"
+								itemValue="#{datosExpedientesDatosGeneralesBean.expedientes.valorTipoExpediente.id}" />
+							<f:selectItems
+								value="#{datosExpedientesDatosGeneralesBean.listaTiposExpedientes}"
+								var="tipExpList" itemLabel="#{tipExpList.descripcion}"
+								widgetVar="comboTipoExp" itemValue="#{tipExpList.id}" />
+						</p:selectOneMenu>
+					</div>
+					<div class="celda-form">
+						<p:commandButton id="botonSituacionLibre"
+							rendered="#{editable and !(datosExpedientesDatosGeneralesBean.expedientes.id == null) and datosExpedientesDatosGeneralesBean.permisoSaveExpSitLib}"
+							disabled="#{datosExpedientesDatosGeneralesBean.disableSaveExpSitLib}"
+							value="#{mensaje['situacion.libre']}"
+							actionListener="#{datosExpedientesDatosGeneralesBean.cargarSituacionesLibres()}"
+							update="formFormularioExpedientes:tabViewPestanasExpediente:comboTipoSit, formFormularioExpedientes:tabViewPestanasExpediente:botonSituacionLibre" />
+					</div>
+				
+					<div class="celda-form">
+						<p:outputLabel rendered="#{editable and !(datosExpedientesDatosGeneralesBean.expedientes.id == null) and datosExpedientesDatosGeneralesBean.permisoSaveExpSitLib}" for="comboTipoSit" value="#{mensaje['situacion']} *" />
+						<p:outputLabel rendered="#{!editable and !(datosExpedientesDatosGeneralesBean.expedientes.id == null) and datosExpedientesDatosGeneralesBean.permisoSaveExpSitLib}" for="comboTipoSit" value="#{mensaje['situacion']}" />
+						<p:selectOneMenu id="comboTipoSit"
+							value="#{datosExpedientesDatosGeneralesBean.selectedNuevaSituacionId}"
+							filter="true" disabled="#{!editable or datosExpedientesDatosGeneralesBean.disableComboExpSitLib}"
+							rendered="#{!(datosExpedientesDatosGeneralesBean.expedientes.id == null) and datosExpedientesDatosGeneralesBean.permisoSaveExpSitLib }" >
+							<f:selectItem
+								itemLabel="#{mensaje['seleccione.una.opcion']}"
+								itemValue="#{datosExpedientesDatosGeneralesBean.sitExpActual.id}" />
+							<f:selectItems
+								value="#{datosExpedientesDatosGeneralesBean.listaSituacionesExpedientes}"
+								var="tipSitList" itemLabel="#{tipSitList.descripcion}"
+								widgetVar="comboTipoSit" itemValue="#{tipSitList.id}" />
+							<p:ajax  disabled="#{editable and !(datosExpedientesDatosGeneralesBean.expedientes.id == null) and datosExpedientesDatosGeneralesBean.permisoSaveExp}"
+								listener="#{datosExpedientesDatosGeneralesBean.actualizarSessionExpedientes}" />
+						</p:selectOneMenu>
+					</div>
+				</div>
+				
+				<div>
+					<div class="celda-form">
+						<p:outputLabel rendered="#{editable and !(datosExpedientesDatosGeneralesBean.expedientes.getValorTipoExpediente().getCodigo()=='PSAN')}" for="fechaEntrada"
+							value="#{mensaje['fecha.entrada.consejo']} *" />
+							<p:outputLabel rendered="#{!editable and !(datosExpedientesDatosGeneralesBean.expedientes.getValorTipoExpediente().getCodigo()=='PSAN')}" for="fechaEntrada"
+							value="#{mensaje['fecha.entrada.consejo']}" />
+							<p:outputLabel rendered="#{editable and (datosExpedientesDatosGeneralesBean.expedientes.getValorTipoExpediente().getCodigo()=='PSAN')}" for="fechaEntrada"
+							value="#{mensaje['fecha.inicio']} *" />
+							<p:outputLabel rendered="#{!editable and (datosExpedientesDatosGeneralesBean.expedientes.getValorTipoExpediente().getCodigo()=='PSAN')}" for="fechaEntrada"
+							value="#{mensaje['fecha.inicio']}" />
+							
+						<p:datePicker id="fechaEntrada"
+							value="#{datosExpedientesDatosGeneralesBean.expedientes.fechaEntrada}"
+							locale="es" monthNavigator="true" pattern="dd/MM/yyyy"
+							disabled="#{!editable or (datosExpedientesDatosGeneralesBean.expedientes.id != null and datosExpedientesDatosGeneralesBean.expedientes.getValorTipoExpediente().getCodigo()=='PSAN')}"
+							converterMessage="#{mensaje['formato.fecha.invalido']}" mask="#{editable}">
+							<p:ajax  disabled="#{editable and !(datosExpedientesDatosGeneralesBean.expedientes.id == null) and datosExpedientesDatosGeneralesBean.permisoSaveExp}"
+								listener="#{datosExpedientesDatosGeneralesBean.actualizarSessionExpedientes}" />
+						</p:datePicker>
+						<p:message for="fechaEntrada"/>
+					</div>
+				
+					<div class="celda-form">
+						<p:outputLabel rendered="#{editable}" for="nombreExpediente" styleClass="p-d-block"
+							value="#{mensaje['nombre']}" />
+								<p:outputLabel rendered="#{!editable}" for="nombreExpediente" styleClass="p-d-block"
+							value="#{mensaje['nombre']}" />
+						<p:inputText id="nombreExpediente"
+							value="#{datosExpedientesDatosGeneralesBean.expedientes.nombreExpediente}"
+							disabled="#{!editable}" maxlength="255">
+							<p:ajax  disabled="#{editable and !(datosExpedientesDatosGeneralesBean.expedientes.id == null) and datosExpedientesDatosGeneralesBean.permisoSaveExp}"
+								listener="#{datosExpedientesDatosGeneralesBean.actualizarSessionExpedientes}"/>
+						</p:inputText>
+					</div>
+					
+					<div class="celda-form">
+						<p:outputLabel rendered="#{!editable and !(datosExpedientesDatosGeneralesBean.expedientes.getValorTipoExpediente().getCodigo()=='XPC')}" value="#{mensaje['responsable.expediente']}" for="responsablesTramitacionExp" />
+						<p:outputLabel rendered="#{editable and !(datosExpedientesDatosGeneralesBean.expedientes.getValorTipoExpediente().getCodigo()=='XPC')}" for="responsablesTramitacionExp" value="#{mensaje['responsable.expediente']} *" />
+						<p:outputLabel rendered="#{!editable and (datosExpedientesDatosGeneralesBean.expedientes.getValorTipoExpediente().getCodigo()=='XPC')}" value="#{mensaje['mesa.destino']}" for="responsablesTramitacionExp" />
+						<p:outputLabel rendered="#{editable and (datosExpedientesDatosGeneralesBean.expedientes.getValorTipoExpediente().getCodigo()=='XPC')}" for="responsablesTramitacionExp" value="#{mensaje['mesa.destino']} *" />						
+						<p:selectOneMenu id="responsablesTramitacionExp"
+							disabled="#{not editable or (!datosExpedientesDatosGeneralesBean.permisoRcoEditRespExp and !datosExpedientesDatosGeneralesBean.permisoRceEditRespExp and 
+								!datosExpedientesDatosGeneralesBean.permisoPsanEditRespExp and !datosExpedientesDatosGeneralesBean.permisoXpcEditRespExp)}"
+							value="#{datosExpedientesDatosGeneralesBean.selectedNuevoResponsableId}"
+							style="min-width: 150px;">
+							<f:selectItem itemLabel="#{mensaje['seleccione.una.opcion']}" itemValue="" />
+							<f:selectItems
+								value="#{datosExpedientesDatosGeneralesBean.listaResponsables}"
+								var="r" itemLabel="#{fu:ptoSusp(r.descripcion)}" itemValue="#{r.id}">
+							</f:selectItems>
+							<p:ajax  disabled="#{editable and !(datosExpedientesDatosGeneralesBean.expedientes.id == null) and datosExpedientesDatosGeneralesBean.permisoSaveExp}"
+								listener="#{datosExpedientesDatosGeneralesBean.actualizarSessionExpedientes}" />
+						</p:selectOneMenu>
+					</div>
+					
+					<div class="celda-form">
+						<p:outputLabel for="checkTramAnonima" value="#{mensaje['tramitacion.anonima']}" 
+							rendered="#{datosExpedientesDatosGeneralesBean.permisoRcoCamposPestanya or datosExpedientesDatosGeneralesBean.permisoRceCamposPestanya or 
+								datosExpedientesDatosGeneralesBean.permisoPsanCamposPestanya or datosExpedientesDatosGeneralesBean.permisoXpcCamposPestanya}"/>
+						<p:selectBooleanCheckbox id="checkTramAnonima" value="#{datosExpedientesDatosGeneralesBean.tramAnonima}" 
+							itemLabel="#{mensaje['si']}" disabled="#{!editable}"
+							rendered="#{datosExpedientesDatosGeneralesBean.permisoRcoCamposPestanya or datosExpedientesDatosGeneralesBean.permisoRceCamposPestanya or 
+								datosExpedientesDatosGeneralesBean.permisoPsanCamposPestanya or datosExpedientesDatosGeneralesBean.permisoXpcCamposPestanya}">
+							<p:ajax  disabled="#{editable and !(datosExpedientesDatosGeneralesBean.expedientes.id == null) and datosExpedientesDatosGeneralesBean.permisoSaveExp}"
+								listener="#{datosExpedientesDatosGeneralesBean.actualizarSessionExpedientes}" />
+						</p:selectBooleanCheckbox>
+					</div>
+					<div class="celda-form">
+						<p:outputLabel for="checkSubsanRecusacion" value="#{mensaje['abstencion.recusacion']}" 
+							rendered="#{datosExpedientesDatosGeneralesBean.permisoRcoCamposPestanya or datosExpedientesDatosGeneralesBean.permisoRceCamposPestanya or 
+								datosExpedientesDatosGeneralesBean.permisoPsanCamposPestanya or datosExpedientesDatosGeneralesBean.permisoXpcCamposPestanya}"/>
+						<p:selectBooleanCheckbox id="checkSubsanRecusacion" value="#{datosExpedientesDatosGeneralesBean.abstencionRecusacion}" 
+							itemLabel="#{mensaje['si']}" disabled="#{!editable}"
+							rendered="#{datosExpedientesDatosGeneralesBean.permisoRcoCamposPestanya or datosExpedientesDatosGeneralesBean.permisoRceCamposPestanya or 
+								datosExpedientesDatosGeneralesBean.permisoPsanCamposPestanya or datosExpedientesDatosGeneralesBean.permisoXpcCamposPestanya}">
+							<p:ajax  disabled="#{editable and !(datosExpedientesDatosGeneralesBean.expedientes.id == null) and datosExpedientesDatosGeneralesBean.permisoSaveExp}"
+								listener="#{datosExpedientesDatosGeneralesBean.actualizarSessionExpedientes}" />
+						</p:selectBooleanCheckbox>
+					</div>					
+										
+									
+					<div class="celda-form">
+						<p:outputLabel for="comboInstructor"
+							value="#{mensaje['instructor']}" 
+							rendered="#{((datosExpedientesDatosGeneralesBean.expedientes.getValorTipoExpediente().getCodigo()=='PSAN') or (datosExpedientesDatosGeneralesBean.expedientes.getValorTipoExpediente().getCodigo()=='RCO')) and !(datosExpedientesDatosGeneralesBean.selectedInstructorAPIId == null)}" />
+						<p:selectOneMenu id="comboInstructor"
+							value="#{datosExpedientesDatosGeneralesBean.selectedInstructorAPIId}" 
+							filter="true" disabled="true" 
+							rendered="#{((datosExpedientesDatosGeneralesBean.expedientes.getValorTipoExpediente().getCodigo()=='PSAN') or (datosExpedientesDatosGeneralesBean.expedientes.getValorTipoExpediente().getCodigo()=='RCO')) and !(datosExpedientesDatosGeneralesBean.selectedInstructorAPIId == null)}" >
+							<f:selectItem itemLabel="#{mensaje['seleccione.una.opcion']}" itemValue="" />
+							<f:selectItems
+								value="#{datosExpedientesDatosGeneralesBean.listaInstructoresAPI}"
+								var="ins" 
+								itemLabel="#{ins.descripcion}"
+								itemValue="#{ins.id}" 
+								disabled="true" />
+							<p:ajax  disabled="#{editable and !(datosExpedientesDatosGeneralesBean.expedientes.id == null) and datosExpedientesDatosGeneralesBean.permisoSaveExp}"
+								listener="#{datosExpedientesDatosGeneralesBean.actualizarSessionExpedientes}" />
+						</p:selectOneMenu>
+					</div>
+						
+				</div>
+			<p:outputPanel style="border: none;" rendered="false" >
+				
+				<div>
+					<div class="celda-form">
+						<p:outputLabel for="fechaRegistro"
+							value="#{mensaje['fecha.registro']}" />
+						<p:datePicker id="fechaRegistro"
+							value="#{datosExpedientesDatosGeneralesBean.expedientes.fechaRegistro}"
+							locale="es" monthNavigator="true" pattern="dd/MM/yyyy"
+							disabled="#{!editable}"
+							converterMessage="#{mensaje['formato.fecha.invalido']}" mask="#{editable}">
+							<p:ajax  disabled="#{editable and !(datosExpedientesDatosGeneralesBean.expedientes.id == null) and datosExpedientesDatosGeneralesBean.permisoSaveExp}"
+								listener="#{datosExpedientesDatosGeneralesBean.actualizarSessionExpedientes}" />
+						</p:datePicker>
+						<p:message for="fechaRegistro"/>
+					</div>
+				
+					<div class="celda-form">
+						<p:outputLabel for="numRegistro" styleClass="p-d-block"
+							value="#{mensaje['numRegistro']}" />
+						<p:inputText id="numRegistro"
+							value="#{datosExpedientesDatosGeneralesBean.expedientes.numRegistro}"
+							disabled="#{!editable}" maxlength="50">
+							<p:ajax  disabled="#{editable and !(datosExpedientesDatosGeneralesBean.expedientes.id == null) and datosExpedientesDatosGeneralesBean.permisoSaveExp}"
+								listener="#{datosExpedientesDatosGeneralesBean.actualizarSessionExpedientes}" />
+						</p:inputText>
+					</div>
+				
+					<div class="celda-form">
+						<p:outputLabel for="comboTipoEnt"
+							value="#{mensaje['canal.entrada']}" />
+						<p:selectOneMenu id="comboTipoEnt"
+							value="#{datosExpedientesDatosGeneralesBean.selectedNuevoCanalEntId}"
+							filter="true" disabled="#{!editable}">
+							<f:selectItem itemLabel="#{mensaje['seleccione.una.opcion']}"
+								itemValue="" />
+							<f:selectItems
+								value="#{datosExpedientesDatosGeneralesBean.listaTiposCanalEntrada}"
+								var="tipCanalEntList" itemLabel="#{tipCanalEntList.descripcion}"
+								widgetVar="comboTipoEnt" itemValue="#{tipCanalEntList.id}" />
+							<p:ajax  disabled="#{editable and !(datosExpedientesDatosGeneralesBean.expedientes.id == null) and datosExpedientesDatosGeneralesBean.permisoSaveExp}"
+								listener="#{datosExpedientesDatosGeneralesBean.actualizarSessionExpedientes}" />
+						</p:selectOneMenu>
+					</div>
+				</div>
+				</p:outputPanel>
+				<p:outputPanel style="border: none;" rendered="#{!(datosExpedientesDatosGeneralesBean.expedientes.getValorTipoExpediente().getCodigo()=='PSAN')}" >
+				<div>
+					<p:outputPanel style="border: none;">
+					<div class="celda-form">
+						<p:outputLabel for="origenExpediente" value="#{mensaje['origen.aepd']}" />
+						<p:selectOneMenu id="origenExpediente" value="#{datosExpedientesDatosGeneralesBean.selectedOrigenId}" 
+							disabled="#{!editable}">
+								<f:selectItem itemLabel="#{mensaje['seleccione.una.opcion']}" itemValue="" />
+								<f:selectItems value="#{datosExpedientesDatosGeneralesBean.listaValoresDominioOrigen}" var="origenList" 
+									itemLabel="#{origenList.descripcion}" itemValue="#{origenList.id}" widgetVar="origenExpediente"/>
+								<p:ajax disabled="#{editable and !(datosExpedientesDatosGeneralesBean.expedientes.id == null) and datosExpedientesDatosGeneralesBean.permisoSaveExp}"
+									listener="#{datosExpedientesDatosGeneralesBean.actualizarSessionExpedientes}" />
+						</p:selectOneMenu>
+					</div>
+					<div class="celda-form">
+						<p:outputLabel for="checkComptCtpda" value="#{mensaje['competencia.ctpda']}" 
+							rendered="#{datosExpedientesDatosGeneralesBean.permisoRcoCamposPestanya or datosExpedientesDatosGeneralesBean.permisoRceCamposPestanya or 
+								datosExpedientesDatosGeneralesBean.permisoPsanCamposPestanya or datosExpedientesDatosGeneralesBean.permisoXpcCamposPestanya}" />
+						<p:selectBooleanCheckbox id="checkComptCtpda" value="#{datosExpedientesDatosGeneralesBean.comptCtpda}" 
+							itemLabel="#{mensaje['si']}" disabled="#{!editable}"
+							rendered="#{datosExpedientesDatosGeneralesBean.permisoRcoCamposPestanya or datosExpedientesDatosGeneralesBean.permisoRceCamposPestanya or 
+								datosExpedientesDatosGeneralesBean.permisoPsanCamposPestanya or datosExpedientesDatosGeneralesBean.permisoXpcCamposPestanya}">
+							<p:ajax event="change" update="comboAutComp" listener="#{datosExpedientesDatosGeneralesBean.vaciaAutCompt}"/> 
+							<p:ajax  disabled="#{editable and !(datosExpedientesDatosGeneralesBean.expedientes.id == null) and datosExpedientesDatosGeneralesBean.permisoSaveExp}"
+								listener="#{datosExpedientesDatosGeneralesBean.actualizarSessionExpedientes}" />
+						</p:selectBooleanCheckbox>
+					</div>
+
+					<div class="celda-form" >
+						<p:outputLabel for="comboAutComp" value="#{mensaje['organismo.competente']}"
+							rendered="#{datosExpedientesDatosGeneralesBean.permisoRcoCamposPestanya or datosExpedientesDatosGeneralesBean.permisoRceCamposPestanya or 
+								datosExpedientesDatosGeneralesBean.permisoPsanCamposPestanya or datosExpedientesDatosGeneralesBean.permisoXpcCamposPestanya}"/>
+						<p:selectOneMenu id="comboAutComp" value="#{datosExpedientesDatosGeneralesBean.selectedAutoridadCompetenteId}" 
+							filter="true" disabled="#{!editable or (editable and datosExpedientesDatosGeneralesBean.comptCtpda)}" 
+							rendered="#{datosExpedientesDatosGeneralesBean.permisoRcoCamposPestanya or datosExpedientesDatosGeneralesBean.permisoRceCamposPestanya or 
+								datosExpedientesDatosGeneralesBean.permisoPsanCamposPestanya or datosExpedientesDatosGeneralesBean.permisoXpcCamposPestanya}">
+							<f:selectItem itemLabel="#{mensaje['seleccione.una.opcion']}" itemValue="" />
+							<f:selectItems
+								value="#{datosExpedientesDatosGeneralesBean.listaAutoridadCompetente}"
+								var="autoridadCompt" itemLabel="#{autoridadCompt.descripcion}"
+								widgetVar="comboAutComp" itemValue="#{autoridadCompt.id}" />
+							<f:validateBean disabled="true"/>
+							<p:ajax  disabled="#{editable and !(datosExpedientesDatosGeneralesBean.expedientes.id == null) and datosExpedientesDatosGeneralesBean.permisoSaveExp}"
+								listener="#{datosExpedientesDatosGeneralesBean.actualizarSessionExpedientes}" />
+						</p:selectOneMenu>
+						
+						</div>
+
+						
+					
+					
+				<div>
+				<div class="ui-g">
+				<div class="ui-g-12 ui-md-11">
+					<p:outputLabel for="motivoExpediente" styleClass="p-d-block" value="#{mensaje['motivo.expediente']}" 
+						rendered="#{datosExpedientesDatosGeneralesBean.permisoRcoCamposPestanya or datosExpedientesDatosGeneralesBean.permisoRceCamposPestanya or 
+								datosExpedientesDatosGeneralesBean.permisoPsanCamposPestanya or datosExpedientesDatosGeneralesBean.permisoXpcCamposPestanya}"/>				
+				</div>
+				<div class="ui-g-12 ui-md-1">
+					<p:commandButton id="editarMotivoExpediente" widgetVar="editarMotivoExpediente" icon="pi pi-pencil" 
+								actionListener="#{datosExpedientesDatosGeneralesBean.activarEdicionMotivoExp}" update="motivoExpediente"
+								rendered="#{datosExpedientesDatosGeneralesBean.habilitarBotonEdicionMotivoExp and (datosExpedientesDatosGeneralesBean.permisoRcoCamposPestanya or datosExpedientesDatosGeneralesBean.permisoRceCamposPestanya or 
+									datosExpedientesDatosGeneralesBean.permisoPsanCamposPestanya or datosExpedientesDatosGeneralesBean.permisoXpcCamposPestanya)}">
+					</p:commandButton>	
+				</div>
+				</div>
+				<div class="celda-form">
+					<p:inputTextarea rows="6" cols="125" id="motivoExpediente" counter="textoMotivoArea" counterTemplate="#{mensaje['counter.template']}"  autoResize="false"
+						value="#{datosExpedientesDatosGeneralesBean.expedientes.motivo}"
+						maxlength="500"
+						readonly="#{datosExpedientesDatosGeneralesBean.habilitarMotivoExp or !editable}"
+						rendered="#{datosExpedientesDatosGeneralesBean.permisoRcoCamposPestanya or datosExpedientesDatosGeneralesBean.permisoRceCamposPestanya or 
+								datosExpedientesDatosGeneralesBean.permisoPsanCamposPestanya or datosExpedientesDatosGeneralesBean.permisoXpcCamposPestanya}">
+						<p:ajax  disabled="#{editable and !(datosExpedientesDatosGeneralesBean.expedientes.id == null) and datosExpedientesDatosGeneralesBean.permisoSaveExp}"
+							listener="#{datosExpedientesDatosGeneralesBean.actualizarSessionExpedientes}" />
+					</p:inputTextarea>
+					<div class="ui-g">
+						<div class="ui-g-12 ui-md-3">
+							<div class="contador-char">
+								<h:outputText id="textoMotivoArea"
+									rendered="#{datosExpedientesDatosGeneralesBean.permisoRcoCamposPestanya or datosExpedientesDatosGeneralesBean.permisoRceCamposPestanya or 
+										datosExpedientesDatosGeneralesBean.permisoPsanCamposPestanya or datosExpedientesDatosGeneralesBean.permisoXpcCamposPestanya}"/>
+							</div>
+						</div>
+						<div class="ui-g-12 ui-md-9" align="right">
+							<div class="contador-char">
+								<h:outputText id="usuarioFechaModifMotivo" value="#{datosExpedientesDatosGeneralesBean.auditoriaModifMotivoExp}"
+									rendered="#{datosExpedientesDatosGeneralesBean.permisoRcoCamposPestanya or datosExpedientesDatosGeneralesBean.permisoRceCamposPestanya or 
+										datosExpedientesDatosGeneralesBean.permisoPsanCamposPestanya or datosExpedientesDatosGeneralesBean.permisoXpcCamposPestanya}"/>
+							</div>
+						</div>
+					</div>
+					
+						
+					</div>
+					</div>
+					
+					<!-- Desplegable para campo descripcion expediente -->
+					<p:fieldset id="bloqueDescripcion" legend="#{mensaje['descripcion']}" styleClass="ui-g" toggleable="true" toggleSpeed="250" collapsed="true">
+						<p:outputPanel>
+							<div>
+								<div class="ui-g">
+									<div class="ui-g-12 ui-md-11">
+										<p:outputLabel for="descripcionExpediente" styleClass="p-d-block" value="#{mensaje['descripcion']}" />				
+									</div>
+									<div class="ui-g-12 ui-md-1">
+										<p:commandButton id="editarDescripcionExpediente" widgetVar="editarDescripcionExpediente" icon="pi pi-pencil" 
+											rendered="#{datosExpedientesDatosGeneralesBean.habilitarBotonEdicionDescripcionExp}" 
+											actionListener="#{datosExpedientesDatosGeneralesBean.activarEdicionDescripcionExp}" update="descripcionExpediente">
+										</p:commandButton>	
+									</div>
+								</div>
+								<div class="celda-form">
+									<p:inputTextarea rows="6" cols="125" id="descripcionExpediente" counter="textoDescripcionExpediente" counterTemplate="#{mensaje['counter.template']}"  
+										autoResize="false" value="#{datosExpedientesDatosGeneralesBean.expedientes.descripcion}"
+										maxlength="4000" readonly="#{datosExpedientesDatosGeneralesBean.habilitarDescripcionExp or !editable}">
+										<p:ajax  disabled="#{editable and !(datosExpedientesDatosGeneralesBean.expedientes.id == null) and datosExpedientesDatosGeneralesBean.permisoSaveExp}"
+											listener="#{datosExpedientesDatosGeneralesBean.actualizarSessionExpedientes}" />
+									</p:inputTextarea>
+									<div class="ui-g">
+										<div class="ui-g-12 ui-md-3">
+											<div class="contador-char">
+												<h:outputText id="textoDescripcionExpediente" />
+											</div>
+										</div>
+										<div class="ui-g-12 ui-md-9" align="right">
+											<div class="contador-char">
+												<h:outputText id="usuarioFechaModifDescripcion" value="#{datosExpedientesDatosGeneralesBean.auditoriaModifDescripcionExp}"/>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</p:outputPanel>
+					</p:fieldset>
+					
+				</p:outputPanel>
+				</div>
+			</p:outputPanel>
+			</p:outputPanel>
+			<!-- FIN: CAMPOS VISIBLES PARA CUALQUIER TIPO DE EXPEDIENTES -->
+			<!-- CAMPOS VISIBLES PARA TIPOS DE EXPEDIENTES: RCE/RCO -->
+			<p:outputPanel style="margin-top: 10px;"
+				rendered="#{!(datosExpedientesDatosGeneralesBean.expedientes.getValorTipoExpediente().getCodigo()=='PSAN') and !(datosExpedientesDatosGeneralesBean.expedientes.id == null)}" >
+				<div>				
+					<div class="celda-form">
+						<p:outputLabel for="selectMultipleMateria" value="#{mensaje['materia']}" rendered="#{!(datosExpedientesDatosGeneralesBean.expedientes.getValorTipoExpediente().getCodigo()=='XPC')}" />
+						<p:selectCheckboxMenu id="selectMultipleMateria"
+							value="#{datosExpedientesDatosGeneralesBean.selectedMaterias}"
+							var="valDomMateriaSelected" 
+							itemLabel="#{valDomMateriaSelected.descripcion}"
+							itemValue="#{valDomMateriaSelected}"
+							label="#{mensaje['seleccione.opciones']}" 
+							rendered="#{!(datosExpedientesDatosGeneralesBean.expedientes.getValorTipoExpediente().getCodigo()=='XPC')}" 
+							multiple="true"
+							filter="true"
+							style="width: 30rem"
+							disabled="#{!editable}" >
+							<p:ajax event="itemUnselect" listener="#{datosExpedientesDatosGeneralesBean.onItemUnselect}" />	
+							<f:selectItems value="#{datosExpedientesDatosGeneralesBean.listaMaterias}"
+								var="materias" 
+								itemLabel="#{materias.valorDominioMateria.descripcion}"
+								itemValue="#{materias}" 
+								disabled="#{!editable}" />
+							<p:ajax disabled="#{editable and !(datosExpedientesDatosGeneralesBean.expedientes.id == null) and datosExpedientesDatosGeneralesBean.permisoSaveExp}"
+								listener="#{datosExpedientesDatosGeneralesBean.actualizarSessionExpedientes}" />
+						</p:selectCheckboxMenu>
+					</div>					
+					<div class="celda-form">
+						<p:outputLabel for="selectMultipleArtAfect"
+							value="#{mensaje['articulo.afectado']}" rendered="#{!(datosExpedientesDatosGeneralesBean.expedientes.getValorTipoExpediente().getCodigo()=='XPC')}" />
+						<p:selectCheckboxMenu id="selectMultipleArtAfect"
+							value="#{datosExpedientesDatosGeneralesBean.selectedArticulosAfectados}"
+							var="valDomArtAfectSelected" 
+							itemLabel="#{valDomArtAfectSelected.descripcion}"
+							itemValue="#{valDomArtAfectSelected}"
+							label="#{mensaje['seleccione.opciones']}" 
+							rendered="#{!(datosExpedientesDatosGeneralesBean.expedientes.getValorTipoExpediente().getCodigo()=='XPC')}" 
+							multiple="true"
+							filter="true"
+							style="width: 30rem"
+							disabled="#{!editable}" >
+							<p:ajax event="itemUnselect"
+								listener="#{datosExpedientesDatosGeneralesBean.onItemUnselect}" />	
+							<f:selectItems
+								value="#{datosExpedientesDatosGeneralesBean.listaArticuloAfectado}"
+								var="artAfect" 
+								itemLabel="#{artAfect.descripcion}"
+								itemValue="#{artAfect}" 
+								disabled="#{!editable}" />
+							<p:ajax  disabled="#{editable and !(datosExpedientesDatosGeneralesBean.expedientes.id == null) and datosExpedientesDatosGeneralesBean.permisoSaveExp}"
+								listener="#{datosExpedientesDatosGeneralesBean.actualizarSessionExpedientes}" />
+						</p:selectCheckboxMenu>
+					</div>					
+					<div class="celda-form">
+						<p:outputLabel for="selectMultipleDercRecl" value="#{mensaje['derecho.reclamado']}" rendered="#{!(datosExpedientesDatosGeneralesBean.expedientes.getValorTipoExpediente().getCodigo()=='RCO') and !(datosExpedientesDatosGeneralesBean.expedientes.getValorTipoExpediente().getCodigo()=='XPC')}"/>
+						<p:selectCheckboxMenu id="selectMultipleDercRecl"
+							value="#{datosExpedientesDatosGeneralesBean.selectedDerechosReclamados}" 
+							var="valDomDercReclSelected" 
+							itemLabel="#{valDomDercReclSelected.descripcion}"
+							itemValue="#{valDomDercReclSelected}"
+							label="#{mensaje['seleccione.opciones']}" 
+							multiple="true"
+							filter="true"
+							style="width: 35rem"
+							disabled="#{!editable}"
+							rendered="#{!(datosExpedientesDatosGeneralesBean.expedientes.getValorTipoExpediente().getCodigo()=='RCO')  and !(datosExpedientesDatosGeneralesBean.expedientes.getValorTipoExpediente().getCodigo()=='XPC')}" >
+							<p:ajax event="itemUnselect"
+								listener="#{datosExpedientesDatosGeneralesBean.onItemUnselect}" />	
+							<f:selectItems
+								value="#{datosExpedientesDatosGeneralesBean.listaDerechoReclamado}"
+								var="dercRecl" 
+								itemLabel="#{dercRecl.descripcion}"
+								itemValue="#{dercRecl}" 
+								disabled="#{!editable}" />
+							<f:validateBean disabled="true"/>
+							<p:ajax  disabled="#{editable and !(datosExpedientesDatosGeneralesBean.expedientes.id == null) and datosExpedientesDatosGeneralesBean.permisoSaveExp}"
+								listener="#{datosExpedientesDatosGeneralesBean.actualizarSessionExpedientes}" />
+						</p:selectCheckboxMenu>
+					</div>
+				</div>
+				
+				<!-- campos solo visibles para expedientes tipo RCO -->
+				<div>
+					<div class="celda-form">
+						<p:outputLabel rendered="#{datosExpedientesDatosGeneralesBean.expedientes.getValorTipoExpediente().getCodigo()=='RCO'}" for="fechaInfraccion"
+							value="#{mensaje['fecha.infraccion']}" />							
+						<p:datePicker id="fechaInfraccion" widgetVar="fechaInfraccion" value="#{datosExpedientesDatosGeneralesBean.expedientes.fechaInfraccion}"
+							locale="es" monthNavigator="true" pattern="dd/MM/yyyy"
+							disabled="#{!editable}" converterMessage="#{mensaje['formato.fecha.invalido']}" mask="#{editable}"
+							rendered="#{datosExpedientesDatosGeneralesBean.expedientes.getValorTipoExpediente().getCodigo()=='RCO'}"
+							showButtonBar="true">
+							<p:ajax disabled="#{editable and !(datosExpedientesDatosGeneralesBean.expedientes.id == null) and datosExpedientesDatosGeneralesBean.permisoSaveExp}"
+								listener="#{datosExpedientesDatosGeneralesBean.actualizarSessionExpedientes}" />
+							<p:ajax listener="#{datosExpedientesDatosGeneralesBean.valorFechaPrescripcion}" update="formFormularioExpedientes:tabViewPestanasExpediente:fechaPrescripcion"/>
+						</p:datePicker>
+						<p:message for="fechaInfraccion"/>						
+						<p:remoteCommand name="cambioFechaInfraccion" update="formFormularioExpedientes:tabViewPestanasExpediente:fechaPrescripcion" action="#{datosExpedientesDatosGeneralesBean.valorFechaPrescripcion()}" process="@this,formFormularioExpedientes:tabViewPestanasExpediente:fechaInfraccion,formFormularioExpedientes:tabViewPestanasExpediente:fechaPrescripcion"/>
+						<script>	
+							$(function(){
+								var wFechaInfr = PF('fechaInfraccion');
+								if(wFechaInfr)
+									wFechaInfr.jq.find("[type='text']").on('cleared', cambioFechaInfraccion());
+								});
+						</script>
+					</div>					
+					<div class="celda-form">
+						<p:outputLabel for="checkInfraccionContinuada" value="#{mensaje['infraccion.continuada']}" rendered="#{datosExpedientesDatosGeneralesBean.expedientes.getValorTipoExpediente().getCodigo()=='RCO'}"/>
+						<p:selectBooleanCheckbox id="checkInfraccionContinuada" value="#{datosExpedientesDatosGeneralesBean.expedientes.infraccionContinuada}" 
+							itemLabel="#{mensaje['si']}" disabled="#{!editable}"
+							rendered="#{datosExpedientesDatosGeneralesBean.expedientes.getValorTipoExpediente().getCodigo()=='RCO'}">
+							<p:ajax  disabled="#{editable and !(datosExpedientesDatosGeneralesBean.expedientes.id == null) and datosExpedientesDatosGeneralesBean.permisoSaveExp}"
+								listener="#{datosExpedientesDatosGeneralesBean.actualizarSessionExpedientes}" />
+						</p:selectBooleanCheckbox>
+					</div>
+					<div class="celda-form">
+						<p:outputLabel for="gravedadExpediente" value="#{mensaje['gravedad']}" rendered="#{datosExpedientesDatosGeneralesBean.expedientes.getValorTipoExpediente().getCodigo()=='RCO'}"/>
+						<p:selectOneMenu id="gravedadExpediente" value="#{datosExpedientesDatosGeneralesBean.selectedGravedadId}" 
+							disabled="#{!editable}"
+							rendered="#{datosExpedientesDatosGeneralesBean.expedientes.getValorTipoExpediente().getCodigo()=='RCO'}">
+								<f:selectItem itemLabel="#{mensaje['seleccione.una.opcion']}" itemValue="" />
+								<f:selectItems value="#{datosExpedientesDatosGeneralesBean.listaValoresDominioGravedad}" var="gravedadList" 
+									itemLabel="#{gravedadList.descripcion}" itemValue="#{gravedadList.id}" widgetVar="gravedadExpediente"/>
+								<p:ajax disabled="#{editable and !(datosExpedientesDatosGeneralesBean.expedientes.id == null) and datosExpedientesDatosGeneralesBean.permisoSaveExp}"
+									listener="#{datosExpedientesDatosGeneralesBean.actualizarSessionExpedientes}" />
+								<p:ajax listener="#{datosExpedientesDatosGeneralesBean.valorFechaPrescripcion}" update="formFormularioExpedientes:tabViewPestanasExpediente:fechaPrescripcion"/>
+						</p:selectOneMenu>
+					</div>
+					<div class="celda-form">
+						<p:outputLabel rendered="#{datosExpedientesDatosGeneralesBean.expedientes.getValorTipoExpediente().getCodigo()=='RCO'}" for="fechaPrescripcion"
+							value="#{mensaje['fecha.prescripcion']}" />							
+						<p:datePicker id="fechaPrescripcion" value="#{datosExpedientesDatosGeneralesBean.expedientes.fechaPrescripcion}"
+							locale="es" monthNavigator="true" pattern="dd/MM/yyyy"
+							disabled="#{true}" converterMessage="#{mensaje['formato.fecha.invalido']}"
+							rendered="#{datosExpedientesDatosGeneralesBean.expedientes.getValorTipoExpediente().getCodigo()=='RCO'}">
+							<p:ajax disabled="#{editable and !(datosExpedientesDatosGeneralesBean.expedientes.id == null) and datosExpedientesDatosGeneralesBean.permisoSaveExp}"
+								listener="#{datosExpedientesDatosGeneralesBean.actualizarSessionExpedientes}" />
+						</p:datePicker>
+						<p:message for="fechaPrescripcion"/>
+					</div>		
+				</div>
+				
+				<!-- campos solo visibles para expedientes tipo RCE o XPC-->
+				<div>
+					<div class="celda-form">
+						<p:outputLabel rendered="#{(datosExpedientesDatosGeneralesBean.expedientes.getValorTipoExpediente().getCodigo()=='RCE') or (datosExpedientesDatosGeneralesBean.expedientes.getValorTipoExpediente().getCodigo()=='XPC')}" 
+							for="fechaSolicitud" value="#{mensaje['fecha.solicitud.ej']}" />							
+						<p:datePicker id="fechaSolicitud" value="#{datosExpedientesDatosGeneralesBean.expedientes.fechaSolicitudEjercicio}"
+							locale="es" monthNavigator="true" pattern="dd/MM/yyyy"
+							disabled="#{!editable}" converterMessage="#{mensaje['formato.fecha.invalido']}" mask="#{editable}"
+							rendered="#{(datosExpedientesDatosGeneralesBean.expedientes.getValorTipoExpediente().getCodigo()=='RCE') or (datosExpedientesDatosGeneralesBean.expedientes.getValorTipoExpediente().getCodigo()=='XPC')}">
+							<p:ajax disabled="#{editable and !(datosExpedientesDatosGeneralesBean.expedientes.id == null) and datosExpedientesDatosGeneralesBean.permisoSaveExp}"
+								listener="#{datosExpedientesDatosGeneralesBean.actualizarSessionExpedientes}" />
+						</p:datePicker>
+						<p:message for="fechaSolicitud"/>
+					</div>					
+					<div class="celda-form">
+						<p:outputLabel for="checkIndicadorNoRespuesta" value="#{mensaje['indicador.no.respuesta']}" rendered="#{(datosExpedientesDatosGeneralesBean.expedientes.getValorTipoExpediente().getCodigo()=='RCE') or (datosExpedientesDatosGeneralesBean.expedientes.getValorTipoExpediente().getCodigo()=='XPC')}"/>
+						<p:selectBooleanCheckbox id="checkIndicadorNoRespuesta" value="#{datosExpedientesDatosGeneralesBean.expedientes.respuestaSolicitudEjercicio}" 
+							itemLabel="#{mensaje['si']}" disabled="#{!editable}"
+							rendered="#{(datosExpedientesDatosGeneralesBean.expedientes.getValorTipoExpediente().getCodigo()=='RCE') or (datosExpedientesDatosGeneralesBean.expedientes.getValorTipoExpediente().getCodigo()=='XPC')}">
+							<p:ajax  disabled="#{editable and !(datosExpedientesDatosGeneralesBean.expedientes.id == null) and datosExpedientesDatosGeneralesBean.permisoSaveExp}"
+								listener="#{datosExpedientesDatosGeneralesBean.actualizarSessionExpedientes}" />
+						</p:selectBooleanCheckbox>
+					</div>
+					<div class="celda-form">
+						<p:outputLabel for="checkIndicadorRespuestaInsact" value="#{mensaje['indicador.respuesta.insatisfactoria']}" rendered="#{(datosExpedientesDatosGeneralesBean.expedientes.getValorTipoExpediente().getCodigo()=='RCE') or (datosExpedientesDatosGeneralesBean.expedientes.getValorTipoExpediente().getCodigo()=='XPC')}"/>
+						<p:selectBooleanCheckbox id="checkIndicadorRespuestaInsact" value="#{datosExpedientesDatosGeneralesBean.expedientes.respuestaInsatisfactoria}" 
+							itemLabel="#{mensaje['si']}" disabled="#{!editable}"
+							rendered="#{(datosExpedientesDatosGeneralesBean.expedientes.getValorTipoExpediente().getCodigo()=='RCE') or (datosExpedientesDatosGeneralesBean.expedientes.getValorTipoExpediente().getCodigo()=='XPC')}">
+							<p:ajax  disabled="#{editable and !(datosExpedientesDatosGeneralesBean.expedientes.id == null) and datosExpedientesDatosGeneralesBean.permisoSaveExp}"
+								listener="#{datosExpedientesDatosGeneralesBean.actualizarSessionExpedientes}" />
+						</p:selectBooleanCheckbox>
+					</div>
+					<div class="celda-form">
+						<p:outputLabel rendered="#{(datosExpedientesDatosGeneralesBean.expedientes.getValorTipoExpediente().getCodigo()=='RCE') or (datosExpedientesDatosGeneralesBean.expedientes.getValorTipoExpediente().getCodigo()=='XPC')}" 
+							for="fechaRespuesta" value="#{mensaje['fecha.respuesta.ej']}" />							
+						<p:datePicker id="fechaRespuesta" value="#{datosExpedientesDatosGeneralesBean.expedientes.fechaRespuestaSolicitudEjercicio}"
+							locale="es" monthNavigator="true" pattern="dd/MM/yyyy"
+							disabled="#{!editable}" converterMessage="#{mensaje['formato.fecha.invalido']}" mask="#{editable}"
+							rendered="#{(datosExpedientesDatosGeneralesBean.expedientes.getValorTipoExpediente().getCodigo()=='RCE') or (datosExpedientesDatosGeneralesBean.expedientes.getValorTipoExpediente().getCodigo()=='XPC')}">
+							<p:ajax disabled="#{editable and !(datosExpedientesDatosGeneralesBean.expedientes.id == null) and datosExpedientesDatosGeneralesBean.permisoSaveExp}"
+								listener="#{datosExpedientesDatosGeneralesBean.actualizarSessionExpedientes}" />
+						</p:datePicker>
+						<p:message for="fechaRespuesta"/>
+					</div>	
+				</div>
+				
+				<div>
+					<div class="celda-form">
+						<p:outputLabel for="etiqueta1" styleClass="p-d-block"
+							value="#{mensaje['etiquetas']}" />
+						<p:inputText id="etiqueta1"
+							value="#{datosExpedientesDatosGeneralesBean.expedientes.etiqueta1}"
+							disabled="#{!editable}" maxlength="100" size="10">
+							<p:ajax  disabled="#{editable and !(datosExpedientesDatosGeneralesBean.expedientes.id == null) and datosExpedientesDatosGeneralesBean.permisoSaveExp}"
+								listener="#{datosExpedientesDatosGeneralesBean.actualizarSessionExpedientes}"/>
+						</p:inputText>
+					</div>					
+					<div class="celda-form">
+						<p:inputText id="etiqueta2"
+							value="#{datosExpedientesDatosGeneralesBean.expedientes.etiqueta2}"
+							disabled="#{!editable}" maxlength="100" size="10">
+							<p:ajax  disabled="#{editable and !(datosExpedientesDatosGeneralesBean.expedientes.id == null) and datosExpedientesDatosGeneralesBean.permisoSaveExp}"
+								listener="#{datosExpedientesDatosGeneralesBean.actualizarSessionExpedientes}" />
+						</p:inputText>
+					</div>					
+					<div class="celda-form">	
+						<p:inputText id="etiqueta3"
+							value="#{datosExpedientesDatosGeneralesBean.expedientes.etiqueta3}"
+							disabled="#{!editable}" maxlength="100" size="10">
+							<p:ajax  disabled="#{editable and !(datosExpedientesDatosGeneralesBean.expedientes.id == null) and datosExpedientesDatosGeneralesBean.permisoSaveExp}"
+								listener="#{datosExpedientesDatosGeneralesBean.actualizarSessionExpedientes}" />
+						</p:inputText>
+					</div>
+				</div>
+								
+				<div>
+<!-- 					<div class="celda-form"> -->
+<!-- 						<p:outputLabel for="checkApi" value="#{mensaje['api']}"  -->
+<!-- 						 rendered="#{datosExpedientesDatosGeneralesBean.expedientes.getValorTipoExpediente().getCodigo()=='RCO'}" /> -->
+<!-- 						<p:selectBooleanCheckbox id="checkApi" value="#{datosExpedientesDatosGeneralesBean.api}"  -->
+<!-- 							itemLabel="#{mensaje['si']}" disabled="#{!editable}" -->
+<!-- 							rendered="#{datosExpedientesDatosGeneralesBean.expedientes.getValorTipoExpediente().getCodigo()=='RCO'}" > -->
+<!-- 							<p:ajax  disabled="#{editable and !(datosExpedientesDatosGeneralesBean.expedientes.id == null) and datosExpedientesDatosGeneralesBean.permisoSaveExp}" -->
+<!-- 								listener="#{datosExpedientesDatosGeneralesBean.actualizarSessionExpedientes}" /> -->
+<!-- 						</p:selectBooleanCheckbox> -->
+<!-- 					</div> -->
+					<div>
+						<p:outputPanel class="celda-form" rendered="#{datosExpedientesDatosGeneralesBean.pintarOpSol}" >
+							<p:outputLabel for="checkOposSol" value="#{mensaje['oposicion.solicitante']}" />
+							<p:selectBooleanCheckbox id="checkOposSol" value="#{datosExpedientesDatosGeneralesBean.opsicSolicitante}" 
+								itemLabel="#{mensaje['si']}" disabled="#{!editable}" >
+								<p:ajax  disabled="#{editable and !(datosExpedientesDatosGeneralesBean.expedientes.id == null) and datosExpedientesDatosGeneralesBean.permisoSaveExp}"
+								listener="#{datosExpedientesDatosGeneralesBean.actualizarSessionExpedientes}" />
+							</p:selectBooleanCheckbox>
+						</p:outputPanel>
+						<p:outputPanel class="celda-form" rendered="#{datosExpedientesDatosGeneralesBean.pintarOpRep}">
+							<p:outputLabel for="checkOposRepr" value="#{mensaje['oposicion.representante']}" />
+							<p:selectBooleanCheckbox id="checkOposRepr" value="#{datosExpedientesDatosGeneralesBean.opsicRepresentante}" 
+								itemLabel="#{mensaje['si']}" disabled="#{!editable}" >
+								<p:ajax  disabled="#{editable and !(datosExpedientesDatosGeneralesBean.expedientes.id == null) and datosExpedientesDatosGeneralesBean.permisoSaveExp}"
+								listener="#{datosExpedientesDatosGeneralesBean.actualizarSessionExpedientes}" />
+							</p:selectBooleanCheckbox>
+						</p:outputPanel>
+					</div>
+				</div>
+			</p:outputPanel>
+			<!-- FIN: CAMPOS VISIBLES PARA TIPOS DE EXPEDIENTES: RCE/RCO -->
+
+
+			<!-- CAMPOS VISIBLES PARA TIPOS DE EXPEDIENTES: XPC y cualquier situación -->
+			<p:outputPanel style="margin-top: 10px;" rendered="#{((datosExpedientesDatosGeneralesBean.expedientes.getValorTipoExpediente().getCodigo()=='XPC'))}" >
+						
+				<div class="celda-form">
+						<p:outputLabel for="expIdentificado" styleClass="p-d-block"
+							value="#{mensaje['expediente.identificado']}" />
+						<p:inputText id="expIdentificado"
+							value="#{datosExpedientesDatosGeneralesBean.expedientes.expedienteIdentificado}"
+							disabled="#{!editable}" maxlength="50">
+							<p:ajax  disabled="#{editable and !(datosExpedientesDatosGeneralesBean.expedientes.id == null) and datosExpedientesDatosGeneralesBean.permisoSaveExp}"
+								listener="#{datosExpedientesDatosGeneralesBean.actualizarSessionExpedientes}" />
+						</p:inputText>
+				</div>
+				
+								
+			</p:outputPanel>
+						<!-- CAMPOS VISIBLES PARA TIPOS DE EXPEDIENTES: XPC y situación PC-->
+			<p:outputPanel style="border: none;" rendered="#{((datosExpedientesDatosGeneralesBean.expedientes.getValorTipoExpediente().getCodigo()=='XPC') and (datosExpedientesDatosGeneralesBean.expedientes.getValorSituacionExpediente().getCodigo()=='PC'))}" >
+				
+				<div class="celda-form">
+						<p:commandButton id="botonCrearExpediente"
+							rendered="#{editable and !(datosExpedientesDatosGeneralesBean.expedientes.id == null) and datosExpedientesDatosGeneralesBean.permisoCreaExpEPC and datosExpedientesBean.numerosSaltos!=2}"
+							value="#{mensaje['crear.expediente']}"
+							actionListener="#{datosExpedientesDatosGeneralesBean.abrirDialogoSelecTipoExpediente()}"
+							update="formFormularioExpedientes:tabViewPestanasExpediente:dialogSelecTipoExpediente,formFormularioExpedientes:tabViewPestanasExpediente:comboTiposExpedientes">
+								<p:confirm header="#{mensaje['confirmar.operacion']}" message="#{mensaje['pregunta.cambiar.responsable']}  #{responsablesTramitacionService.obtener(datosExpedientesDatosGeneralesBean.selectedNuevoResponsableId).getDescripcion()} #{mensaje['pregunta.cambiar.responsable2']}" icon="pi pi-info-circle"/>
+							</p:commandButton>
+				</div>
+				
+				
+				<div class="celda-form">
+						<p:commandButton id="botonIncorporarExpediente"
+							rendered="#{editable and !(datosExpedientesDatosGeneralesBean.expedientes.id == null) and datosExpedientesDatosGeneralesBean.permisoDocsAExpEPC and datosExpedientesBean.numerosSaltos!=2}"
+							value="#{mensaje['incorporar.expediente']}"
+							actionListener="#{datosExpedientesDatosGeneralesBean.abrirBuscadorExpedientes()}"
+							update="formFormularioExpedientes:tabViewPestanasExpediente:numeroExpediente_filtroBuscadorExp,formFormularioExpedientes:tabViewPestanasExpediente:nombreExpediente_filtroBuscadorExp,
+							formFormularioExpedientes:tabViewPestanasExpediente:fechaEntrada_filtroBuscadorExp,formFormularioExpedientes:tabViewPestanasExpediente:tablaExpedientesBuscador"/>
+				</div>
+				
+								
+			</p:outputPanel>
+			<!-- FIN: CAMPOS VISIBLES PARA TIPOS DE EXPEDIENTES: XPC -->
+	
+			
+		</p:fieldset>
+		
+	<div class="botonera-form" align="right">
+		<p:commandButton icon="pi pi-save" 
+			rendered="#{editable and !(datosExpedientesDatosGeneralesBean.expedientes.id == null) and datosExpedientesDatosGeneralesBean.permisoSaveExp}"
+			id="saveDatosGenerales" value="#{mensaje['guardar']}"
+			action="#{datosExpedientesDatosGeneralesBean.guardarDatosGenerales()}"
+			oncomplete="#{datosExpedientesDatosGeneralesBean.actualizaSituacion()}"
+			update="formFormularioExpedientes,
+					formFormularioExpedientes:panelActualizadoCabecera,
+					formFormularioExpedientes:panelSituacionCabecera,
+					formFormularioExpedientes:panelSituacionAdicionalCabecera,
+					formFormularioExpedientes:tabViewPestanasExpediente:comboTipoSit,
+					formFormularioExpedientes:tabViewPestanasExpediente:botonSituacionLibre"/>
+					
+		<p:commandButton icon="pi pi-times" rendered="#{editable and !(datosExpedientesDatosGeneralesBean.expedientes.id == null) and datosExpedientesDatosGeneralesBean.permisoSaveExp}"
+			id="cancelarDatosGenerales" value="#{mensaje['cancelar']}" 
+			action="#{datosExpedientesBean.ejecutarVolver()}" >
+			<p:confirm header="#{mensaje['confirmar.operacion']}" message="#{mensaje['pregunta.confirma.cancelar']}" icon="pi pi-info-circle" />
+		</p:commandButton>
+		<p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true" >
+			<div class="botonera-form" align="right">
+				<p:commandButton value="#{mensaje['si']}" type="button" styleClass="ui-confirmdialog-yes" />
+				<p:commandButton value="#{mensaje['no']}" type="button" styleClass="ui-confirmdialog-no ui-button-flat" />
+			</div>								
+		</p:confirmDialog>						
+	</div>
+		
+	<!-- DIALOGO SELECCIONAR TIPO DE EXPEDIENTE PARA TIPO EXPEDIENTE XPC -->
+	<p:dialog id="dialogSelecTipoExpediente"  header="#{mensaje['seleccionar.tipo.expediente']}" widgetVar="dialogSelecTipoExpediente">
+		
+		<p:messages for="messagesDialogSelecTipoExpediente" id="messagesDialogSelecTipoExpediente" showDetail="true" closable="true">
+			<p:autoUpdate/> 
+        </p:messages>
+        
+        <div>        	
+        	<div class="celda-form">
+				
+				<p:outputLabel for="comboTiposExpedientes" value="#{mensaje['tipo.expediente']} *" />
+				<p:selectOneMenu id="comboTiposExpedientes" value="#{datosExpedientesDatosGeneralesBean.selectedValorDomTipoExpedienteId}" filter="true">
+						<f:selectItem itemLabel="#{mensaje['seleccione.tipo.expediente']}" itemValue="" />
+						<f:selectItems value="#{datosExpedientesDatosGeneralesBean.listaValoresDomTiposExpedientesPosibles}" var="tipoExpediente" 
+							itemLabel="#{tipoExpediente.descripcion}" itemValue="#{tipoExpediente.codigo}" 
+							widgetVar="comboTiposExpedientes"/>
+				</p:selectOneMenu>
+			</div>	
+			
+			<div class="botonera-form" align="right">
+				<p:commandButton icon="pi pi-save" id="cambiarTipoExpediente" value="#{mensaje['guardar']}" action="#{datosExpedientesDatosGeneralesBean.cambiarTipoExpediente()}" />
+			</div>		
+        </div>				 
+	</p:dialog>
+	
+	<!-- DIALOGO BUSCARDOR EXPEDIENTES PARA DOCUMENTOS -->
+	<p:dialog id="dialogBuscadorExpedientes" header="#{mensaje['buscador.expedientes']}" widgetVar="dialogBuscadorExpedientes" 
+		closable="true" resizable="false" draggable="true" modal="true" responsive="true" contentWidth="100%" contentHeight="100%" width="1200" height="500">
+		
+		<p:messages for="messagesDialogBuscadorExpedientes" id="messagesDialogBuscadorExpedientes" showDetail="true" closable="true">
+			<p:autoUpdate/> 
+        </p:messages>
+       
+			<p:fieldset legend="#{mensaje['filtros.busqueda']}" id="bloqueDialogBuscadorExpedientes" toggleable="true" toggleSpeed="250">
+				<div>
+					<div class="celda-form">
+						<p:outputLabel for="numeroExpediente_filtroBuscadorExp" value="#{mensaje['numero.expediente']}" />
+						<p:inputText id="numeroExpediente_filtroBuscadorExp" maxlength="255" value="#{datosExpedientesDatosGeneralesBean.numeroExpedienteFiltro}" />
+					</div>					
+					<div class="celda-form">
+						<p:outputLabel for="nombreExpediente_filtroBuscadorExp" value="#{mensaje['nombre.expediente']}" />
+						<p:inputText id="nombreExpediente_filtroBuscadorExp" maxlength="255" value="#{datosExpedientesDatosGeneralesBean.nombreExpedienteFiltro}" />
+					</div>
+					<div class="celda-form">
+						<p:outputLabel for="fechaEntrada_filtroBuscadorExp" value="#{mensaje['fecha.entrada']}" />
+						<p:datePicker id="fechaEntrada_filtroBuscadorExp" value="#{datosExpedientesDatosGeneralesBean.fechaEntradaFiltro}" 
+							locale="es" monthNavigator="true" pattern="dd/MM/yyyy" converterMessage="#{mensaje['formato.fecha.invalido']}" mask="#{editable}"/>
+						<p:message for="fechaEntrada_filtroBuscadorExp"/>
+					</div>
+				</div>
+
+				<div class="botonera-form">
+					<p:commandButton id="filtrarBuscadorExpedientes" icon="pi pi-filter" value="#{mensaje['filtrar']}"
+						onstart="PF('expWV').paginator.setPage(0);"
+						update="formFormularioExpedientes:tabViewPestanasExpediente:numeroExpediente_filtroBuscadorExp,formFormularioExpedientes:tabViewPestanasExpediente:nombreExpediente_filtroBuscadorExp,
+							formFormularioExpedientes:tabViewPestanasExpediente:fechaEntrada_filtroBuscadorExp,formFormularioExpedientes:tabViewPestanasExpediente:tablaExpedientesBuscador" /> 
+					<p:commandButton id="limpiarFiltroBuscadorExpedientes" value="#{mensaje['limpiar.filtro']}" icon="pi pi-filter-slash"
+						actionListener="#{datosExpedientesDatosGeneralesBean.limpiarFiltroBuscadorExpedientes()}"
+						onstart="PF('expWV').paginator.setPage(0);"
+						update="formFormularioExpedientes:tabViewPestanasExpediente:numeroExpediente_filtroBuscadorExp,formFormularioExpedientes:tabViewPestanasExpediente:nombreExpediente_filtroBuscadorExp,
+							formFormularioExpedientes:tabViewPestanasExpediente:fechaEntrada_filtroBuscadorExp,formFormularioExpedientes:tabViewPestanasExpediente:tablaExpedientesBuscador" />
+				</div>
+			</p:fieldset>
+
+			<p:outputPanel id="panelResultadosBusquedaexpedientes">
+				<p:dataTable var="exp" id="tablaExpedientesBuscador"
+					value="#{datosExpedientesDatosGeneralesBean.lazyModelExpedientesBuscador}" 
+					paginator="true"
+					paginatorTemplate=" {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+					rowsPerPageTemplate="10,20,50,100" rows="10"
+					currentPageReportTemplate="#{mensaje['paginador.template']}"
+					selectionMode="single" sortBy="#{datosExpedientesDatosGeneralesBean.sortDefaultLazyExpedientes}"
+					sortOrder="ascending"
+					selection="#{datosExpedientesDatosGeneralesBean.selectedLazyExpedientes}"
+					rowKey="#{exp.id}" 
+					paginatorPosition="bottom"
+					widgetVar="expWV">
+
+					<p:column headerText="#{mensaje['numero.expediente']}" sortBy="#{exp.numExpediente}">
+						<h:outputText value="#{exp.numExpediente}" />
+					</p:column>					
+					<p:column headerText="#{mensaje['nombre.expediente']}" sortBy="#{exp.nombreExpediente}">
+						<h:outputText value="#{exp.nombreExpediente}" />
+					</p:column>
+					<p:column headerText="#{mensaje['fecha.entrada']}" sortBy="#{exp.fechaEntrada}">
+						<h:outputText value="#{exp.fechaEntrada}" >
+							<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+						</h:outputText>
+					</p:column>				
+					
+					<p:column headerText="#{mensaje['acciones']}" width="70px">
+						<p:commandButton id="seleccionarExpediente" widgetVar="seleccionarExpedientes" icon="pi pi-plus-circle"
+							action="#{datosExpedientesDatosGeneralesBean.seleccionarExpVincularDocumentos(exp)}" >
+							<p:confirm header="#{mensaje['confirmar.operacion']}" message="#{mensaje['pregunta.seleccionar.expediente']}" icon="pi pi-info-circle"/>
+						</p:commandButton>	
+						<p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true">
+				            <div class="botonera-form" align="right">
+				            	<p:commandButton value="#{mensaje['si']}" type="button" styleClass="ui-confirmdialog-yes" />
+				           	 	<p:commandButton value="#{mensaje['no']}" type="button" styleClass="ui-confirmdialog-no ui-button-flat"/>
+				            </div>				           
+						</p:confirmDialog>						
+					</p:column>
+				</p:dataTable>
+			</p:outputPanel>
+	</p:dialog>
+
+</ui:composition>
+</html>

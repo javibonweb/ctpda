@@ -1,0 +1,324 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:sec="https://joinfaces.org/security"
+	xmlns:c="http://java.sun.com/jstl/core"
+	xmlns:fu="http://joinfaces.org/functions">
+	
+<ui:composition
+	template="#{navegacionBean.get('TEMPLATE_LAYOUT_GENERICO')}">
+	<ui:define name="content">
+
+
+
+		<script type="text/javascript">
+			function clickBotonFila(tablaId, id, elemId) {
+				$("div[id='" + tablaId + "'] " //tabla (id jsf completo)
+						+ "tr[data-rk='" + id + "'] " //fila (id = rowkey del datatable)
+						+ "[id$=':" + elemId + "']") //botón (solo la terminación del id jsf)
+				.click();
+			}
+
+			 PrimeFaces.locales['es'] = {
+				        closeText: 'Cerrar',
+				        prevText: 'Anterior',
+				        nextText: 'Siguiente',
+				        monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+				        monthNamesShort: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+				        dayNames: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+				        dayNamesShort: ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab'],
+				        dayNamesMin: ['D', 'L', 'M', 'X', 'J', 'V', 'S'],
+				        weekHeader: 'Semana',
+				        firstDay: 1,
+				        isRTL: false,
+				        showMonthAfterYear: false,
+				        yearSuffix: '',
+				        timeOnlyTitle: 'Sólo hora',
+				        timeText: 'Tiempo',
+				        hourText: 'Hora',
+				        minuteText: 'Minuto',
+				        secondText: 'Segundo',
+				        millisecondText: 'Milisegundo',
+				        currentText: 'Fecha actual',
+				        ampm: false,
+				        month: 'Mes',
+				        week: 'Semana',
+				        day: 'Día',
+				        allDayText: 'Todo el día',
+				        today: 'Hoy',
+				        clear: 'Claro'
+							 };
+		</script>
+
+		<c:set var="editable" value="#{expedientesBean.formEditable}" />
+		<c:set var="nombreListado" value="listadoEntradas" />
+
+		<h:form id="formListadoEntradas">
+
+			<p:messages for="messagesListado" id="messagesListado"
+				showDetail="true" closable="true">
+				<p:autoUpdate />
+			</p:messages>
+			
+			<p:defaultCommand target="filtrar" />
+			
+
+			<!-- PANEL FILTRO DE BUSQUEDA DE EXPEDIENTES XPC -->
+
+			<p:panel header="#{mensaje['gestion.entradas']}">
+				
+				<p:staticMessage severity="info" detail="#{expedientesBean.mensajeExpedienteCreado}" rendered="#{expedientesBean.mostrarMensajeUltimoExpedienteCreado}" />
+				<br />
+				
+				<p:fieldset legend="#{mensaje['filtros.busqueda']}"
+					id="bloqueFiltroBusqueda" toggleable="true" toggleSpeed="250">
+
+					<div>
+						<div class="celda-form">
+							<p:outputLabel for="numeroExpediente_filtro"
+								value="#{mensaje['numero.entrada']}" />
+							<p:inputText id="numeroExpediente_filtro" maxlength="255"
+								value="#{expedientesBean.numeroExpedienteFiltro}" />
+						</div>
+
+						<div class="celda-form">
+							<p:outputLabel value="#{mensaje['situacion']}"
+								for="situacion_filtro" />
+							<p:selectOneMenu id="situacion_filtro"
+								value="#{expedientesBean.selectedSituacionIdFiltro}"
+								style="min-width: 150px;">
+								<f:selectItem itemLabel="#{mensaje['todos']}" itemValue="" />
+								<f:selectItems
+									value="#{expedientesBean.listaValoresDominioSituacionXPC}"
+									var="sitList" itemLabel="#{sitList.descripcion}"
+									widgetVar="comboFiltroSitacion" itemValue="#{sitList.id}" />
+							</p:selectOneMenu>
+						</div>
+						<div class="celda-form">
+							<p:outputLabel for="finalizados_filtro" value="#{mensaje['solo.no.finalizadas']}"/>
+							<p:selectBooleanCheckbox id="finalizados_filtro" value="#{expedientesBean.noFinalizadosFiltro}" itemLabel="#{mensaje['si']}"/>
+						</div>
+						
+						<div class="celda-form">
+							<p:outputLabel for="fechaEntradaInicial_filtro"
+								value="#{mensaje['rango.fecha.entrada.inicial']}" />
+							<p:datePicker id="fechaEntradaInicial_filtro" value="#{expedientesBean.fechaEntradaInicialFiltro}" 
+								locale="es" monthNavigator="true" pattern="dd/MM/yyyy"
+								converterMessage="#{mensaje['formato.fecha.invalido']}" mask="true"/>
+							<p:message for="fechaEntradaInicial_filtro"/>
+						</div>
+						<div class="celda-form">
+							<p:outputLabel for="fechaEntradaFinal_filtro"
+								value="#{mensaje['rango.fecha.entrada.final']}" />
+							<p:datePicker id="fechaEntradaFinal_filtro" value="#{expedientesBean.fechaEntradaFinalFiltro}" 
+								locale="es" monthNavigator="true" pattern="dd/MM/yyyy"
+								converterMessage="#{mensaje['formato.fecha.invalido']}" mask="true"/>
+							<p:message for="fechaEntradaFinal_filtro"/>
+						</div>
+						<div class="celda-form">
+							<p:outputLabel for="persona_filtro" value="#{mensaje['persona']}" />
+							<p:inputText id="persona_filtro" maxlength="255"
+								value="#{expedientesBean.personaFiltro}" />
+						</div>
+						<div class="celda-form">
+							<p:outputLabel for="ident_persona_filtro" value="#{mensaje['ident.persona']}" />
+							<p:inputText id="ident_persona_filtro" maxlength="15"
+								value="#{expedientesBean.identPersonaFiltro}" />
+						</div>
+						<div class="celda-form">
+							<p:outputLabel for="sujetosObligados_filtro"
+								value="#{mensaje['sujeto.obligado']}" />
+							<p:inputText id="sujetosObligados_filtro" maxlength="255"
+								value="#{expedientesBean.sujetoObligadoFiltro}" />
+						</div>									
+						
+					</div>
+
+					<div class="botonera-form">
+
+						<p:commandButton id="nuevoExpediente" icon="pi pi-plus"
+							rendered="#{expedientesBean.permisoNewExp == true}"
+							action="#{expedientesBean.onCrear('XPC')}" 
+							value="#{mensaje['nueva.entr']}">
+						</p:commandButton>							
+
+						<p:commandButton id="filtrar" icon="pi pi-filter"
+							value="#{mensaje['filtrar']}"
+							update="formListadoEntradas:numeroExpediente_filtro,
+									formListadoEntradas:situacion_filtro,
+									formListadoEntradas:fechaEntradaInicial_filtro,
+									formListadoEntradas:fechaEntradaFinal_filtro,
+									formListadoEntradas:persona_filtro,
+									formListadoEntradas:ident_persona_filtro,
+									formListadoEntradas:sujetosObligados_filtro,
+									formListadoEntradas:listadoExpedientes,
+									formListadoEntradas:finalizados_filtro"
+							onstart="PF('expedientesMaestraWV').paginator.setPage(0);" />
+						<p:commandButton id="limpiarFiltro"
+							value="#{mensaje['limpiar.filtro']}" icon="pi pi-filter-slash"
+							actionListener="#{expedientesBean.limpiarFiltro()}"
+							update="formListadoEntradas:numeroExpediente_filtro,
+									formListadoEntradas:situacion_filtro,
+									formListadoEntradas:fechaEntradaInicial_filtro,
+									formListadoEntradas:fechaEntradaFinal_filtro,
+									formListadoEntradas:persona_filtro,
+									formListadoEntradas:ident_persona_filtro,
+									formListadoEntradas:sujetosObligados_filtro,
+									formListadoEntradas:listadoExpedientes,
+									formListadoEntradas:finalizados_filtro,
+									formListadoEntradas:ident_persona_filtro"
+							onstart="PF('expedientesMaestraWV').paginator.setPage(0);" />
+					</div>
+				</p:fieldset>
+				
+				<div class="botonera-form" align="right">
+				 	<p:commandButton id="botonExportarCSV" value="#{mensaje['csv']}" icon="pi pi-file-excel" title="Exportar a CSV">
+	                    <p:dataExporter type="xlsxstream" target="listadoExpedientes" fileName="#{utilsComun.getNombreCsvExportar('ENTRADAS')}"/>
+	                </p:commandButton>
+				</div>
+
+				<!-- PANEL CON LOS RESULTADOS DE BUSQUEDA -->
+				<p:outputPanel id="panelResultadosBusqueda">
+					<p:dataTable var="expedientesMaestra" id="listadoExpedientes"
+						value="#{expedientesBean.lazyModel}" paginator="true"
+						paginatorTemplate=" {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+						rowsPerPageTemplate="10,20,50,100" rows="10"
+						currentPageReportTemplate="#{mensaje['paginador.template']}"
+						selectionMode="single"
+						sortBy="#{expedientesBean.defaultOrden}"
+						sortOrder="ascending"
+						selection="#{expedientesBean.selectedExpedientes}"
+						rowKey="#{expedientesMaestra.id}" paginatorPosition="bottom"
+						widgetVar="expedientesMaestraWV">
+
+						<p:ajax event="rowDblselect"
+							listener="#{expedientesBean.onTipAgrupRowDblClkSelect}"
+							global="false"
+							oncomplete="clickBotonFila(this.source, args.id, 'consultarExpedientes');">
+						</p:ajax>
+
+						<p:column headerText="#{mensaje['numero.entrada']}" width="120px"
+							sortBy="#{expedientesMaestra.numExpediente}">
+							<h:outputText value="#{expedientesMaestra.numExpediente}" /> 
+						</p:column>
+						
+						<p:column headerText="#{mensaje['nombre.expediente']}"
+							sortBy="#{expedientesMaestra.nombreExpediente}" rendered="false">
+							<h:outputText value="#{expedientesMaestra.nombreExpediente}" />
+						</p:column>
+						<p:column headerText="#{mensaje['situacion']}"
+							sortBy="#{expedientesMaestra.situacion}">
+							<h:outputText value="#{expedientesMaestra.situacion}" />
+						</p:column>
+						<p:column headerText="#{mensaje['fecha.entrada']}" width="150px"
+							sortBy="#{expedientesMaestra.fechaEntrada}">
+							<h:outputText value="#{expedientesMaestra.getFechaEntrada()}" />
+						</p:column>
+						<p:column headerText="#{mensaje['persona']}"
+							sortBy="#{expedientesMaestra.persona}">
+							<h:outputText value="#{expedientesMaestra.persona}" />
+						</p:column>
+						<p:column headerText="#{mensaje['sujeto.obligado']}"
+							sortBy="#{expedientesMaestra.sujetoObligado}">
+							<h:outputText value="#{expedientesMaestra.sujetoObligado}" />
+						</p:column>
+						<p:column visible="false" exportable="false">
+               				<h:outputText value="#{expedientesMaestra.idMateria}"/>
+						</p:column>							
+						<p:column visible="false" exportable="false">
+               				<h:outputText value="#{expedientesMaestra.idMateriaSup}"/>
+						</p:column>	
+						
+						<p:column headerText="#{mensaje['acciones']}" width="70px" exportable="false">
+
+							<p:commandButton id="consultarExpedientes" icon="pi pi-eye"
+								rendered="#{expedientesBean.permisoConsExp == true}"
+								action="#{expedientesBean.onConsultar(expedientesMaestra.id)}">
+							</p:commandButton>
+
+							<p:commandButton id="editarExpedientes"
+								rendered="#{expedientesBean.permisoEditExp == true and (expedientesMaestra.finalizados eq false)}"
+								widgetVar="editarExpedientes" icon="pi pi-pencil"
+								action="#{expedientesBean.onEditar(expedientesMaestra.id)}">
+							</p:commandButton>
+						</p:column>
+					</p:dataTable>
+				</p:outputPanel>
+			</p:panel>
+			<br />
+			<p:commandButton id="volver" value="#{mensaje['volver']}"
+				actionListener="#{volverBean.migaPanVolver()}"
+				oncomplete="document.location.href='#{request.contextPath}/aplicacion/bienvenido.xhtml'">
+			</p:commandButton>
+
+
+		</h:form>
+
+		<!-- DIALOGO EXPEDIENTES -->
+<!-- 		<p:dialog id="dialogExpedientes" -->
+<!-- 			header="#{expedientesBean.cabeceraDialogo}" -->
+<!-- 			widgetVar="dialogExpedientes"> -->
+<!-- 			<h:form id="formDialogExpedientes"> -->
+
+<!-- 				<p:messages for="messagesFormulario" id="messagesFormulario" -->
+<!-- 					showDetail="true" closable="true"> -->
+<!-- 					<p:autoUpdate /> -->
+<!-- 				</p:messages> -->
+<!-- 				<div> -->
+<!-- 					<div class="celda-form"> -->
+<!-- 						<p:outputLabel for="comboTipoExpediente" -->
+<!-- 							value="#{mensaje['crear.tipo.expediente']} " /> -->
+<!-- 						<p:spacer height="5px" /> -->
+<!-- 						<p:outputLabel for="comboTipoExpediente" -->
+<!-- 							value="#{mensaje['tipo.expediente']} *" /> -->
+<!-- 						<p:selectOneMenu id="comboTipoExpediente" -->
+<!-- 							value="#{expedientesBean.selectedNuevoTipoExpedienteId}" -->
+<!-- 							style="min-width: auto; width: 1000px;"> -->
+<!-- 							<f:selectItem itemLabel="Seleccione un Tipo de Expediente" -->
+<!-- 								itemValue="#{expedientesBean.expedientes.valorTipoExpediente.id}" /> -->
+<!-- 							<f:selectItems -->
+<!-- 								value="#{expedientesBean.listaValoresDominioTipoExp}" -->
+<!-- 								var="tipExpList" itemLabel="#{tipExpList.descripcion}" -->
+<!-- 								widgetVar="comboTipoExpediente" itemValue="#{tipExpList.id}" /> -->
+<!-- 						</p:selectOneMenu> -->
+<!-- 					</div> -->
+<!-- 				</div> -->
+
+<!-- 				<div> -->
+<!-- 					<div class="botonera-form"> -->
+<!-- 						<p:commandButton id="validarTipExp" icon="pi pi-save" -->
+<!-- 							rendered="#{expedientesBean.permisoSaveExp == true}" -->
+<!-- 							action="#{expedientesBean.onCrear()}"  -->
+<!-- 							value="#{mensaje['guardar']}"> -->
+<!-- 							<f:param name="id" value="#{expedientesBean.selectedNuevoTipoExpedienteId}" />	 -->
+<!-- 						</p:commandButton> -->
+<!-- 						<p:commandButton id="cancelarValidrTipExp" -->
+<!-- 							value="#{mensaje['cancelar']}" icon="pi pi-times" -->
+<!-- 							actionListener="#{volverBean.cancelar()}" -->
+<!-- 							oncomplete="document.location.href='#{request.contextPath}/aplicacion/expedientes/expedientes/listadoExpedientes.jsf'" > -->
+<!-- 							<p:confirm header="#{mensaje['confirmar.operacion']}" -->
+<!-- 								message="#{mensaje['pregunta.confirma.cancelar']}" -->
+<!-- 								icon="pi pi-info-circle" /> -->
+<!-- 						</p:commandButton> -->
+<!-- 						<p:confirmDialog global="true" showEffect="fade" -->
+<!-- 							hideEffect="fade" responsive="true" > -->
+<!-- 							<p:commandButton value="#{mensaje['si']}" type="button" -->
+<!-- 								styleClass="ui-confirmdialog-yes" /> -->
+<!-- 							<p:commandButton value="#{mensaje['no']}" type="button" -->
+<!-- 								styleClass="ui-confirmdialog-no ui-button-flat" /> -->
+<!-- 						</p:confirmDialog>	 -->
+<!-- 					</div> -->
+<!-- 				</div> -->
+
+<!-- 			</h:form> -->
+<!-- 		</p:dialog> -->
+	</ui:define>
+
+</ui:composition>
+
+</html>

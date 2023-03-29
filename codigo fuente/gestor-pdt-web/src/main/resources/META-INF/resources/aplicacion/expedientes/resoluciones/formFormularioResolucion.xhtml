@@ -1,0 +1,477 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:c="http://java.sun.com/jstl/core"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:sec="https://joinfaces.org/security">
+<ui:composition
+	template="#{navegacionBean.get('TEMPLATE_LAYOUT_GENERICO')}">
+	<ui:define name="content">
+
+		<c:set var="bean" value="#{datosResolucionBean}" />
+		<c:set var="editable" value="#{bean.formEditable}" />
+		
+		<h:form id="formFormularioResoluciones">
+
+			<p:messages for="messagesFormulario" id="messagesFormulario"
+				showDetail="true" closable="true">
+				<p:autoUpdate />
+			</p:messages>
+
+			<p:panel id="panelExpedientes">
+				<f:facet name="header">
+					<h:outputText value="#{mensaje['formulario.resolucion']}"/>
+				</f:facet>
+				
+				<p:outputPanel deferred="true" rendered="#{!(bean.resolucion.id == null)}">
+					<p class="ui-widget-content ui-tabs ui-g-12 ui-md-12">
+						<h:outputText style="padding-left: 10px;"
+						value="#{mensaje['numero.resolucion']}: " />
+						<h:outputText
+							value="#{bean.resolucion.codigoResolucion}" style="font-weight:bold" />
+					</p>
+				</p:outputPanel>
+				
+				<p:fieldset legend="#{mensaje['datos.resolucion']}" id="bloqueDatosResol" toggleable="true" toggleSpeed="250">       		
+				<div>
+				
+					<div class="celda-form">
+						<p:outputLabel
+							for="numResolucion" value="#{mensaje['numero.resolucion']}" />
+						<p:inputText id="numResolucion" disabled="true" size="15"
+							value="#{bean.resolucion.codigoResolucion}" />
+					</div>
+
+					<div class="celda-form">
+						<p:outputLabel for="fechaResolucion" value="#{mensaje['fecha.resolucion']}" />
+						<p:inputText id="fechaResolucion" value="#{bean.resolucion.fechaResolucion}" disabled="true" size="10">
+							<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+						</p:inputText>						
+					</div>
+
+					<div class="celda-form">
+						<p:outputLabel for="comboTipoRes" value="#{mensaje['tipologia']} *" />
+						<p:selectOneMenu id="comboTipoRes"
+							value="#{bean.selectedNuevoTipoResolId}"
+							filter="true" disabled="true" >
+							<f:selectItem
+								itemLabel="#{mensaje['seleccione.una.opcion']}"
+								itemValue="#{null}" />
+							<f:selectItems
+								value="#{bean.listaTiposResolucion}"
+								var="t" 
+								itemLabel="#{t.descripcion}" itemValue="#{t.id}" />
+						</p:selectOneMenu>
+					</div>
+
+					<div class="celda-form">
+						<p:outputLabel for="comboSentidoRes" value="#{mensaje['sentido']} *" />
+						<p:selectOneMenu id="comboSentidoRes"
+							value="#{bean.selectedNuevoSentidoResolId}"
+							filter="true" disabled="#{!editable}" >
+							<f:selectItem
+								itemLabel="#{mensaje['seleccione.una.opcion']}"
+								itemValue="#{null}" />
+							<f:selectItems
+								value="#{bean.listaSentidosResolucion}"
+								var="t" 
+								itemLabel="#{t.descripcion}" itemValue="#{t.id}" />
+						</p:selectOneMenu>
+					</div>
+				</div>
+				
+				<div class="ui-g">
+				
+						<div class="celda-form">
+							<p:outputLabel for="selectMultipleDerechos" value="#{mensaje['derechos.reclamados']}" />
+							<p:selectCheckboxMenu id="selectMultipleDerechos"
+								value="#{bean.selectedDerechosReclamadosResolucion}"
+								var="sel" 
+								itemLabel="#{sel.descripcion}"
+								itemValue="#{sel}"
+								label="#{mensaje['seleccione.opciones']}" 
+								multiple="true"
+								filter="true"
+								style="width: 30em"
+								disabled="#{!editable}" >
+								<f:selectItems value="#{bean.listaDerechosReclamadosResolucion}"
+									var="d" 
+									itemLabel="#{d.descripcion}"
+									itemValue="#{d}" />
+							</p:selectCheckboxMenu>
+						</div>
+
+						<div class="celda-form">
+							<p:outputLabel for="selectMultipleArticulos" value="#{mensaje['articulos.afectados']}" />
+							<p:selectCheckboxMenu id="selectMultipleArticulos"
+								value="#{bean.selectedArticulosAfectadosResolucion}"
+								var="sel" 
+								itemLabel="#{sel.descripcion}"
+								itemValue="#{sel}"
+								label="#{mensaje['seleccione.opciones']}" 
+								multiple="true"
+								filter="true"
+								style="width: 30em"
+								disabled="#{!editable}" >
+								<f:selectItems value="#{bean.listaArticulosAfectadosResolucion}"
+									var="a" 
+									itemLabel="#{a.descripcion}"
+									itemValue="#{a}" />
+							</p:selectCheckboxMenu>
+						</div>
+					
+				</div>
+
+				<div>
+					<div class="celda-form">
+						<p:outputLabel for="resumenResol" styleClass="p-d-block"
+							value="#{mensaje['resumen']}" />
+						<p:inputTextarea rows="6" cols="125" id="resumenResol" counter="cuentaResumenResol" counterTemplate="#{mensaje['counter.template']}"  autoResize="false"
+							value="#{bean.resolucion.resumen}"
+							disabled="#{!editable}" maxlength="4000">
+						</p:inputTextarea>
+						<div class="contador-char"><h:outputText id="cuentaResumenResol" /></div>
+					</div>
+
+				</div>
+				<div>
+
+					<div class="celda-form">
+						<p:outputLabel for="checkResolTotalmenteNotificada" value="#{mensaje['totalmente.notificada']}" />
+						<p:selectBooleanCheckbox id="checkResolTotalmenteNotificada" value="#{bean.resolucion.notificadaTotal}" 
+							itemLabel="#{mensaje['si']}" disabled="#{!editable or !(bean.resolucion.fechaPublicacionWeb == null)}">
+							<p:ajax update="fechaWeb" />
+	
+						</p:selectBooleanCheckbox>
+					</div>
+					
+					<div class="celda-form">
+						<p:outputLabel for="checkResolAnonimizada" value="#{mensaje['anonimizada']}" />
+						<p:selectBooleanCheckbox id="checkResolAnonimizada" value="#{bean.resolucion.anonimizada}" 
+							itemLabel="#{mensaje['si']}" disabled="#{!editable or !(bean.resolucion.fechaPublicacionWeb == null)}">
+							<p:ajax update="fechaWeb" />
+						</p:selectBooleanCheckbox>
+					</div>
+					
+					<div class="celda-form">
+						<p:outputLabel for="fechaWeb" value="#{mensaje['fecha.publicacion.web']}" />
+						<p:datePicker id="fechaWeb"
+							value="#{bean.resolucion.fechaPublicacionWeb}"
+							locale="es" monthNavigator="true" pattern="dd/MM/yyyy"
+							disabled="#{!editable or (bean.resolucion.anonimizada == false or bean.resolucion.notificadaTotal == false)}"
+							converterMessage="#{mensaje['formato.fecha.invalido']}" mask="true">
+							<p:ajax update="checkResolAnonimizada, checkResolTotalmenteNotificada" />
+						</p:datePicker>
+						<p:message for="fechaWeb"/>
+					</div>
+				</div>
+				
+													<!-- BOTONES GUARDAR Y CANCELAR -->
+				<div class="botonera-form" align="right">
+					<p:commandButton icon="pi pi-save" 
+						rendered="#{editable}"
+						id="saveDatosResolucion" value="#{mensaje['guardar']}"
+						action="#{bean.saveResolucion}"
+						update="@form"/>
+					<p:commandButton icon="pi pi-times" 
+						rendered="#{editable}"
+						id="cancelarDatosResolucion" value="#{mensaje['cancelar']}" 
+						action="#{bean.ejecutarVolver}" >
+						<p:confirm header="#{mensaje['confirmar.operacion']}"
+									message="#{mensaje['pregunta.confirma.cancelar']}"
+									icon="pi pi-info-circle" />
+					</p:commandButton>
+					<p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true" >
+						<div class="botonera-form" align="right">
+							<p:commandButton value="#{mensaje['si']}" type="button" styleClass="ui-confirmdialog-yes" />
+							<p:commandButton value="#{mensaje['no']}" type="button" styleClass="ui-confirmdialog-no ui-button-flat" />
+						</div>							
+					</p:confirmDialog>
+					
+					<p:outputPanel id="panelEditarResByForm" rendered="#{bean.permisoEditarResol == true and !editable and bean.numerosSaltos!=2}">
+						<p:commandButton id="editarResByForm" widgetVar="editarResByForm" icon="pi pi-pencil"
+							action="#{bean.onEditarByForm(bean.resolucion.id)}">
+							<f:param name="id" value="#{bean.resolucion.id}" />
+						</p:commandButton>
+					</p:outputPanel>
+				</div>
+				
+				</p:fieldset>
+
+				
+					<div class="texto-derecha">
+						<div class="celda-form">
+							<p:commandButton id="abrirBusquedaRelacionables" icon="pi pi-search" value="#{mensaje['nueva.relacion.expediente']}"
+								rendered="#{editable and bean.permisoEditarResolExp == true}" immediate="true" process="@this"
+								actionListener="#{bean.abrirBusquedaRelacionables}"
+								update="" />
+						</div>
+					</div>
+					
+				
+			<p:outputPanel id="panelRelacionesResolucion">
+			
+			<p:panel id="panelListadoDocumentosResolucion" header="#{mensaje['listado.documentos.relacionados.resolucion']}" 
+						toggleable="true" toggleableHeader="true" collapsed="false" toggleSpeed="250">										
+					<p:dataTable var="dr" id="listaDocumentosResolucion" widgetVar="listaDocumentosResolucion"
+						value="#{bean.lazyModelDocumentosResolucion}" paginator="true"
+						paginatorTemplate=" {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+						rows="10"
+						currentPageReportTemplate="#{mensaje['paginador.template']}"
+						selectionMode="single"
+						paginatorAlwaysVisible="false"
+						rowKey="#{dr.id}" paginatorPosition="bottom">
+							
+						<p:column headerText="#{mensaje['documento']}">
+							<h:outputText value="#{dr.documentoExpediente.descripcionDocumento}" />
+						</p:column>
+						
+						<p:column headerText="#{mensaje['ext']}" width="50">
+							<h:outputText value="#{dr.documentoExpediente.documento.extensionFichero}" />
+						</p:column>
+						
+						<!-- tipo doc -->
+						<p:column headerText="#{mensaje['anonimizado']}" width="90">
+							<span class="#{dr.anonimizado? 'pastilla-si' : ''}" />
+						</p:column>
+						
+
+						<p:column headerText="#{mensaje['acciones']}" width="90" >
+									
+							<p:commandButton id="editarRelacionDocumento" rendered="#{editable and bean.permisoEditarResolDoc and false}"
+								icon="pi pi-pencil"
+								action="#{bean.editarRelacionDocumento(dr.id)}"
+								update="@form:dialogDocumentoResolucion"
+								oncomplete="PF('dialogDocumentoResolucion').show()">
+							</p:commandButton>
+							<p:tooltip for="editarRelacionDocumento" rendered="#{editable and bean.permisoEditarResolDoc and false}"
+								value="#{mensaje['editar.documento.relacionado.resolucion']}"
+								showEffect="fade" hideEffect="fade" position="top" showDelay="500" />
+
+							<p:commandButton id="eliminarRelacionDocumento" icon="pi pi-times" rendered="#{editable and bean.permisoBorrarResolDoc}"
+								actionListener="#{bean.eliminarRelacionDocumento(dr.id)}"
+								update="listaDocumentosResolucion">
+								<p:confirm header="#{mensaje['confirmar.operacion']}" message="#{mensaje['confirmar.borrar.relacion']}" icon="pi pi-info-circle" />
+							</p:commandButton>
+							<p:tooltip for="eliminarRelacionDocumento" value="#{mensaje['eliminar.relacion']}" rendered="#{editable and bean.permisoBorrarResolDoc}"
+									showEffect="fade" hideEffect="fade" position="top" showDelay="500" />
+									
+							<p:commandButton id="verDocResol" icon="pi pi-file" process="@this"
+								actionListener="#{bean.registrarAccesoDocumento(dr)}"
+								onclick="abrirEditorDoc(#{dr.documentoExpediente.id}, 'view')">
+							</p:commandButton>
+							<p:tooltip for="verDocResol" value="#{mensaje['ver.resolucion']}" 
+									showEffect="fade" hideEffect="fade" position="top" showDelay="500" />
+		
+						</p:column>
+
+					</p:dataTable>
+				</p:panel>
+
+				<p:spacer height="15" />
+			
+				<p:panel id="panelListadoExpedientesResolucion" header="#{mensaje['listado.expedientes.asociados']}"
+						toggleable="true" toggleableHeader="true" collapsed="false" toggleSpeed="250">										
+					<p:dataTable var="er" id="listaExpedientesResolucion" widgetVar="listaExpedientesResolucion"
+						value="#{bean.lazyModelExpedientesResolucion}" paginator="true"
+						paginatorTemplate=" {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+						rows="10"
+						paginatorAlwaysVisible="false"
+						currentPageReportTemplate="#{mensaje['paginador.template']}"
+						selectionMode="single"
+						rowKey="#{er.id}" paginatorPosition="bottom">
+							
+						<p:column headerText="#{mensaje['num.expediente']}">
+							<h:outputText value="#{er.expediente.numExpediente}" />
+						</p:column>
+						
+						<p:column headerText="#{mensaje['sentido']}" width="150">
+							<h:outputText value="#{er.valorSentidoResolucion.descripcion}" />
+						</p:column>
+						
+						<p:column headerText="#{mensaje['principal']}" width="100">
+							<p:selectBooleanCheckbox id="checkExpedienteResolPrincipal" 
+								value="#{er.principal}" disabled="#{!editable or er.principal}" styleClass="ui-readonly">
+								<p:ajax listener="#{bean.cambiarExpedientePrincipal(er.id)}" disabled="#{er.principal}"
+									update="listaExpedientesResolucion" />
+							</p:selectBooleanCheckbox>
+						</p:column>
+						
+						<p:column headerText="#{mensaje['acciones']}" width="90" rendered="#{editable}">
+									
+							<p:commandButton id="editarRelacionExpediente" rendered="#{editable and bean.permisoEditarResolExp}"
+								icon="pi pi-pencil"
+								action="#{bean.editarRelacionExpediente(er.id)}"
+								update="@form:dialogExpedienteResolucion"
+								oncomplete="PF('dialogExpedienteResolucion').show()">
+							</p:commandButton>
+							<p:tooltip for="editarRelacionExpediente" rendered="#{editable and bean.permisoEditarResolExp}"
+								value="#{mensaje['editar.expediente.relacionado.resolucion']}" 
+								showEffect="fade" hideEffect="fade" position="top" showDelay="500" />
+
+							<p:commandButton id="eliminarRelacionExpediente" icon="pi pi-times" rendered="#{editable and bean.permisoBorrarResolExp}"
+								actionListener="#{bean.eliminarRelacionExpediente(er.id)}"
+								update="listaExpedientesResolucion">
+								<p:confirm header="#{mensaje['confirmar.operacion']}" message="#{mensaje['confirmar.borrar.relacion']}" icon="pi pi-info-circle" />
+							</p:commandButton>
+							<p:tooltip for="eliminarRelacionExpediente" value="#{mensaje['eliminar.relacion']}" rendered="#{editable and bean.permisoBorrarResolExp}"
+									showEffect="fade" hideEffect="fade" position="top" showDelay="500" />
+
+						</p:column>
+
+					</p:dataTable>
+				</p:panel>
+
+				<p:spacer height="15" />
+
+
+				<p:panel id="panelListadoSujetosResolucion" header="#{mensaje['listado.sujetos.relacionados.resolucion']}" 
+						toggleable="true" toggleableHeader="true" collapsed="false" toggleSpeed="250">										
+					<p:dataTable var="sr" id="listaSujetosResolucion" widgetVar="listaSujetosResolucion"
+						value="#{bean.lazyModelSujetosObligadosResolucion}" paginator="true"
+						paginatorTemplate=" {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+						rows="10"
+						paginatorAlwaysVisible="false"
+						currentPageReportTemplate="#{mensaje['paginador.template']}"
+						selectionMode="single"
+						rowKey="#{sr.id}" paginatorPosition="bottom">
+							
+						<p:column headerText="#{mensaje['num.expediente']}" width="120">
+							<h:outputText value="#{sr.expediente.numExpediente}" />
+						</p:column>
+						
+						<p:column headerText="#{mensaje['organismo']}">
+							<h:outputText value="#{sr.sujetoObligado.descripcion}" />
+						</p:column>
+						
+						
+						<p:column headerText="#{mensaje['principal']}" width="90">
+							<p:selectBooleanCheckbox id="checkSujetoResolPrincipal" 
+								value="#{sr.principal}" disabled="#{!editable or sr.principal}" styleClass="ui-readonly">
+								<p:ajax listener="#{bean.cambiarSujetoPrincipal(sr.id)}" disabled="#{sr.principal}"
+									update="listaSujetosResolucion" />
+							</p:selectBooleanCheckbox>
+						</p:column>
+						
+						<p:column headerText="#{mensaje['fecha.notificacion']}" width="100">
+							<h:outputText value="#{sr.fechaNotificacion}" >
+								<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+							</h:outputText>
+						</p:column>
+
+						<p:column headerText="#{mensaje['acciones']}" width="90" rendered="#{editable}">
+									
+							<p:commandButton id="editarRelacionSujeto" rendered="#{editable and bean.permisoEditarResolSuj}"
+								icon="pi pi-pencil"
+								action="#{bean.editarRelacionSujeto(sr.id)}"
+								update="@form:dialogSujetoObligadoResolucion"
+								oncomplete="PF('dialogSujetoObligadoResolucion').show()">
+							</p:commandButton>
+							<p:tooltip for="editarRelacionSujeto" rendered="#{editable and bean.permisoEditarResolSuj}"
+								value="#{mensaje['editar.sujeto.relacionado.resolucion']}"
+								showEffect="fade" hideEffect="fade" position="top" showDelay="500" />
+
+							<p:commandButton id="eliminarRelacionSujeto" icon="pi pi-times" rendered="#{editable and bean.permisoBorrarResolSuj}"
+								actionListener="#{bean.eliminarRelacionSujeto(sr.id)}"
+								update="listaSujetosResolucion">
+								<p:confirm header="#{mensaje['confirmar.operacion']}" message="#{mensaje['confirmar.borrar.relacion']}" icon="pi pi-info-circle" />
+							</p:commandButton>
+							<p:tooltip for="eliminarRelacionSujeto" value="#{mensaje['eliminar.relacion']}" rendered="#{editable and bean.permisoBorrarResolSuj}"
+									showEffect="fade" hideEffect="fade" position="top" showDelay="500" />
+
+						</p:column>
+
+					</p:dataTable>
+				</p:panel>
+
+				
+				<p:spacer height="15" />
+
+				
+				<p:panel id="panelListadoPersonasResolucion" header="#{mensaje['listado.personas.relacionadas.resolucion']}"
+						toggleable="true" toggleableHeader="true" collapsed="false" toggleSpeed="250">										
+					<p:dataTable var="pr" id="listaPersonasResolucion" widgetVar="listaPersonasResolucion"
+						value="#{bean.lazyModelPersonasResolucion}" paginator="true"
+						paginatorTemplate=" {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+						rows="10"
+						paginatorAlwaysVisible="false"
+						currentPageReportTemplate="#{mensaje['paginador.template']}"
+						selectionMode="single"
+						rowKey="#{pr.id}" paginatorPosition="bottom">
+							
+						<p:column headerText="#{mensaje['num.expediente']}" width="120">
+							<h:outputText value="#{pr.expediente.numExpediente}" />
+						</p:column>
+						
+						<p:column headerText="#{mensaje['nombre']}">
+							<h:outputText value="#{pr.persona.nombreAp}" />
+						</p:column>
+						
+						<p:column headerText="#{mensaje['principal']}" width="90">
+							<p:selectBooleanCheckbox id="checkPersonaResolPrincipal" 
+								value="#{pr.principal}" disabled="#{!editable or pr.principal}" styleClass="ui-readonly">
+								<p:ajax listener="#{bean.cambiarPersonaPrincipal(pr.id)}" disabled="#{pr.principal}"
+									update="listaPersonasResolucion" />
+							</p:selectBooleanCheckbox>
+						</p:column>
+						
+						<p:column headerText="#{mensaje['fecha.notificacion']}" width="100">
+							<h:outputText value="#{pr.fechaNotificacion}" >
+								<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+							</h:outputText>
+						</p:column>
+
+						<p:column headerText="#{mensaje['acciones']}" width="90" rendered="#{editable}">
+									
+							<p:commandButton id="editarRelacionPersona" rendered="#{editable and bean.permisoEditarResolPers}"
+								icon="pi pi-pencil"
+								action="#{bean.editarRelacionPersona(pr.id)}"
+								update="@form:dialogPersonaResolucion"
+								oncomplete="PF('dialogPersonaResolucion').show()">
+							</p:commandButton>
+							<p:tooltip for="editarRelacionPersona" rendered="#{editable and bean.permisoEditarResolPers}"
+								value="#{mensaje['editar.persona.relacionada.resolucion']}" 
+								showEffect="fade" hideEffect="fade" position="top" showDelay="500" />
+
+							<p:commandButton id="eliminarRelacionPersona" icon="pi pi-times" rendered="#{editable and bean.permisoBorrarResolPers}"
+								actionListener="#{bean.eliminarRelacionPersona(pr.id)}"
+								update="listaPersonasResolucion">
+								<p:confirm header="#{mensaje['confirmar.operacion']}" message="#{mensaje['confirmar.borrar.relacion']}" icon="pi pi-info-circle" />
+							</p:commandButton>
+							<p:tooltip for="eliminarRelacionPersona" value="#{mensaje['eliminar.relacion']}" rendered="#{editable and bean.permisoBorrarResolPers}"
+									showEffect="fade" hideEffect="fade" position="top" showDelay="500" />
+
+						</p:column>
+
+					</p:dataTable>
+				</p:panel>
+
+
+			</p:outputPanel>
+
+
+
+			</p:panel>
+
+			<ui:include src="dialogExpedienteResolucion.xhtml" />
+			<ui:include src="dialogPersonaResolucion.xhtml" />
+			<ui:include src="dialogSujetoObligadoResolucion.xhtml" />
+			<ui:include src="dialogDocumentoResolucion.xhtml" />
+			
+			<ui:include src="dialogBuscarExpRelacionadosResolucion.xhtml" />
+			
+			<p:commandButton id="volver" value="#{mensaje['volver']}" immediate="true"
+				action="#{bean.ejecutarVolver}" >
+			</p:commandButton>
+
+		</h:form>
+        		
+		<ui:include src="../expedientes/abrirEditorDoc.xhtml" />
+        
+	</ui:define>
+</ui:composition>
+</html>

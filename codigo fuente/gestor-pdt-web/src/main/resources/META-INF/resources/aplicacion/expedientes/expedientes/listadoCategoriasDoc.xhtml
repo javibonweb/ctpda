@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:c="http://java.sun.com/jstl/core"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:sec="https://joinfaces.org/security"
+	xmlns:fu="http://joinfaces.org/functions">
+
+<ui:composition>
+
+	<c:set var="ancho_sn" value="25" />
+	<style>
+	.ui-accordion .ui-accordion-header span.botonera {
+		float: right;
+		margin-top: -2px;
+	}
+	.ui-accordion .ui-accordion-header .ui-button-icon-only .ui-icon {
+		left: 50%;
+	}
+	</style>
+	
+	<script>
+	function clickAbrirTodo(e, index)
+	{
+	    if (!e) var e = window.event;
+	    e.cancelBubble = true;
+	    if (e.stopPropagation) e.stopPropagation();
+	    
+	    PF('panelesDocumentos').select(index);
+	    PF('panelesAgrupaciones_'+index).selectAll();
+	}
+	
+	function clickCerrarTodo(e, index)
+	{
+	    if (!e) var e = window.event;
+	    e.cancelBubble = true;
+	    if (e.stopPropagation) e.stopPropagation();
+	    
+	    PF('panelesDocumentos').unselect(index);
+	    PF('panelesAgrupaciones_'+index).unselectAll();
+	}
+	</script>
+		
+		    <p:accordionPanel id="panelesDocumentos" widgetVar="panelesDocumentos" value="#{datosExpedientesDocumentosBean.listaCategoriasDocumentosExpediente}" 
+		    	var="cat" varStatus="catStat" multiple="true">
+				<p:ajax event="tabChange" listener="#{datosExpedientesDocumentosBean.onChangeTabAcordeon}" />
+				<p:ajax event="tabClose" listener="#{datosExpedientesDocumentosBean.onCloseTabAcordeon}" />
+            <p:tab >
+                <f:facet name="title">
+                	<h:outputText value="#{cat.descripcion}"  />
+                	<span class="botonera">
+                    <p:button id="btnAbrirAcordeon" icon="pi pi-plus"
+                    	onclick="clickAbrirTodo(event, #{catStat.index})" >
+                    </p:button>
+                    <p:button id="btnCerrarAcordeon" icon="pi pi-minus"
+                    	onclick="clickCerrarTodo(event, #{catStat.index})" >
+                    </p:button>
+                	</span>
+  						<p:tooltip for="btnAbrirAcordeon" value="#{mensaje['abrir.categoria']}"
+							showEffect="fade" hideEffect="fade" position="top" showDelay="500" />
+ 						<p:tooltip for="btnCerrarAcordeon" value="#{mensaje['cerrar.categoria']}"
+							showEffect="fade" hideEffect="fade" position="top" showDelay="500" />
+                </f:facet>
+                
+	                <br />                
+					<p:outputPanel 
+						styleClass="panel-docs-tramite panel-docs-tramite-#{cat.id}">
+						<ui:include src="listadoAgrupacionesExp.xhtml">
+							<ui:param name="indexTab" value="#{catStat.index}" />
+							<ui:param name="value" value="#{cat.agrupaciones}" />
+						</ui:include>
+					</p:outputPanel>
+            </p:tab>
+            </p:accordionPanel>
+            		
+</ui:composition>
+</html>

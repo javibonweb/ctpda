@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:sec="https://joinfaces.org/security"
+	xmlns:c="http://java.sun.com/jstl/core"
+	xmlns:fu="http://joinfaces.org/functions">
+	
+<ui:composition
+	template="#{navegacionBean.get('TEMPLATE_LAYOUT_GENERICO')}">
+	<ui:define name="content">
+
+
+		<c:set var="editable" value="#{notificacionesPendientesBean.formEditable}" />
+
+		<h:form id="formListadoNotificacionesPendientes">
+
+			<p:remoteCommand name="PF_actualizar_documentos" update="@(.panel-documentos)"
+				action="#{datosExpedientesDocumentosBean.actualizarDocumentosTramite(notificacionesPendientesBean.tramiteExpediente.id)}" process="@this" />
+
+			<p:messages for="messagesListadoNotificacionesPendientes" id="messagesListadoNotificacionesPendientes"
+				showDetail="true" closable="true">
+				<p:autoUpdate />
+			</p:messages>
+			
+			<p:defaultCommand target="filtrar" />
+
+			<!-- PANEL FILTRO DE BUSQUEDA DE NOTIFICACIONES PENDIENTES -->
+
+			<p:panel header="#{mensaje['buscador.notificaciones.pendientes']}">
+				<p:fieldset legend="#{mensaje['filtros.busqueda']}"
+					id="bloqueFiltroBusqueda" toggleable="true" toggleSpeed="250">
+
+					<div>
+						<div class="celda-form">
+							<p:outputLabel value="#{mensaje['tipo.tramite']}"
+								for="tipoTram_filtro" />
+							<p:selectOneMenu id="tipoTram_filtro" disabled="true"
+								value="#{notificacionesPendientesBean.selectedTipoTramiteIdFiltro}"
+								style="min-width: 150px;">
+								<f:selectItem itemLabel="#{mensaje['todos']}" itemValue="#{null}" />
+								<f:selectItems
+									value="#{notificacionesPendientesBean.listaTipoTramites}"
+									var="tipTramList" itemLabel="#{fu:ptoSusp(tipTramList.descripcion)}"
+									widgetVar="comboFiltroTipoTramites"
+									itemValue="#{tipTramList.id}" />
+							</p:selectOneMenu>
+						</div>
+						<div class="celda-form">
+							<p:outputLabel value="#{mensaje['responsable.tramite']}"
+								for="responsableTram_filtro" />
+							<p:selectOneMenu id="responsableTram_filtro"
+								value="#{notificacionesPendientesBean.selectedResponsableTramIdFiltro}"
+								style="min-width: 150px;" filter="true" filterMatchMode="contains">
+								<f:selectItem itemLabel="#{mensaje['todos']}" itemValue="" />
+								<f:selectItems
+									value="#{notificacionesPendientesBean.listaResponsablesTramitacion}"
+									var="respTramList" itemLabel="#{respTramList.descripcion}"
+									widgetVar="comboFiltroResponsableTram" itemValue="#{respTramList.id}" />
+							</p:selectOneMenu>
+						</div>
+						<div class="celda-form">
+							<p:outputLabel value="#{mensaje['tipo.expedientes']}"
+								for="tipoExpedientes_filtro" />
+							<p:selectOneMenu id="tipoExpedientes_filtro"
+								value="#{notificacionesPendientesBean.selectedTipoExpedienteIdFiltro}"
+								style="min-width: 150px;">
+								<f:selectItem itemLabel="#{mensaje['todos']}" itemValue="" />
+								<f:selectItems
+									value="#{notificacionesPendientesBean.listaValoresDominioTipoExp}"
+									var="tipExpList" itemLabel="#{fu:ptoSusp(tipExpList.descripcion)}"
+									widgetVar="comboFiltroTipoExpedientes"
+									itemValue="#{tipExpList.id}" />
+							</p:selectOneMenu>
+						</div>												
+						<div class="celda-form">
+							<p:outputLabel for="numeroExpediente_filtro"
+								value="#{mensaje['numero.expediente']}" />
+							<p:inputText id="numeroExpediente_filtro" maxlength="255"
+								value="#{notificacionesPendientesBean.numeroExpedienteFiltro}" />
+						</div>
+						<div class="celda-form">
+							<p:outputLabel value="#{mensaje['canal.salida']}"
+								for="canalSalida_filtro" />
+							<p:selectOneMenu id="canalSalida_filtro"
+								value="#{notificacionesPendientesBean.selectedCanalSalidaIdFiltro}"
+								style="min-width: 150px;">
+								<f:selectItem itemLabel="#{mensaje['seleccione.canal.salida']}" itemValue="" />
+								<f:selectItems
+									value="#{notificacionesPendientesBean.listaValoresDominioCanalSalida}"
+									var="canalSalidaList" itemLabel="#{canalSalidaList.descripcion}"
+									widgetVar="comboFiltroCanalSalida" itemValue="#{canalSalidaList.id}" />
+							</p:selectOneMenu>
+						</div>						
+
+						<div class="celda-form">
+							<p:outputLabel value="#{mensaje['situacion']}"
+								for="situacion_filtro" />
+							<p:selectOneMenu id="situacion_filtro"
+								value="#{notificacionesPendientesBean.selectedSituacionIdFiltro}"
+								style="min-width: 150px;">
+								<f:selectItem itemLabel="#{mensaje['todos']}" itemValue="" />
+								<f:selectItems
+									value="#{notificacionesPendientesBean.listaValoresDominioSituacion}"
+									var="sitList" itemLabel="#{sitList.descripcion}"
+									widgetVar="comboFiltroSitacion" itemValue="#{sitList.id}" />
+							</p:selectOneMenu>
+						</div>
+					</div>
+					<div>
+						<div class="celda-form">
+							<p:outputLabel for="fechaEntradaInicial_filtro"
+								value="#{mensaje['rango.inicial']}" />
+							<p:datePicker id="fechaEntradaInicial_filtro" value="#{notificacionesPendientesBean.fechaEntradaInicialFiltro}" 
+								locale="es" monthNavigator="true" pattern="dd/MM/yyyy"
+								converterMessage="#{mensaje['formato.fecha.invalido']}" mask="true"/>
+							<p:message for="fechaEntradaInicial_filtro"/>
+						</div>
+						<div class="celda-form">
+							<p:outputLabel for="fechaEntradaFinal_filtro"
+								value="#{mensaje['rango.final']}" />
+							<p:datePicker id="fechaEntradaFinal_filtro" value="#{notificacionesPendientesBean.fechaEntradaFinalFiltro}" 
+								locale="es" monthNavigator="true" pattern="dd/MM/yyyy"
+								converterMessage="#{mensaje['formato.fecha.invalido']}" mask="true"/>
+							<p:message for="fechaEntradaFinal_filtro"/>
+						</div>	
+
+						<div class="celda-form">
+							<p:outputLabel value="#{mensaje['responsable.expediente']}" for="responsable_filtro" />
+							<p:selectOneMenu id="responsable_filtro"
+								value="#{notificacionesPendientesBean.selectedResponsableExpIdFiltro}"
+								style="min-width: 150px;" filter="true" filterMatchMode="contains">
+								<f:selectItem itemLabel="#{mensaje['todos']}" itemValue="" />
+								<f:selectItems
+									value="#{notificacionesPendientesBean.listaResponsablesExpediente}"
+									var="respExpList" itemLabel="#{respExpList.descripcion}"
+									widgetVar="comboFiltroResponsableExp" itemValue="#{respExpList.id}" />
+							</p:selectOneMenu>
+						</div>
+					</div>
+
+					<div class="botonera-form">
+						<p:commandButton id="filtrar" icon="pi pi-filter"
+							value="#{mensaje['filtrar']}"
+							actionListener="#{notificacionesPendientesBean.buscar()}"
+							update="formListadoNotificacionesPendientes:tipoTram_filtro,
+ 									formListadoNotificacionesPendientes:responsableTram_filtro, 
+ 									formListadoNotificacionesPendientes:tipoExpedientes_filtro, 
+ 									formListadoNotificacionesPendientes:numeroExpediente_filtro, 
+ 									formListadoNotificacionesPendientes:situacion_filtro,
+ 									formListadoNotificacionesPendientes:canalSalida_filtro, 
+ 									formListadoNotificacionesPendientes:fechaEntradaInicial_filtro, 
+ 									formListadoNotificacionesPendientes:fechaEntradaFinal_filtro, 
+ 									formListadoNotificacionesPendientes:responsable_filtro"
+							onstart="PF('notificacionesPendientesMaestraWV').paginator.setPage(0);" />
+						<p:commandButton id="limpiarFiltro"
+							value="#{mensaje['limpiar.filtro']}" icon="pi pi-filter-slash"
+							actionListener="#{notificacionesPendientesBean.limpiarFiltro()}"
+							update="formListadoNotificacionesPendientes:tipoTram_filtro,
+ 									formListadoNotificacionesPendientes:responsableTram_filtro,
+ 									formListadoNotificacionesPendientes:tipoExpedientes_filtro, 
+ 									formListadoNotificacionesPendientes:numeroExpediente_filtro, 
+ 									formListadoNotificacionesPendientes:situacion_filtro,
+ 									formListadoNotificacionesPendientes:canalSalida_filtro,
+ 									formListadoNotificacionesPendientes:fechaEntradaInicial_filtro,
+ 									formListadoNotificacionesPendientes:fechaEntradaFinal_filtro,
+ 									formListadoNotificacionesPendientes:responsable_filtro"
+							onstart="PF('notificacionesPendientesMaestraWV').paginator.setPage(0);" />
+					</div>
+				</p:fieldset>
+				
+				<div class="botonera-form" align="right">
+				 	<p:commandButton id="botonExportarCSV" value="#{mensaje['csv']}" icon="pi pi-file-excel" title="Exportar a CSV" rendered="#{not empty notificacionesPendientesBean.lazyModel}">
+	                    <p:dataExporter type="xlsxstream" target="listadoNotificacionesPendientes" fileName="#{utilsComun.getNombreCsvExportar('NOTIFICACIONES_PENDIENTES')}"/>
+	                </p:commandButton>
+				</div>
+
+				<!-- PANEL CON LOS RESULTADOS DE BUSQUEDA -->
+				<p:outputPanel id="panelResultadosBusqueda" >
+					<p:dataTable var="notificacionesPendientesMaestra" id="listadoNotificacionesPendientes"
+						value="#{notificacionesPendientesBean.lazyModel}" paginator="true"
+						paginatorTemplate=" {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+						rowsPerPageTemplate="10,20,50,100" rows="10"
+						currentPageReportTemplate="#{mensaje['paginador.template']}"
+						selectionMode="single"
+						sortBy="#{notificacionesPendientesBean.defaultOrden}"
+						sortOrder="ascending"
+						selection="#{notificacionesPendientesBean.selectedNotificacionesPendientes}"
+						rowKey="#{notificacionesPendientesMaestra.id}" paginatorPosition="bottom"
+						widgetVar="notificacionesPendientesMaestraWV" rendered="#{not empty notificacionesPendientesBean.lazyModel}">
+
+
+			            <p:column sortBy="#{notificacionesPendientesMaestra.id}" visible="false" exportable="false">
+							<h:outputText value="#{notificacionesPendientesMaestra.id}" />
+						</p:column>
+
+						<p:column headerText="#{mensaje['fecha.inicio']}" width="70px"
+							sortBy="#{notificacionesPendientesMaestra.fechaIni}">
+							<h:outputText value="#{notificacionesPendientesMaestra.fechaIni}" >
+								<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+							</h:outputText>
+						</p:column>						
+						
+						<p:column headerText="#{mensaje['tramite']}" width="120px"
+							sortBy="#{notificacionesPendientesMaestra.descTramSup}">
+							<h:outputText value="#{fu:ptoSusp(notificacionesPendientesMaestra.descTramSup)}" /> 
+						</p:column>
+						
+						<p:column headerText="#{mensaje['numero.expediente']}" width="105px"
+							sortBy="#{notificacionesPendientesMaestra.numExpediente}">
+							<h:outputText value="#{notificacionesPendientesMaestra.numExpediente}" /> 
+						</p:column>
+						
+						<p:column headerText="#{mensaje['tipo.interviniente']}" width="90px"
+							sortBy="#{notificacionesPendientesMaestra.descTipoInterviniente}">
+							<h:outputText value="#{notificacionesPendientesMaestra.descTipoInterviniente}" />
+						</p:column>
+						
+						<p:column headerText="#{mensaje['interviniente']}" width="90px"
+							sortBy="#{notificacionesPendientesMaestra.interviniente}">
+							<h:outputText value="#{notificacionesPendientesMaestra.interviniente}" />
+						</p:column>		
+						<p:column headerText="#{mensaje['fecha.envio']}" width="70px"
+							sortBy="#{notificacionesPendientesMaestra.fechaEnvio}">
+							<h:outputText value="#{notificacionesPendientesMaestra.fechaEnvio}">
+								<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+							</h:outputText>
+						</p:column>		
+						<p:column headerText="#{mensaje['requiere.acuse']}" width="70px"
+							sortBy="#{notificacionesPendientesMaestra.acuseRecibo}">
+							<h:outputText value="#{mensaje['no']}" rendered="#{notificacionesPendientesMaestra.acuseRecibo == false}" />
+							<h:outputText value="#{mensaje['si']}" rendered="#{notificacionesPendientesMaestra.acuseRecibo == true}" />
+						</p:column>
+						<p:column headerText="#{mensaje['fecha.limite']}" width="80px"
+								sortBy="#{notificacionesPendientesMaestra.fechaLimite}">
+								<h:outputText value="#{notificacionesPendientesMaestra.fechaLimite}">
+									<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+								</h:outputText>
+						</p:column>
+						<p:column headerText="#{mensaje['fecha.notif']}" width="70px"
+								sortBy="#{notificacionesPendientesMaestra.fechaNotificacion}">
+								<h:outputText value="#{notificacionesPendientesMaestra.fechaNotificacion}">
+									<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+								</h:outputText>
+						</p:column>	
+						<p:column headerText="#{mensaje['canal.salida']}" width="90px"
+							sortBy="#{notificacionesPendientesMaestra.descCanalSalida}">
+							<h:outputText value="#{notificacionesPendientesMaestra.descCanalSalida}" />
+						</p:column>
+						<p:column headerText="#{mensaje['resultado']}" width="90px"
+							sortBy="#{notificacionesPendientesMaestra.descResNotif}">
+							<h:outputText value="#{notificacionesPendientesMaestra.descResNotif}" />
+						</p:column>																																																				
+						
+
+						<p:column headerText="#{mensaje['acciones']}" exportable="false" width="85px">
+
+							<p:commandButton id="consultarExpedientes" icon="pi pi-eye" rendered="false"
+								action="#{notificacionesPendientesBean.onConsultar(notificacionesPendientesMaestra.id)}">
+							</p:commandButton>
+
+							<p:commandButton id="editarExpedientes" rendered="false"
+								widgetVar="editarExpedientes" icon="pi pi-pencil"
+								action="#{notificacionesPendientesBean.onEditar(notificacionesPendientesMaestra.id)}">
+							</p:commandButton>
+							<p:commandButton id="editarDatosNotificacion" rendered="#{notificacionesPendientesBean.permisoModDatNot}"
+								widgetVar="editarDatosNotificacion" icon="pi pi-envelope"
+								update="@form:dialogNotificacion"
+								action="#{notificacionesPendientesBean.editarNotificacion(notificacionesPendientesMaestra.id)}">
+							</p:commandButton>
+						</p:column>
+					</p:dataTable>
+					
+					<ui:include src="dialogNotificacion.xhtml" />
+					
+				</p:outputPanel>
+			</p:panel>
+			<br />
+			<p:commandButton id="volver" value="#{mensaje['volver']}"
+				oncomplete="document.location.href='#{request.contextPath}/aplicacion/bienvenido.xhtml'">
+			</p:commandButton>
+
+
+		<c:set var="editable" value="${true}" />
+		<c:set var="esAlta" value="${false}" />
+
+		<ui:include src="dialogIncorporarDoc.xhtml" />
+		<ui:include src="dialogVincularDocs.xhtml" />
+		
+		<ui:include src="dialogDescripcionDocDefecto.xhtml">
+			<ui:param name="bean"      value="#{incorporarDocumentosBean}" />
+			<ui:param name="operacion" value="incorporar" />
+		</ui:include>
+
+		<ui:include src="dialogDescripcionDocDefecto.xhtml">
+			<ui:param name="bean"      value="#{vincularDocumentosBean}" />
+			<ui:param name="operacion" value="vincular" />
+		</ui:include>
+
+		<ui:include src="dialogAccesosDocumento.xhtml" />
+
+		</h:form>
+		
+		<ui:include src="abrirEditorDoc.xhtml" />
+
+	</ui:define>
+
+</ui:composition>
+
+</html>

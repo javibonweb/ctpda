@@ -1,0 +1,93 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:c="http://java.sun.com/jstl/core"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:sec="https://joinfaces.org/security"
+    xmlns:fu="http://joinfaces.org/functions">
+<ui:composition>
+
+			<div>
+				<div class="celda-form">
+					<p:outputLabel rendered="#{tramExp.cfgMetadatosTram != null}" for="comboTipoInteresado" value="#{tramExp.cfgMetadatosTram.tipoInteresado}" />
+					<p:outputLabel rendered="#{tramExp.cfgMetadatosTram == null}" for="comboTipoInteresado" value="#{mensaje['etiqueta.pendiente.definir']}" />
+					<p:selectOneMenu id="comboTipoInteresado" disabled="#{!editable}"
+						value="#{tramExp.selectedNuevoTipoInteresadoId}">
+						<f:selectItem
+							itemLabel="#{mensaje['seleccione.una.opcion']}"
+							itemValue="#{null}"/>
+						<f:selectItems
+							value="#{tramExp.listaValoresDominioTipoInteresado}"
+							var="tipIntList" itemLabel="#{tipIntList.descripcion}"
+							widgetVar="comboTipoInteresado" itemValue="#{tipIntList.id}" />
+						<p:ajax
+							listener="#{datosTramiteExpedienteBean.onChangeTipoInteresado(tramExp)}"
+							update="combosIdentInteresado, comboCanalSalida"/>																	
+					</p:selectOneMenu>
+				</div>
+					<p:outputPanel id="combosIdentInteresado" styleClass="celda-form">
+						<p:outputLabel for="comboIdentSujObl" value="#{tramExp.cfgMetadatosTram.identifInteresado}"  disabled="#{!editable}" rendered="#{tramExp.cfgMetadatosTram != null and tramExp.selectedNuevoTipoInteresadoId != null}"/>
+						<p:outputLabel rendered="#{tramExp.cfgMetadatosTram == null and tramExp.selectedNuevoTipoInteresadoId != null}" for="comboIdentSujObl" value="#{mensaje['etiqueta.pendiente.definir']}" disabled="#{!editable}"/>							
+						<p:selectOneMenu id="comboIdentSujObl" disabled="#{!editable}"
+							value="#{tramExp.selectedNuevaIdentifInteresadoId}"
+							rendered="#{tramExp.esIdentIntSujOblig == true}">
+							<f:selectItem
+								itemLabel="#{mensaje['seleccione.una.opcion']}"
+								itemValue="#{tramExp.detalleExpdteTram.valorDominioInteresado.id}" />
+							<f:selectItems
+								value="#{tramExp.listaIdentifIntSujOblig}"
+								var="identifIntList" itemLabel="#{identifIntList.descripcion}"
+								widgetVar="comboIdentSujObl"
+								itemValue="#{identifIntList.id}" />
+						</p:selectOneMenu>
+						
+						
+						<p:selectOneMenu id="comboIdentDPD" disabled="#{!editable}"
+							value="#{tramExp.selectedNuevaIdentifInteresadoId}"
+							rendered="#{tramExp.esIdentIntAutControl == true}">
+							<f:selectItem
+								itemLabel="#{mensaje['seleccione.una.opcion']}"
+								itemValue="#{tramExp.detalleExpdteTram.valorDominioInteresado.id}" />
+							<f:selectItems
+								value="#{tramExp.listaValoresDominioIdentifInteresado}"
+								var="identifIntList" itemLabel="#{identifIntList.descripcion}"
+								widgetVar="comboIdentDPD"
+								itemValue="#{identifIntList.id}" />
+						</p:selectOneMenu>
+						<p:selectOneMenu id="comboIdentPers" disabled="#{!editable}"
+							value="#{tramExp.selectedNuevaIdentifInteresadoId}"
+							rendered="#{tramExp.esIdentIntPersona == true}">
+							<f:selectItem
+								itemLabel="#{mensaje['seleccione.una.opcion']}"
+								itemValue="#{tramExp.detalleExpdteTram.valorDominioInteresado.id}" />
+							<f:selectItems
+								value="#{tramExp.listaIdentifIntPers}"
+								var="identifIntList" itemLabel="#{identifIntList.getNombreAp()}"
+								widgetVar="comboIdentPers"
+								itemValue="#{identifIntList.id}" />
+							<p:ajax
+								listener="#{datosTramiteExpedienteBean.onChangeInteresadoPersona(tramExp)}"
+								update="comboCanalSalida"/>																	
+						</p:selectOneMenu>
+						<p:selectOneMenu id="comboIdentDpd" disabled="#{!editable}"
+							value="#{tramExp.selectedNuevaIdentifInteresadoId}"
+							rendered="#{tramExp.esIdentIntDPD == true}">
+							<f:selectItem
+								itemLabel="#{mensaje['seleccione.una.opcion']}"
+								itemValue="#{tramExp.detalleExpdteTram.valorDominioInteresado.id}" />
+							<f:selectItems
+								value="#{tramExp.listaIdentifIntDpd}"
+								var="identifIntList" itemLabel="#{identifIntList.getNombreAp()}"
+								widgetVar="comboIdentDpd"
+								itemValue="#{identifIntList.id}" />
+							<p:ajax
+								listener="#{datosTramiteExpedienteBean.onChangeInteresadoDpd(tramExp)}"
+								update="comboCanalSalida"/>																	
+						</p:selectOneMenu>
+					</p:outputPanel>					
+			</div>				
+
+</ui:composition>
+</html>

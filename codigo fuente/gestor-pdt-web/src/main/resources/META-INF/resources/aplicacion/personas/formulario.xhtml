@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+				xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:pe="http://primefaces.org/ui/extensions"                
+                xmlns:sec="https://joinfaces.org/security"
+                template="#{navegacionBean.get('TEMPLATE_LAYOUT_GENERICO')}">  
+                               
+    <ui:define name="content" >
+		
+		<c:set var="editable" value="#{datosPersonasBean.formEditable}"  />
+			
+    	<h:form id="formFormulario">
+    	
+	    	<p:messages for="messagesFormulario" id="messagesFormulario" showDetail="true" closable="true">
+	    		<p:autoUpdate/> 
+	        </p:messages>
+        
+	    	<p:panel id="panelPersona">
+	    		<f:facet name="header">
+		    		<h:outputText value="#{mensaje['formulario.persona']}" style="font-weight:bold" />
+	    		</f:facet>
+	    	
+		    	<p:spacer height="10" />
+		    	
+		    	<p:outputPanel id="panelEditarPersonaByForm" rendered="#{datosPersonasBean.permisoEditPers == true and !editable and datosPersonasBean.numerosSaltos!=2}">
+					<div class="botonera-form" style="text-align:right">
+						<p:commandButton id="editarPersonaByForm" widgetVar="editarPersonaByForm" icon="pi pi-pencil"
+							action="#{datosPersonasBean.onEditarByForm(datosPersonasBean.persona.id)}">
+							<f:param name="id" value="#{datosPersonasBean.persona.id}" />
+						</p:commandButton>
+					</div>				
+				</p:outputPanel>
+		    	
+		    	<p:outputPanel id="panelTipoPersona">
+		    		<div id="bloqueTipoPersona" class="ui-g">
+			    		<div class="celda-form">
+			   				<p:outputLabel for="valorTipoPersona" styleClass="p-d-block" rendered="#{editable}" value="#{mensaje['tipo.persona']} *" />
+			   				<p:outputLabel for="valorTipoPersona" styleClass="p-d-block" rendered="#{!editable}" value="#{mensaje['tipo.persona']}" />																										   
+			   				<p:selectOneRadio id="valorTipoPersona" value="#{datosPersonasBean.idTipoPersonaSeleccionado}" 
+			   						layout="grid" columns="2" styleClass="grid-radio" disabled="#{not editable}"
+			   						widgetVar="chkTipo">
+					            <f:selectItems value="#{datosPersonasBean.listaValoresDominioTipoPersona}" var="valorTipoPersona" 
+					            	itemLabel="#{valorTipoPersona.descripcion}" itemValue="#{valorTipoPersona.id}"/>
+								<p:ajax event="click" listener="#{datosPersonasBean.onChangeTipoPersona}" process="@this"
+									update="panelDatosPersona" />
+					        </p:selectOneRadio>
+					    </div>
+		   			</div>
+		   		</p:outputPanel>
+		   		
+		    	<p:outputPanel id="panelDatosPersona">
+		   				   			
+			    	<p:outputPanel id="panelIdentificacion">
+			    		<p:panel rendered="#{empty datosPersonasBean.persona.valorTipoPersona}">
+			   				<h:outputText value="#{mensaje['debe.seleccionar.tipo.persona']}" />
+			    		</p:panel>
+			   				
+			   			<p:fieldset id="bloqueIdentificacion" legend="#{mensaje['datos.identificativos']}" styleClass="ui-g" toggleable="true" toggleSpeed="250" 
+			   				rendered="#{not empty datosPersonasBean.persona.valorTipoPersona}">
+			   				<div class="width: 100%">
+					    		<p:outputPanel rendered="#{datosPersonasBean.persona.esPF}">
+									<div class="celda-form">
+								   		<p:outputLabel for="nombre" styleClass="p-d-block" rendered="#{editable}" value="#{mensaje['nombre']} *" />
+							   			<p:outputLabel for="nombre" styleClass="p-d-block" rendered="#{!editable}" value="#{mensaje['nombre']}" />
+										<p:inputText id="nombre" styleClass="p-d-block" maxlength="100" size="30" disabled="#{not editable}"
+											 value="#{datosPersonasBean.persona.nombreRazonsocial}"/>
+									</div>
+									
+									<div class="celda-form">
+										<p:outputLabel for="primer_apellido" styleClass="p-d-block" rendered="#{editable and datosPersonasBean.persona.esPF}" value="#{mensaje['primer.apellido']} *" />
+							   			<p:outputLabel for="primer_apellido" styleClass="p-d-block" rendered="#{!editable and datosPersonasBean.persona.esPF}" value="#{mensaje['primer.apellido']}" />		
+										<p:inputText id="primer_apellido" styleClass="p-d-block" maxlength="100" size="30" disabled="#{not editable}"
+											value="#{datosPersonasBean.persona.primerApellido}"/>
+									</div>
+									
+									<div class="celda-form">
+						   				<p:outputLabel for="segundo_apellido" styleClass="p-d-block">#{mensaje['segundo.apellido']}</p:outputLabel>
+										<p:inputText id="segundo_apellido" styleClass="p-d-block" maxlength="100" size="30" disabled="#{not editable}" 
+											value="#{datosPersonasBean.persona.segundoApellido}"/>
+									</div>
+				  
+									<div class="celda-form">
+										<p:outputLabel for="iniciales" styleClass="campos-pf p-d-block" >#{mensaje['iniciales']}</p:outputLabel>
+										<div class="ui-inputgroup">
+										<p:inputText id="iniciales" styleClass="campos-pf p-d-block" maxlength="5" size="5" disabled="#{not editable}"
+										 	value="#{datosPersonasBean.persona.iniciales}"/>
+										<p:commandButton id="completarIniciales" icon="pi pi-check" rendered="#{editable}"
+											actionListener="#{datosPersonasBean.calcularIniciales}"
+											process="@this, nombre, primer_apellido, segundo_apellido"
+											update="messagesFormulario, iniciales" />
+										</div>
+									</div>
+									
+									<div class="celda-form">
+							   			<p:outputLabel for="comboValorIdentificador" styleClass="p-d-block" value="#{mensaje['tipo.identificador']} *" rendered="#{editable}"/>
+							   			<p:outputLabel for="comboValorIdentificador" styleClass="p-d-block" value="#{mensaje['tipo.identificador']}" rendered="#{!editable}"/>		
+						   				<p:selectOneMenu id="comboValorIdentificador" value="#{datosPersonasBean.idTipoIdentificadorSeleccionado}" disabled="#{not editable}">
+				               				<f:selectItem itemLabel="Seleccione una opción" itemValue="#{null}" noSelectionOption="true" />
+											<f:selectItems value="#{datosPersonasBean.listaValoresDominioTipoIdentificador}" var="t" 
+												itemLabel="#{t.descripcion}"
+												itemValue="#{t.id}" />
+											<p:ajax event="change" process="@this, nif_cif" listener="#{datosPersonasBean.onChangeTipoIdentificador}" update="nif_cif" />
+										</p:selectOneMenu>
+							        </div>
+							        	  
+									<div class="celda-form">
+										<p:outputLabel for="nif_cif" styleClass="p-d-block" value="#{mensaje['identificador']} *" rendered="#{editable}"/>
+							   			<p:outputLabel for="nif_cif" styleClass="p-d-block" value="#{mensaje['identificador']}" rendered="#{!editable}"/>	
+										<p:inputText id="nif_cif" styleClass="p-d-block" maxlength="9" size="10" disabled="#{not editable or null==datosPersonasBean.idTipoIdentificadorSeleccionado}"
+											 value="#{datosPersonasBean.persona.nifCif}"/>
+									</div>
+				  
+									<div class="celda-form">
+						   				<p:outputLabel for="comboValorSexo" styleClass="p-d-block" rendered="#{editable and datosPersonasBean.persona.esPF}" value="#{mensaje['sexo']} *" />
+							   			<p:outputLabel for="comboValorSexo" styleClass="p-d-block" rendered="#{!editable and datosPersonasBean.persona.esPF}" value="#{mensaje['sexo']}" />		
+						   				<p:selectOneMenu id="comboValorSexo" value="#{datosPersonasBean.idSexoSeleccionado}" disabled="#{not editable}">
+				               				<f:selectItem itemLabel="Seleccione una opción" itemValue="#{null}" noSelectionOption="true" />
+											<f:selectItems value="#{datosPersonasBean.listaValoresDominioSexo}" var="listValSex" 
+												itemLabel="#{listValSex.descripcion}"
+												itemValue="#{listValSex.id}" />
+										</p:selectOneMenu>
+							        </div>
+					
+					    		</p:outputPanel>
+					    		
+					    		<p:outputPanel rendered="#{!datosPersonasBean.persona.esPF}">
+									<div class="celda-form">
+							   			<p:outputLabel for="nombre_pj" styleClass="p-d-block" rendered="#{editable}" value="#{mensaje['razon.social']} *" />
+							   			<p:outputLabel for="nombre_pj" styleClass="p-d-block" rendered="#{!editable}" value="#{mensaje['razon.social']}" />	
+										<p:inputText id="nombre_pj" styleClass="p-d-block" maxlength="100" size="30" disabled="#{not editable}"
+											value="#{datosPersonasBean.persona.nombreRazonsocial}"/>
+									</div>
+									
+									<div class="celda-form">
+							   			<p:outputLabel for="comboValorIdentificadorPJ" styleClass="p-d-block" value="#{mensaje['tipo.identificador']} *" rendered="#{editable}"/>
+							   			<p:outputLabel for="comboValorIdentificadorPJ" styleClass="p-d-block" value="#{mensaje['tipo.identificador']}" rendered="#{!editable}"/>		
+						   				<p:selectOneMenu id="comboValorIdentificadorPJ" value="#{datosPersonasBean.idTipoIdentificadorSeleccionado}" disabled="#{!editable}">
+				               				<f:selectItem itemLabel="Seleccione una opción" itemValue="#{null}" noSelectionOption="true" />
+											<f:selectItems value="#{datosPersonasBean.listaValoresDominioTipoIdentificador}" var="t" 
+												itemLabel="#{t.descripcion}"
+												itemValue="#{t.id}" />
+											<p:ajax event="change" process="@this, nif_cif_pj" listener="#{datosPersonasBean.onChangeTipoIdentificador}" update="nif_cif_pj" />
+										</p:selectOneMenu>
+							        </div>
+							        				        
+									<div class="celda-form">
+										<p:outputLabel for="nif_cif_pj" styleClass="p-d-block" value="#{mensaje['identificador']} *" rendered="#{editable}"/>
+							   			<p:outputLabel for="nif_cif_pj" styleClass="p-d-block" value="#{mensaje['identificador']}" rendered="#{!editable}"/>	
+										<p:inputText id="nif_cif_pj" styleClass="p-d-block" maxlength="9" size="10" disabled="#{not editable or null==datosPersonasBean.idTipoIdentificadorSeleccionado}"
+											value="#{datosPersonasBean.persona.nifCif}"/>
+									</div>
+					    		</p:outputPanel>
+						    </div> 
+			    		</p:fieldset>
+			    	</p:outputPanel>	
+			    				    
+					<p:fieldset id="bloqueDomicilio" legend="#{mensaje['domicilio']}" toggleable="true" toggleSpeed="250" rendered="#{not empty datosPersonasBean.persona.valorTipoPersona}">    		
+			    			<div>
+								<div class="celda-form">
+				    			<p:outputLabel for="direccion" styleClass="p-d-block">#{mensaje['direccion']}</p:outputLabel>
+								<p:inputText id="direccion" styleClass="p-d-block" maxlength="120" size="30" disabled="#{not editable}"
+									value="#{datosPersonasBean.persona.direccion}"/>
+								</div>
+								
+								<div class="celda-form">
+					   				<p:outputLabel for="pais" styleClass="p-d-block">#{mensaje['pais']}</p:outputLabel>
+									<p:selectOneMenu id="pais" value="#{datosPersonasBean.idPaisSeleccionado}" disabled="#{not editable}">
+			               					<f:selectItem itemLabel="Seleccione una opción" itemValue="#{null}" noSelectionOption="true" />
+										<f:selectItems value="#{datosPersonasBean.listaPaises}" var="p" 
+											itemLabel="#{p.descripcion}"
+											itemValue="#{p.id}" />
+									</p:selectOneMenu>
+								</div>
+							</div>  
+							<div>
+								<div class="celda-form">
+									<p:outputLabel for="codigo_postal" styleClass="p-d-block">#{mensaje['codigo.postal']}</p:outputLabel>
+									<p:inputMask id="codigo_postal" styleClass="p-d-block"  
+										maxlength="5" size="5" pattern="" mask="9[9999]"
+										disabled="#{not editable}"        
+										value="#{datosPersonasBean.persona.codigoPostal}">
+										<p:ajax event="change" listener="#{datosPersonasBean.onChangeCodigoPostal}" process="@this"
+											update="provincia, localidad" />
+									</p:inputMask>  
+								</div>  
+			  
+								<div class="celda-form">
+					   				<p:outputLabel for="provincia" styleClass="p-d-block">#{mensaje['provincia']}</p:outputLabel>
+									<p:selectOneMenu id="provincia" value="#{datosPersonasBean.idProvinciaSeleccionada}" disabled="#{not editable or empty datosPersonasBean.listaProvincias}">
+			               					<f:selectItem itemLabel="Seleccione una opción" itemValue="#{null}" noSelectionOption="true" />
+										<f:selectItems value="#{datosPersonasBean.listaProvincias}" var="provincias" 
+											itemLabel="#{provincias.descripcion}"
+											itemValue="#{provincias.id}" />
+										<p:ajax event="change" listener="#{datosPersonasBean.onChangeProvincia}" process="@this"
+											update="localidad" />
+									</p:selectOneMenu>
+								</div>
+								
+								<div class="celda-form">
+									<p:outputLabel for="localidad" styleClass="p-d-block">#{mensaje['localidad']}</p:outputLabel>
+									<p:selectOneMenu id="localidad" value="#{datosPersonasBean.idLocalidadSeleccionada}" disabled="#{not editable or empty datosPersonasBean.listaLocalidades}">
+			               				<f:selectItem itemLabel="Seleccione una opción" itemValue="#{null}" noSelectionOption="true" />
+										<f:selectItems value="#{datosPersonasBean.listaLocalidades}" var="localidades" 
+											itemLabel="#{localidades.descripcion}"
+											itemValue="#{localidades.id}" />
+									</p:selectOneMenu>	
+								</div>
+							</div>
+							<div>
+								<div class="celda-form">
+									<p:outputLabel for="descMunicipio" styleClass="p-d-block">#{mensaje['municipio']}</p:outputLabel>
+									<p:inputText id="descMunicipio" styleClass="p-d-block" maxlength="100" size="60" disabled="#{not editable}"
+										value="#{datosPersonasBean.persona.descripcionMunicipio}"/>
+								</div>
+							</div>		
+					</p:fieldset>	
+								    		
+					<p:fieldset id="bloqueContacto" legend="#{mensaje['datos.contacto']}" toggleable="true" toggleSpeed="250" rendered="#{not empty datosPersonasBean.persona.valorTipoPersona}">       		
+			   			<div id="bloqueComunicacion" class="ui-g">
+			   				<div class="width: 100%">
+								<div class="celda-form">
+				   				<p:outputLabel for="telefonoFijo" styleClass="p-d-block">#{mensaje['telefono.fijo']}</p:outputLabel>
+								<p:inputNumber id="telefonoFijo" styleClass="p-d-block" maxValue="999999999" size="10" decimalPlaces="0" disabled="#{not editable}"
+									value="#{datosPersonasBean.persona.telefonoFijo}"/>
+								</div>
+								
+								<div class="celda-form">
+				   				<p:outputLabel for="telefonoMovil" styleClass="p-d-block">#{mensaje['telefono.movil']}</p:outputLabel>
+								<p:inputNumber id="telefonoMovil" styleClass="p-d-block" maxValue="999999999" size="10" decimalPlaces="0" disabled="#{not editable}"
+									value="#{datosPersonasBean.persona.telefonoMovil}"/>
+								</div>
+								
+								<div class="celda-form">
+								<p:outputLabel for="email" styleClass="p-d-block">#{mensaje['email']}</p:outputLabel>
+								<p:inputText id="email" styleClass="p-d-block" maxlength="50" size="20" disabled="#{not editable}"
+									value="#{datosPersonasBean.persona.email}" />
+								</div>
+								
+								<div class="celda-form">
+				   				<p:outputLabel for="viaComunicacion" styleClass="p-d-block">#{mensaje['via.comunicacion']}</p:outputLabel>
+								<p:selectOneMenu id="viaComunicacion" value="#{datosPersonasBean.idViaComunicacionSeleccionada}" disabled="#{not editable}">
+		               				<f:selectItem itemLabel="Seleccione una opción" itemValue="#{null}" noSelectionOption="true" />
+									<f:selectItems value="#{datosPersonasBean.listaValoresDominioViaComunicacion}" var="via" 
+										itemLabel="#{via.descripcion}"
+										itemValue="#{via.id}" />
+								</p:selectOneMenu>
+								</div>
+								
+							</div>		    				    		
+			   			</div>
+			   		</p:fieldset>
+			   		
+			   		<p:fieldset id="bloqueRelExp" legend="#{mensaje['expedientes.relacionados']}" toggleable="true" 
+			   					toggleSpeed="250" rendered="#{datosPersonasBean.persona.id != null}" > 
+			   			<p:dataTable 		
+							var="expPerExp" id="tablaRelExpPerExp"
+							value="#{datosPersonasBean.lazyModel}"
+							paginator="true"
+							paginatorTemplate=" {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+							rowsPerPageTemplate="10,20,50,100" rows="10"
+							currentPageReportTemplate="#{mensaje['paginador.template']}"
+							selectionMode="single"
+							rowKey="#{expPerExp.id}" paginatorPosition="bottom" 
+							sortBy="#{datosPersonasBean.defaultOrden}"
+							sortOrder="ascending" >
+							
+								<p:column headerText="#{mensaje['principal']}"
+									width="80"
+									sortBy="#{expPerExp.persPrincipal}">
+									<p:selectBooleanCheckbox
+										value="#{expPerExp.persPrincipal}" disabled="true">
+									</p:selectBooleanCheckbox>
+								</p:column>
+			
+								<p:column headerText="#{mensaje['numero.expediente']}"
+									sortBy="#{expPerExp.numExpediente}">
+									<h:outputText value="#{expPerExp.numExpediente}" />
+								</p:column>
+								
+								<p:column headerText="#{mensaje['nombre.expediente']}"
+									sortBy="#{expPerExp.nombreExpediente}">
+									<h:outputText value="#{expPerExp.nombreExpediente}" />
+								</p:column>
+								
+								<p:column headerText="#{mensaje['motivo.relacion']}" 
+									sortBy="#{expPerExp.motivoRelacion}">
+						            <h:outputText value="#{expPerExp.motivoRelacion}"/>
+								</p:column>
+								
+								<p:column headerText="#{mensaje['acciones']}" rendered="#{datosPersonasBean.permisoConsPerExp and datosPersonasBean.numerosSaltos!=2}">
+									<p:commandButton id="consultarExpedientes" icon="pi pi-eye"
+										action="#{datosPersonasBean.onConsultar(expPerExp.id)}" />
+								</p:column>
+						</p:dataTable>
+			   		</p:fieldset>
+			   		
+			   		<p:outputPanel rendered="#{!datosPersonasBean.persona.esPF}">
+			   			<f:facet name="title">
+						    <h:outputText id="tituloTabPersonasRepresentantes" value="#{datosPersonasBean.tituloPestPersonasRepresentantes}"/>
+						    </f:facet>
+			   			<ui:include src="listadoPersonasRepresentantes.xhtml" />
+			   		</p:outputPanel>
+			   			   		
+			  		<div class="botonera-form" align="right">
+			    		<p:commandButton id="guardar" 
+			    			rendered="#{editable and not empty datosPersonasBean.persona.valorTipoPersona and datosPersonasBean.permisoSavePers == true}" 
+			    			icon="pi pi-save" value="#{mensaje['guardar']}" 
+			    			action="#{datosPersonasBean.savePersonas}" />
+			   
+						<p:commandButton id="cancelarPersona" value="#{mensaje['cancelar']}" 
+							rendered="#{editable}" icon="pi pi-times" 
+							action="#{datosPersonasBean.ejecutarVolver}">
+							<p:confirm header="#{mensaje['confirmar.operacion']}" message="#{mensaje['pregunta.confirma.cancelar']}" icon="pi pi-info-circle" />
+						</p:commandButton>
+						<p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true" >
+							<div class="botonera-form" align="right">
+								<p:commandButton value="#{mensaje['si']}" type="button" styleClass="ui-confirmdialog-yes" />
+								<p:commandButton value="#{mensaje['no']}" type="button" styleClass="ui-confirmdialog-no ui-button-flat" />
+							</div>							
+						</p:confirmDialog>
+			    	</div>	
+		   		</p:outputPanel>	
+	   		</p:panel>
+			
+			<br/>
+			
+			<p:commandButton id="volver" value="#{mensaje['volver']}" action="#{datosPersonasBean.ejecutarVolver}" />
+    	</h:form>
+    
+    </ui:define>
+    
+</ui:composition>  

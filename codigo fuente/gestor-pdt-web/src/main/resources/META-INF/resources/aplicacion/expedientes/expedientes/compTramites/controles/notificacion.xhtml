@@ -1,0 +1,43 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:c="http://java.sun.com/jstl/core"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:sec="https://joinfaces.org/security"
+    xmlns:fu="http://joinfaces.org/functions">
+<ui:composition>
+
+					<div class="celda-form">
+						<p:outputLabel rendered="#{tramExp.cfgMetadatosTram != null}" for="fechaNotificacion" value="#{tramExp.cfgMetadatosTram.fechaNotificacion}" />
+						<p:outputLabel rendered="#{tramExp.cfgMetadatosTram == null}" for="fechaNotificacion" value="#{mensaje['etiqueta.pendiente.definir']}" />
+						<p:datePicker id="fechaNotificacion" disabled="#{!editable}"
+							value="#{tramExp.detalleExpdteTram.fechaNotificacion}" locale="es"
+							monthNavigator="true" pattern="dd/MM/yyyy"
+							converterMessage="#{mensaje['formato.fecha.invalido']}"
+							mask="true" 
+							showButtonBar="true"
+							readonlyInput="true">
+								<p:ajax
+								listener="#{datosTramiteExpedienteBean.actualizarFechaLimite(tramExp)}" event="change" 
+								update="fechaLimite"/>
+							</p:datePicker>
+						<p:message for="fechaNotificacion" />
+					</div>
+					<div class="celda-form">
+						<p:outputLabel rendered="#{tramExp.cfgMetadatosTram != null}" for="comboResultNotif" value="#{tramExp.cfgMetadatosTram.notifInfructuosa}" />
+						<p:outputLabel rendered="#{tramExp.cfgMetadatosTram == null}" for="comboResultNotif" value="#{mensaje['etiqueta.pendiente.definir']}" />
+						<p:selectOneMenu id="comboResultNotif" disabled="#{!editable}"
+							value="#{tramExp.selectedNuevoResulNotificacionId}" >
+							<f:selectItem
+								itemLabel="#{mensaje['seleccione.una.opcion']}"
+								itemValue="#{null}" />
+							<f:selectItems
+								value="#{datosTramiteExpedienteBean.listaValoresDominioResultadosNotificacion}"
+								var="res" itemLabel="#{res.descripcion}" itemValue="#{res.id}" />
+						</p:selectOneMenu>
+					</div>		
+
+</ui:composition>
+</html>

@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:c="http://java.sun.com/jstl/core"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:sec="https://joinfaces.org/security"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+    xmlns:fu="http://joinfaces.org/functions">
+
+<ui:composition>
+
+	<c:set var="bean" value="#{generarDocumentosBean}" />
+	
+	<!-- DIALOGO GENERAR DOCUMENTOS -->
+	<p:dialog id="dialogGenerarDocs"
+		rendered="#{true or (bean.permisoIncorporar and editable and !(bean.expedientes.id == null))}"
+		header="#{bean.cabeceraDialog}" modal="true"
+		widgetVar="dialogGenerarDocs">
+	
+		<p:messages for="messagesFormularioGenerar"
+			id="messagesFormularioGenerar" showDetail="true" closable="true">
+			<p:autoUpdate />
+		</p:messages>
+		
+		<p:outputPanel id="camposGenerar">
+			<div class="celda-form">
+				<p:outputLabel value="#{mensaje['tipo.documento']} *"
+					for="tiposDocumentoGenerar" />
+				<p:selectOneMenu id="tiposDocumentoGenerar" style="min-width: 150px;"
+					value="#{bean.tipoDocumentoCfgId}"
+					disabled="#{not bean.camposDeshabilitados}">
+					<f:selectItem itemLabel="#{mensaje['seleccione.un']} #{mensaje['tipo.documento']}" itemValue="" />
+					<f:selectItems
+						value="#{bean.listaTiposDocumentos}"
+						var="td" itemLabel="#{fu:ptoSusp(td.descripcionTipoDoc)}" itemValue="#{td.id}">
+					</f:selectItems>
+					<p:ajax listener="#{bean.onSelectTipoDoc}" 
+						process="@this" update="plantillas, @(.controles-descripcion-generar)" />
+				</p:selectOneMenu>
+			</div>
+			<div class="celda-form">
+				<p:outputLabel value="#{mensaje['plantilla']} *"
+					for="plantillas" />
+				<p:selectOneMenu id="plantillas" style="min-width: 150px;"
+					value="#{bean.plantillaDocId}"
+					disabled="#{not bean.camposDeshabilitados or bean.tipoDocumentoCfgId == null}">
+					<f:selectItem itemLabel="#{mensaje['seleccione.una']} #{mensaje['plantilla']}" itemValue="" />
+					<f:selectItems
+						value="#{bean.listaPlantillas}"
+						var="p" itemLabel="#{fu:ptoSusp(p.descripcion)}" itemValue="#{p.id}">
+					</f:selectItems>
+				</p:selectOneMenu>
+			</div>
+			
+			<div class="celda-form">
+			<p:outputPanel styleClass="controles-descripcion-generar">
+					<p:commandButton icon="fa fa-magic"
+						id="btnGenerarDoc" value="#{mensaje['generar.documento']}"
+						rendered="#{bean.camposDeshabilitados and bean.permisoGenerar}"
+						actionListener="#{bean.generar(bean.tramiteExpediente)}" process="camposGenerar"
+						update="camposGenerar, controlesDescripcionGenerar">
+					</p:commandButton>
+			</p:outputPanel>
+			</div>
+		</p:outputPanel>
+		
+		<p:outputPanel id="controlesDescripcionGenerar" styleClass="controles-descripcion-generar">
+		<p:fieldset id="camposDocGenerado" style="width:845px">
+			<c:set var="docu" value="#{bean.documento}" />
+
+           	<p:outputPanel class="celda-form control-descripcion-boton">
+				<p:outputLabel for="descDocumentoExpGen" value="#{mensaje['descripcion']} *" />
+				<p:outputPanel class="#{empty bean.documento.listaCfgDescripcionesTipoDoc? '' : 'ui-inputgroup' }">
+					<p:inputText id="descDocumentoExpGen" disabled="#{bean.camposDeshabilitados}"
+						value="#{docu.descripcion}" size="65" maxlength="255" />
+					<p:commandButton id="btnSelectDesc_generar" icon="pi pi-search" 
+						style="#{not empty bean.documento.listaCfgDescripcionesTipoDoc? 'visibility:visible;margin-right:0px' : 'visibility:hidden;margin-right:3px'}"
+						disabled="#{empty bean.documento.listaCfgDescripcionesTipoDoc or bean.camposDeshabilitados}"
+						update="@namingcontainer:dialogDescripcionDocDefecto_generar"
+						process="@this" oncomplete="PF('dialogDescripcionDocDefecto_generar').show()" />
+					<p:tooltip for="btnSelectDesc_generar" value="#{mensaje['elegir.descripcion.defecto']}"
+						showEffect="fade" hideEffect="fade" position="top" showDelay="500" />
+				</p:outputPanel>													
+			</p:outputPanel>
+          	
+          	<div class="celda-form">
+				<p:outputLabel for="descAbrevDocumentoExpGen"
+					value="#{mensaje['descripcion.abreviada']}" />
+				<p:inputText id="descAbrevDocumentoExpGen" disabled="#{bean.camposDeshabilitados}"
+					value="#{docu.descripcionAbrev}" size="25" maxlength="100" />
+			</div>
+         	<div class="celda-form">
+				<p:commandButton id="verDocGen" icon="pi pi-eye" style="margin-bottom: 2px"
+					disabled="#{bean.camposDeshabilitados}" ajax="true" process="@this"
+					action="#{bean.vistaPreviaFichero}"
+					oncomplete="if(args.ok) PF_mostrar_visor_pdf_generar() ">
+				</p:commandButton>
+		
+				<p:remoteCommand name="PF_mostrar_visor_pdf_generar" action="#{vistaPreviaDocumentosBean.cargarUrl(docu)}"
+					process="@this" />
+
+			</div>
+			<div>
+			<div class="celda-form">
+				<p:outputLabel for="comboCategoriaDocumento"
+					value="#{mensaje['categoria']} *" />
+				<p:selectOneMenu id="comboCategoriaDocumento" value="#{docu.categoriaId}" 
+					disabled="#{bean.camposDeshabilitados}">
+					<f:selectItem itemLabel="Seleccione una categoría de documento"
+						itemValue="#{null}" />
+					<f:selectItems value="#{bean.listaCategoriasDocumentos}"
+						var="c" itemLabel="#{c.descripcion}" itemValue="#{c.id}" />
+				</p:selectOneMenu>
+			</div>
+			</div>
+			
+			<div class="celda-form" style="margin-top: 10px;">
+				<p:selectBooleanCheckbox id="docExpFirmadoGen"     value="#{docu.firmado}"     itemLabel="#{mensaje['firmado']}"     disabled="#{bean.camposDeshabilitados}" />
+				<p:selectBooleanCheckbox id="docExpSelladoGen"     value="#{docu.sellado}"     itemLabel="#{mensaje['sellado']}"     disabled="#{bean.camposDeshabilitados}" />
+				<p:selectBooleanCheckbox id="docExpAnonimizadoGen" value="#{docu.anonimizado}" itemLabel="#{mensaje['anonimizado']}" disabled="#{bean.camposDeshabilitados}" />
+				<p:selectBooleanCheckbox id="docExpAnonimizadoParcialGen" value="#{docu.anonimizadoParcial}" itemLabel="#{mensaje['anonimizado.parcial']}"  disabled="#{bean.camposDeshabilitados}" />
+				<p:selectBooleanCheckbox id="docExpEditableGen"    value="#{docu.editable}"    itemLabel="#{mensaje['editable']}"    disabled="#{bean.camposDeshabilitados}" />				
+			</div>
+		</p:fieldset>
+		
+	    <div class="botonera-form" align="right">
+			<p:commandButton icon="pi pi-check"
+				id="btnAceptarDocGen" value="#{mensaje['aceptar']}"
+				rendered="#{not bean.camposDeshabilitados}"
+				actionListener="#{bean.guardarGenerado}"
+				oncomplete="if(args.saved){ PF('dialogGenerarDocs').hide(); actualizar_documentos(); }" >
+			</p:commandButton>
+			<p:commandButton icon="pi pi-times" process="@this"
+				id="btnCancelarDocGen" value="#{mensaje['cancelar']}"
+				oncomplete="PF('dialogGenerarDocs').hide()" >
+				<p:confirm header="#{mensaje['confirmar.operacion']}"
+					message="#{mensaje['pregunta.confirma.cancelar']}"
+					icon="pi pi-info-circle" />
+			</p:commandButton>
+		</div>
+		</p:outputPanel>
+
+	</p:dialog>
+
+</ui:composition>
+</html>
