@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:c="http://java.sun.com/jstl/core"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:pe="http://primefaces.org/ui/extensions"
+      xmlns:sec="https://joinfaces.org/security">
+<ui:composition template="#{navegacionBean.get('TEMPLATE_LAYOUT_GENERICO')}">
+    <ui:define name="content">
+
+        <h:form id="formFormularioFormacionDfr">
+
+            <p:messages for="messagesFormularioFormacionDfr" id="messagesFormularioFormacionDfr" showDetail="true" closable="true">
+                <p:autoUpdate />
+            </p:messages>
+
+            <p:panel id="panelFormularioFormacionDfr">
+
+                <f:facet name="header">
+                    <h:outputText rendered="#{formularioFormacionDfrBean.modoAcceso eq 'alta'}" value="#{mensaje['formulario.alta.formaciondfr']}" style="font-weight:bold" />
+                    <h:outputText rendered="#{formularioFormacionDfrBean.modoAcceso eq 'edicion'}" value="#{mensaje['formulario.edicion.formaciondfr']}" style="font-weight:bold" />
+                    <h:outputText rendered="#{formularioFormacionDfrBean.modoAcceso eq 'consulta'}" value="#{mensaje['formulario.consulta.formaciondfr']}" style="font-weight:bold" />
+                </f:facet>
+
+                <p:spacer height="10" />
+
+                <div>
+                    <div class="celda-form">
+                        <p:outputLabel rendered="#{formularioFormacionDfrBean.editableFormulario}" for="codigo" value="#{mensaje['codigo']} *" />
+                        <p:outputLabel rendered="#{!formularioFormacionDfrBean.editableFormulario}" for="codigo" value="#{mensaje['codigo']}" />
+                        <p:inputText id="codigo" maxlength="50" size="15"
+                                     value="#{formularioFormacionDfrBean.codigo}"
+                                     disabled="#{!formularioFormacionDfrBean.editableFormulario}" />
+                    </div>
+
+                    <div class="celda-form">
+                        <p:outputLabel  for="descripcion" value="#{mensaje['descripcion']}" />
+                        <p:inputText id="descripcion" maxlength="255" size="30"
+                                     value="#{formularioFormacionDfrBean.descripcion}"
+                                     disabled="#{!formularioFormacionDfrBean.editableFormulario}" />
+                    </div>
+                </div>
+
+                <div>
+                    <div class="celda-form">
+                        <p:outputLabel for="activo"	value="#{mensaje['activo']}" />
+                        <p:selectBooleanCheckbox id="activo" disabled="#{!formularioFormacionDfrBean.editableFormulario}"
+                                                 value="#{formularioFormacionDfrBean.activo}"
+                                                 itemLabel="#{mensaje['si']}">
+                        </p:selectBooleanCheckbox>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="celda-form">
+                        <p:outputLabel for="listadoUsuarios" value="#{mensaje['usuarios']}" />
+                        <p:selectOneMenu id="listadoUsuarios" value="#{formularioFormacionDfrBean.selectedUsuario}"
+                                         disabled="#{!formularioFormacionDfrBean.editableFormulario}">
+                            <f:selectItem itemLabel="#{mensaje['seleccione.una.opcion']}" itemValue="#{null}" noSelectionOption="true" />
+                            <f:selectItems value="#{formularioFormacionDfrBean.listadoUsuarios}"
+                                           var="usuario" itemLabel="#{usuario.login}" itemValue="#{usuario.id}" />
+                        </p:selectOneMenu>
+                    </div>
+                </div>
+
+                <div class="botonera-form" align="right">
+                    <p:commandButton id="guardar" rendered="#{formularioFormacionDfrBean.editableFormulario}"
+                                     icon="pi pi-save" value="#{mensaje['guardar']}"
+                                     actionListener="#{formularioFormacionDfrBean.saveFormacionDfr()}" />
+                </div>
+
+            </p:panel>
+
+            <br/>
+
+            <p:commandButton id="volver" value="#{mensaje['volver']}"
+                             oncomplete="document.location.href='#{request.contextPath}/aplicacion/formaciondfr/listado_formacionDfr.xhtml'">
+            </p:commandButton>
+
+        </h:form>
+
+
+
+    </ui:define>
+
+</ui:composition>
+
+</html>

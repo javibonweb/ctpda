@@ -44,7 +44,6 @@ public class FormacionPruebasDfr extends Auditable{
     private Boolean activo;
 
     @Column(name = "D_DESCRIPCION")
-    @NotNull
     @Size(max = 255)
     @Getter
     @Setter
@@ -59,6 +58,8 @@ public class FormacionPruebasDfr extends Auditable{
 
     @Version
     @Column(name = "N_VERSION")
+    @Getter
+    @Setter
     private Long nVersion;
 
     @OneToOne(fetch = FetchType.LAZY)

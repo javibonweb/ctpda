@@ -4,6 +4,8 @@ import es.juntadeandalucia.ctpda.gestionpdt.model.FormacionPruebasDfr;
 import es.juntadeandalucia.ctpda.gestionpdt.model.Usuario;
 import es.juntadeandalucia.ctpda.gestionpdt.service.FormacionPruebasDfrService;
 import es.juntadeandalucia.ctpda.gestionpdt.service.UsuarioService;
+import es.juntadeandalucia.ctpda.gestionpdt.service.core.exception.BaseException;
+import es.juntadeandalucia.ctpda.gestionpdt.web.core.JsfUtils;
 import es.juntadeandalucia.ctpda.gestionpdt.web.core.LazyDataModelByQueryService;
 import es.juntadeandalucia.ctpda.gestionpdt.web.core.MyFilterMeta;
 import es.juntadeandalucia.ctpda.gestionpdt.web.menu.NavegacionBean.ListadoNavegaciones;
@@ -11,12 +13,15 @@ import es.juntadeandalucia.ctpda.gestionpdt.web.util.BaseBean;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.primefaces.PrimeFaces;
 import org.primefaces.model.SortMeta;
 import org.primefaces.model.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -29,6 +34,10 @@ import java.util.List;
 public class FormacionDfrBean extends BaseBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
+
+    // Constantes. Sonar si queja si no se usa así
+    private static final String MODOACCESO = "modoAcceso";
+    private static final String EDITABLE = "editable";
 
     @Getter @Setter
     private String codigoFiltro;
@@ -56,7 +65,7 @@ public class FormacionDfrBean extends BaseBean implements Serializable {
     private LazyDataModelByQueryService<FormacionPruebasDfr> lazyModel;
 
     @Getter
-    private SortMeta defaultOrden;
+    private SortMeta defaultOrdenListadoFormacionDfr;
 
     @Getter @Setter
     private FormacionPruebasDfr selectedFormacionPruebasDfr;
@@ -100,7 +109,9 @@ public class FormacionDfrBean extends BaseBean implements Serializable {
             }
         });
         // Ordenación por defecto. Ordena por codigo, viene del model (FormacionPruebasDfr)
-        defaultOrden = SortMeta.builder().field("codigo").order(SortOrder.ASCENDING).priority(1).build();
+        defaultOrdenListadoFormacionDfr = SortMeta.builder().field("codigo").order(SortOrder.ASCENDING).priority(1).build();
+
+        JsfUtils.removeSessionAttribute(MODOACCESO);
     }
 
     public String redireccionMenu() {
@@ -109,7 +120,10 @@ public class FormacionDfrBean extends BaseBean implements Serializable {
     }
 
     public String onCrear() {
-        return "";
+        JsfUtils.setFlashAttribute(EDITABLE, true);
+        JsfUtils.setSessionAttribute(MODOACCESO, "alta");
+        log.info("Accedemos al formulario en modo alta");
+        return ListadoNavegaciones.FORM_FORMACIONDFR.getRegla();
     }
 
     public void limpiarFiltros() {
@@ -119,5 +133,43 @@ public class FormacionDfrBean extends BaseBean implements Serializable {
         versionFiltro = null;
         fechaCreacionFiltro = null;
         selectedUsuarioFiltro = null;
+    }
+
+    public String onEditar(Long idFormacionDfr) {
+        JsfUtils.setFlashAttribute(EDITABLE, true);
+        JsfUtils.setSessionAttribute(MODOACCESO, "edicion");
+        JsfUtils.setFlashAttribute("idFormacionDfr", idFormacionDfr);
+        return ListadoNavegaciones.FORM_FORMACIONDFR.getRegla();
+    }
+
+    public String onConsultar(Long idFormacionDfr) {
+        JsfUtils.setFlashAttribute(EDITABLE, false);
+        JsfUtils.setSessionAttribute(MODOACCESO, "consulta");
+        JsfUtils.setFlashAttribute("idFormacionDfr", idFormacionDfr);
+        return ListadoNavegaciones.FORM_FORMACIONDFR.getRegla();
+    }
+
+    public void eliminarFormacionDfr (FormacionPruebasDfr formacionPruebasDfr) {
+        try {
+            formacionPruebasDfrService.delete(formacionPruebasDfr.getId());
+            FacesContext.getCurrentInstance().addMessage("messagesListadoFormaciondfr",new FacesMessage(FacesMessage.SEVERITY_INFO, "", "Formacion DFR borrada correctamente"));
+        } catch (BaseException e) {
+            FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "",mensajesProperties.getString("error"));
+            PrimeFaces.current().dialog().showMessageDynamic(message);
+            log.error(e.getMessage());
+        }
+    }
+
+
+    public void desactivarFormacionDfr (FormacionPruebasDfr formacionPruebasDfr) {
+        try {
+            formacionPruebasDfr.setActivo(false);
+            formacionPruebasDfrService.guardar(formacionPruebasDfr);
+            FacesContext.getCurrentInstance().addMessage("messagesListadoFormaciondfr",new FacesMessage(FacesMessage.SEVERITY_INFO, "", "Formacion DFR desactivada correctamente"));
+        } catch (BaseException e) {
+            FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "",mensajesProperties.getString("error"));
+            PrimeFaces.current().dialog().showMessageDynamic(message);
+            log.error(e.getMessage());
+        }
     }
 }
