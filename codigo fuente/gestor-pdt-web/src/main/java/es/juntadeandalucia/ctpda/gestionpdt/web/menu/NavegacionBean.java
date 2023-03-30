@@ -89,7 +89,7 @@ public class NavegacionBean implements Serializable{
 		LISTADO_FORMACIONBLH,
 		//FormacionDms
 		LISTADO_FORMACIONDMS,
-		
+		FORM_FORMACIONDMS,
 
 		FIN //No se usa. Hace de terminador
 		;

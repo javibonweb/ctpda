@@ -74,19 +74,103 @@
 							action="#{formacionDmsBean.onCrear}" />
 						<p:commandButton id="filtrar" value="#{mensaje['filtrar']}"
 							icon="pi pi-filter"
-							update=""
-							 /><!-- onstart="PF('usuarioWV').paginator.setPage(0);" -->
+							update="formListadoFormaciondms:listadoFormacionDms"
+							onstart="PF('formacionDmsWV').paginator.setPage(0);"/>
+							
 						<p:commandButton id="limpiarFiltro" icon="pi pi-filter-slash"
 							value="#{mensaje['limpiar.filtro']}"
 							actionListener="#{formacionDmsBean.limpiarFiltro()}"
 							update="formListadoFormaciondms:codigo_filtro,formListadoFormaciondms:descripcion_filtro,
 								formListadoFormaciondms:activo_filtro,formListadoFormaciondms:version_filtro,
-								formListadoFormaciondms:fechaCreacion_filtro,formListadoFormaciondms:usuarios_filtro"
-							 /> <!-- onstart="PF('usuarioWV').paginator.setPage(0);" -->
+								formListadoFormaciondms:fechaCreacion_filtro,formListadoFormaciondms:usuarios_filtro,
+								formListadoFormaciondms:listadoFormacionDms"
+							onstart="PF('formacionDmsWV').paginator.setPage(0);" />
 					</div>
 				</p:fieldset>
+				
+				<p:outputPanel id="panelListadoFormacionDms">
+					<p:dataTable var="formacionDms" id="listadoFormacionDms"
+						value="#{formacionDmsBean.lazyModalFormacionPruebasDms}" paginator="true"
+						paginatorTemplate=" {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+						rowsPerPageTemplate="10,20,50,100" rows="10"
+						currentPageReportTemplate="#{mensaje['paginador.template']}"
+						selectionMode="single" sortBy="#{formacionDmsBean.defaultOrdenListadoFormacionDms}"
+						sortOrder="ascending" selection="#{formacionDmsBean.selectedFormacionDms}"
+						rowKey="#{formacionDmsBean.id}" paginatorPosition="bottom"
+						widgetVar="formacionDmsWV">
+
+						<p:column headerText="#{mensaje['codigo']}" sortBy="#{formacionDms.codigo}">
+							<h:outputText value="#{formacionDms.codigo}" />
+						</p:column>
+						
+						<p:column headerText="#{mensaje['descripcion']}" sortBy="#{formacionDms.descripcion}">
+							<h:outputText value="#{formacionDms.descripcion}" />
+						</p:column>
+						
+						<p:column headerText="#{mensaje['activo']}" sortBy="#{formacionDms.activa}">
+							<h:outputText rendered="#{formacionDms.activa eq true}" value="#{mensaje['si']}" />
+							<h:outputText rendered="#{formacionDms.activa eq false}" value="#{mensaje['no']}" />
+						</p:column>
+						
+<!-- 						<p:column headerText="#{mensaje['version']}" sortBy="#{formacionDms.nVersion}"> -->
+<!-- 							<h:outputLabel value="#{formacionDms.nVersion}" /> -->
+<!-- 						</p:column> -->
+						
+						<p:column headerText="#{mensaje['fecha.creacion']}" sortBy="#{formacionDms.fechaCreacion}">
+							<h:outputText value="#{formacionBlh.fechaCreacion}" >
+								<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+							</h:outputText>
+						</p:column>
+						
+						<p:column headerText="#{mensaje['usuario']}" sortBy="#{formacionDms.usuario.login}">
+							<h:outputText value="#{formacionDms.usuario.login}" />
+						</p:column>
+						
+						<p:column headerText="#{mensaje['usuario.creacion']}" sortBy="#{formacionDms.usuCreacion}">
+							<h:outputText value="#{formacionDms.usuCreacion}" />
+						</p:column>
+
+						<p:column headerText="#{mensaje['acciones']}">
+							<p:commandButton id="edicionFormacionDms" widgetVar="edicionFormacionDms"
+								icon="pi pi-pencil" action="#{formacionDmsBean.onEditar(formacionDms.id)}"
+								immediate="true" >
+							</p:commandButton>
+							
+							<p:commandButton id="consultaFormacionDms" widgetVar="consultaFormacionDms"
+								icon="pi pi-eye" action="#{formacionDmsBean.onConsultar(formacionDms.id)}"
+								immediate="true" >
+							</p:commandButton>
+							
+							<p:commandButton id="eliminarFormacionDms" icon="pi pi-trash"
+								actionListener="#{formacionDmsBean.eliminarFormacionDms(formacionDms)}"
+								update="formListadoFormaciondms:listadoFormacionDms">
+								<p:confirm header="#{mensaje['confirmar.operacion']}" message="#{mensaje['pregunta.confirma.eliminar']}" icon="pi pi-info-circle" />
+							</p:commandButton>
+							
+							<p:commandButton id="desactivarFormacionDms" icon="pi pi-times"
+								actionListener="#{formacionDmsBean.desactivarFormacionDms(formacionDms)}"
+								update="formListadoFormaciondms:listadoFormacionDms">
+								<p:confirm header="#{mensaje['confirmar.operacion']}" message="#{mensaje['pregunta.confirma.eliminar']}" icon="pi pi-info-circle" />
+							</p:commandButton>
+							
+							<p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true">
+								<div class="botonera-form" align="right">
+									<p:commandButton value="#{mensaje['si']}" type="button" styleClass="ui-confirmdialog-yes" />
+									<p:commandButton value="#{mensaje['no']}" type="button" styleClass="ui-confirmdialog-no ui-button-flat" />
+								</div>								
+							</p:confirmDialog>
+						</p:column>
+						
+					</p:dataTable>
+				</p:outputPanel>
 			
 			</p:panel>
+			
+			<br/>
+			
+			<p:commandButton id="volver" value="#{mensaje['volver']}"
+				oncomplete="document.location.href='#{request.contextPath}/aplicacion/bienvenido.xhtml'">
+			</p:commandButton>
     	
     	</h:form>
     
