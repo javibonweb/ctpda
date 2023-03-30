@@ -73,7 +73,11 @@
                                          action="#{formacionDfrBean.onCrear}" />
                         <p:commandButton id="filtrar" value="#{mensaje['filtrar']}"
                                          icon="pi pi-filter"
-                                         update=""
+                                         update="formListadoFormaciondfr:codigo_filtro,formListadoFormaciondfr:descripcion_filtro,
+                                formListadoFormaciondfr:activo_filtro,formListadoFormaciondfr:version_filtro,
+                                formListadoFormaciondfr:fechaCreacion_filtro,formListadoFormaciondfr:usuarios_filtro,
+                                formListadoFormaciondfr:formacionPruebasDfr"
+                                         onstart="PF('formacionPruebasDfrWV').paginator.setPage(0);"
                         /><!-- onstart="PF('usuarioWV').paginator.setPage(0);" -->
                         <p:commandButton id="limpiarFiltros" icon="pi pi-filter-slash"
                                          value="#{mensaje['limpiar.filtro']}"
@@ -81,6 +85,7 @@
                                          update="formListadoFormaciondfr:codigo_filtro,formListadoFormaciondfr:descripcion_filtro,
 								formListadoFormaciondfr:activo_filtro,formListadoFormaciondfr:version_filtro,
 								formListadoFormaciondfr:fechaCreacion_filtro,formListadoFormaciondfr:usuarios_filtro"
+                                            onstart="PF('formacionPruebasDfrWV').paginator.setPage(0);"
                         /> <!-- onstart="PF('usuarioWV').paginator.setPage(0);" -->
                     </div>
                 </p:fieldset>
@@ -93,10 +98,14 @@
                                  rowsPerPageTemplate="10,20,50,100" rows="10"
                                  currentPageReportTemplate="#{mensaje['paginador.template']}"
                                  selectionMode="single"
-                                 sortBy="#{formacionDfrBean.codigoFiltro}"
-                                    paginatorPosition="bottom"
-                                    widgetVar="formacionPruebasDfrWV"
+                                 sortBy="#{formacionDfrBean.defaultOrden}"
+                                 sortOrder="ascending"
+                                 selection="#{formacionDfrBean.selectedFormacionPruebasDfr}"
+                                 rowKey="#{formacionPruebasDfr.id}"
+                                 paginatorPosition="bottom"
+                                 widgetVar="formacionPruebasDfrWV"
                     >
+
                         <p:column headerText="#{mensaje['codigo']}" sortBy="#{formacionPruebasDfr.codigo}">
                             <h:outputText value="#{formacionPruebasDfr.codigo}" />
                         </p:column>
@@ -104,18 +113,23 @@
                             <h:outputText value="#{formacionPruebasDfr.descripcion}" />
                         </p:column>
                         <p:column headerText="#{mensaje['activo']}" sortBy="#{formacionPruebasDfr.activo}">
-                            <h:outputText value="#{formacionPruebasDfr.activo}" />
+                            <h:outputText rendered="#{formacionPruebasDfr.activo eq true}" value="#{mensaje['si']}" />
+                            <h:outputText rendered="#{formacionPruebasDfr.activo eq false}" value="#{mensaje['no']}" />
+                        </p:column>
+                        <p:column headerText="#{mensaje['fecha.creacion']}" sortBy="#{formacionPruebasDfr.fechaCreacion}">
+                            <h:outputText value="#{formacionPruebasDfr.fechaCreacion}">
+                                <f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="#{mensaje['usuarios']}" sortBy="#{formacionPruebasDfr.usuario.login}">
+                            <h:outputText value="#{formacionPruebasDfr.usuario.login}" /> <!-- Muestra el login del usuario, es decir el nombre de usuario -->
+                        </p:column>
+                        <p:column headerText="#{mensaje['usuario.creacion']}" sortBy="#{formacionPruebasDfr.usuCreacion}">
+                            <h:outputText value="#{formacionPruebasDfr.usuCreacion}" />
                         </p:column>
                         <!--p:column headerText="#{mensaje['version']}" sortBy="#{formacionPruebasDfr.nVersion}">
                             <h:outputText value="#{formacionPruebasDfr.nVersion}" />
                         </p:column-->
-                        <p:column headerText="#{mensaje['fecha.creacion']}" sortBy="#{formacionPruebasDfr.fechaCreacion}">
-                            <h:outputText value="#{formacionPruebasDfr.fechaCreacion}" />
-                        </p:column>
-                        <p:column headerText="#{mensaje['usuarios']}" sortBy="#{formacionPruebasDfr.usuario}">
-                            <h:outputText value="#{formacionPruebasDfr.usuario}" />
-                        </p:column>
-
                     </p:dataTable>
                 </p:outputPanel>
 

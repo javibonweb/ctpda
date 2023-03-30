@@ -5,11 +5,14 @@ import es.juntadeandalucia.ctpda.gestionpdt.model.Usuario;
 import es.juntadeandalucia.ctpda.gestionpdt.service.FormacionPruebasDfrService;
 import es.juntadeandalucia.ctpda.gestionpdt.service.UsuarioService;
 import es.juntadeandalucia.ctpda.gestionpdt.web.core.LazyDataModelByQueryService;
+import es.juntadeandalucia.ctpda.gestionpdt.web.core.MyFilterMeta;
 import es.juntadeandalucia.ctpda.gestionpdt.web.menu.NavegacionBean.ListadoNavegaciones;
 import es.juntadeandalucia.ctpda.gestionpdt.web.util.BaseBean;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.primefaces.model.SortMeta;
+import org.primefaces.model.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -48,8 +51,15 @@ public class FormacionDfrBean extends BaseBean implements Serializable {
     @Getter @Setter
     private List<Usuario> listaUsuarios;
 
+    // Tabla Lazy
     @Getter
     private LazyDataModelByQueryService<FormacionPruebasDfr> lazyModel;
+
+    @Getter
+    private SortMeta defaultOrden;
+
+    @Getter @Setter
+    private FormacionPruebasDfr selectedFormacionPruebasDfr;
 
     @Autowired
     private FormacionPruebasDfrService formacionPruebasDfrService;
@@ -61,7 +71,7 @@ public class FormacionDfrBean extends BaseBean implements Serializable {
     @Override
     public void init(){
         super.init();
-        activoFiltro = true;
+        activoFiltro = true; // Por defecto activo el checkbox de activo
         listaUsuarios = new ArrayList<>();
         listaUsuarios = usuarioService.findUsuariosActivos();
 
@@ -69,7 +79,28 @@ public class FormacionDfrBean extends BaseBean implements Serializable {
         lazyModel = new LazyDataModelByQueryService<>(FormacionPruebasDfr.class, formacionPruebasDfrService);
         lazyModel.setPreproceso((a, b, c, filters) -> {
             //filtros
+            if (codigoFiltro != null && !codigoFiltro.isEmpty()) {
+                filters.put("codigo", new MyFilterMeta(codigoFiltro)); // Primero, nombre del campo del model
+            }
+            if (descripcionFiltro != null && !descripcionFiltro.isEmpty()) {
+                filters.put("descripcion", new MyFilterMeta(descripcionFiltro));
+            }
+            if (Boolean.TRUE.equals(activoFiltro)) {
+                filters.put("activo", new MyFilterMeta(activoFiltro));
+            }
+            //filters.put("activo", new MyFilterMeta(true)); // Forzamos a que se muestren los activos por defecto
+            if (versionFiltro != null) {
+                filters.put("nVersion", new MyFilterMeta(versionFiltro));
+            }
+            if (fechaCreacionFiltro != null) {
+                filters.put("fechaCreacion", new MyFilterMeta(fechaCreacionFiltro));
+            }
+            if (selectedUsuarioFiltro != null) {
+                filters.put("usuario.id", new MyFilterMeta(selectedUsuarioFiltro));
+            }
         });
+        // Ordenación por defecto. Ordena por codigo, viene del model (FormacionPruebasDfr)
+        defaultOrden = SortMeta.builder().field("codigo").order(SortOrder.ASCENDING).priority(1).build();
     }
 
     public String redireccionMenu() {
