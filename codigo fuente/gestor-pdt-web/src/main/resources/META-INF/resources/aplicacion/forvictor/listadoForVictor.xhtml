@@ -100,7 +100,109 @@
 					</div>
 				</p:fieldset>
 
+				<p:outputPanel id="panelListadoForVictor">
+					<p:dataTable var="forVictor" id="listadoForVictor"
+						value="#{forVictorBean.lazyModalFormacionPruebasVdc}"
+						paginator="true"
+						paginatorTemplate=" {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+						rowsPerPageTemplate="10,20,50,100" rows="10"
+						currentPageReportTemplate="#{mensaje['paginador.template']}"
+						selectionMode="single"
+						sortBy="#{forVictorBean.defaultOrdenListadoForVictor}"
+						sortOrder="ascending"
+						selection="#{forVictorBean.selectedForVictor}"
+						rowKey="#{forVictorBean.id}" paginatorPosition="bottom"
+						widgetVar="formacionVdcWV">
+
+						<p:column headerText="#{mensaje['codigo']}"
+							sortBy="#{forVictor.codigo}">
+							<h:outputText value="#{forVictor.codigo}" />
+						</p:column>
+
+						<p:column headerText="#{mensaje['descripcion']}"
+							sortBy="#{forVictor.descripcion}">
+							<h:outputText value="#{forVictor.descripcion}" />
+						</p:column>
+
+						<p:column headerText="#{mensaje['activo']}"
+							sortBy="#{forVictor.activa}">
+							<h:outputText rendered="#{forVictor.activa eq true}"
+								value="#{mensaje['si']}" />
+							<h:outputText rendered="#{forVictor.activa eq false}"
+								value="#{mensaje['no']}" />
+						</p:column>
+
+						<!-- 						<p:column headerText="#{mensaje['version']}" sortBy="#{formacionBlh.nVersion}"> -->
+						<!-- 							<h:outputLabel value="#{formacionBlh.nVersion}" /> -->
+						<!-- 						</p:column> -->
+
+						<p:column headerText="#{mensaje['fecha.creacion']}"
+							sortBy="#{forVictor.fechaCreacion}">
+							<h:outputText value="#{forVictor.fechaCreacion}">
+								<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+							</h:outputText>
+						</p:column>
+
+						<p:column headerText="#{mensaje['usuario']}"
+							sortBy="#{forVictor.usuario.login}">
+							<h:outputText value="#{forVictor.usuario.login}" />
+						</p:column>
+
+						<p:column headerText="#{mensaje['usuario.creacion']}"
+							sortBy="#{forVictor.usuCreacion}">
+							<h:outputText value="#{forVictor.usuCreacion}" />
+						</p:column>
+
+						<p:column headerText="#{mensaje['acciones']}">
+							<p:commandButton id="edicionForVictor"
+								widgetVar="edicionForVictor" icon="pi pi-pencil"
+								action="#{forVictorBean.onEditar(forVictor.id)}"
+								immediate="true">
+							</p:commandButton>
+
+							<p:commandButton id="consultaForVictor"
+								widgetVar="consultaForVictor" icon="pi pi-eye"
+								action="#{forVictorBean.onConsultar(forVictor.id)}"
+								immediate="true">
+							</p:commandButton>
+
+							<p:commandButton id="eliminarForVictor" icon="pi pi-trash"
+								actionListener="#{forVictorBean.eliminarForVictor(forVictor)}"
+								update="formListadoForVictor:listadoForVictor">
+								<p:confirm header="#{mensaje['confirmar.operacion']}"
+									message="#{mensaje['pregunta.confirma.eliminar']}"
+									icon="pi pi-info-circle" />
+							</p:commandButton>
+
+							<p:commandButton id="desactivarForVictor" icon="pi pi-times"
+								actionListener="#{forVictorBean.desactivarForVictor(forVictor)}"
+								update="formListadoForVictor:listadoForVictor">
+								<p:confirm header="#{mensaje['confirmar.operacion']}"
+									message="#{mensaje['pregunta.confirma.eliminar']}"
+									icon="pi pi-info-circle" />
+							</p:commandButton>
+
+							<p:confirmDialog global="true" showEffect="fade"
+								hideEffect="fade" responsive="true">
+								<div class="botonera-form" align="right">
+									<p:commandButton value="#{mensaje['si']}" type="button"
+										styleClass="ui-confirmdialog-yes" />
+									<p:commandButton value="#{mensaje['no']}" type="button"
+										styleClass="ui-confirmdialog-no ui-button-flat" />
+								</div>
+							</p:confirmDialog>
+						</p:column>
+
+					</p:dataTable>
+				</p:outputPanel>
+
 			</p:panel>
+
+			<br />
+
+			<p:commandButton id="volver" value="#{mensaje['volver']}"
+				oncomplete="document.location.href='#{request.contextPath}/aplicacion/bienvenido.xhtml'">
+			</p:commandButton>
 
 		</h:form>
 

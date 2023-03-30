@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:c="http://java.sun.com/jstl/core"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:sec="https://joinfaces.org/security"
+	template="#{navegacionBean.get('TEMPLATE_LAYOUT_GENERICO')}">
+
+	<ui:define name="content">
+	
+		<h:form id="formFormularioForVictor">
+		
+			<p:messages for="messagesFormularioForVictor" id="messagesFormularioForVictor" showDetail="true" closable="true">
+				<p:autoUpdate />
+			</p:messages>
+			
+			<p:panel id="panelFormularioForVictor">
+			
+				<f:facet name="header">
+					<h:outputText rendered="#{formularioForVictorBean.modoAcceso eq 'alta'}" value="#{mensaje['formulario.alta.forVictor']}" style="font-weight:bold" />
+					<h:outputText rendered="#{formularioForVictorBean.modoAcceso eq 'edicion'}" value="#{mensaje['formulario.edicion.forVictor']}" style="font-weight:bold" />
+					<h:outputText rendered="#{formularioForVictorBean.modoAcceso eq 'consulta'}" value="#{mensaje['formulario.consulta.forVictor']}" style="font-weight:bold" />
+				</f:facet>
+				
+				<p:spacer height="10" />
+				
+				<div>
+					<div class="celda-form">
+						<p:outputLabel rendered="#{formularioForVictorBean.editableFormulario}" for="codigo" value="#{mensaje['codigo']} *" />
+						<p:outputLabel rendered="#{!formularioForVictorBean.editableFormulario}" for="codigo" value="#{mensaje['codigo']}" />
+						<p:inputText id="codigo" maxlength="50" size="15"
+							value="#{formularioForVictorBean.codigo}"
+							disabled="#{!formularioForVictorBean.editableFormulario}" />
+					</div>
+					
+					<div class="celda-form">
+						<p:outputLabel  for="descripcion" value="#{mensaje['descripcion']}" />
+						<p:inputText id="descripcion" maxlength="255" size="30"
+							value="#{formularioForVictorBean.descripcion}"
+							disabled="#{!formularioForVictorBean.editableFormulario}" />
+					</div>
+				</div>
+				
+				<div>
+					<div class="celda-form">
+						<p:outputLabel for="activo"	value="#{mensaje['activo']}" />
+						<p:selectBooleanCheckbox id="activo" disabled="#{!formularioForVictorBean.editableFormulario}"
+							value="#{formularioForVictorBean.activo}"
+							itemLabel="#{mensaje['si']}">
+						</p:selectBooleanCheckbox>
+					</div>
+				</div>
+				
+				<div>
+					<div class="celda-form">
+						<p:outputLabel for="listadoUsuarios" value="#{mensaje['usuarios']}" />
+						<p:selectOneMenu id="listadoUsuarios" value="#{formularioForVictorBean.selectedUsuario}"
+							disabled="#{!formularioForVictorBean.editableFormulario}">
+							<f:selectItem itemLabel="#{mensaje['seleccione.una.opcion']}" itemValue="#{null}" noSelectionOption="true" />
+							<f:selectItems value="#{formularioForVictorBean.listadoUsuarios}"
+								var="usuario" itemLabel="#{usuario.login}" itemValue="#{usuario.id}" />
+						</p:selectOneMenu>
+					</div>
+				</div>
+				
+				<div class="botonera-form" align="right">
+					<p:commandButton id="guardar" rendered="#{formularioForVictorBean.editableFormulario}"
+						icon="pi pi-save" value="#{mensaje['guardar']}"
+						actionListener="#{formularioForVictorBean.saveForVictor()}" />
+				</div>
+				
+			</p:panel>
+			
+			<br/>
+			
+			<p:commandButton id="volver" value="#{mensaje['volver']}"
+				oncomplete="document.location.href='#{request.contextPath}/aplicacion/forvictor/listadoForVictor.xhtml'">
+			</p:commandButton>
+		
+		</h:form>
+	
+	
+	
+	</ui:define>
+	
+</ui:composition>

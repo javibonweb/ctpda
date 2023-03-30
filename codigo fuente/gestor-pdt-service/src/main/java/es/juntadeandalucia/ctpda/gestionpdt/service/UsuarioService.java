@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 
 import com.querydsl.core.BooleanBuilder;
 
-import es.juntadeandalucia.ctpda.gestionpdt.model.QUsuario;
 import es.juntadeandalucia.ctpda.gestionpdt.model.Usuario;
 import es.juntadeandalucia.ctpda.gestionpdt.repository.UsuarioRepository;
 import es.juntadeandalucia.ctpda.gestionpdt.service.core.AbstractCRUDService;
@@ -30,17 +29,17 @@ public class UsuarioService extends AbstractCRUDService<Usuario> {
 
 	protected UsuarioService(@Autowired MathsQueryService mathsQueryService,
 			@Autowired UsuarioRepository usuarioRepository) {
-		super(mathsQueryService, usuarioRepository, QUsuario.usuario);
+		super(mathsQueryService, usuarioRepository, null);
 		// también lo guardo para mi por si quiero hacer consultas personalizadas.
 		this.usuarioRepository = usuarioRepository;
 	}
-	
+
 	public Usuario nuevoUsuario() {
 		Usuario u = new Usuario();
-		
+
 		u.setActiva(Boolean.TRUE);
-		//No se tienen en cuenta sexo, tipo, etc.
-		
+		// No se tienen en cuenta sexo, tipo, etc.
+
 		return u;
 	}
 
@@ -55,35 +54,33 @@ public class UsuarioService extends AbstractCRUDService<Usuario> {
 		log.debug("Verifico si puedo eliminar y elevo excepción sino");
 
 	}
-	
-	public Usuario findUsuarioActivo(String usuario, String clave){
+
+	public Usuario findUsuarioActivo(String usuario, String clave) {
 		return usuarioRepository.findUsuarioActivo(usuario, clave);
 	}
-	
-	public List<Usuario> findFirmantesActivos(){
+
+	public List<Usuario> findFirmantesActivos() {
 		return usuarioRepository.findFirmantesActivos();
 	}
-	
-	
-	public Usuario findByLogin(String usuario){
+
+	public Usuario findByLogin(String usuario) {
 		return usuarioRepository.findByLogin(usuario);
 	}
-	
-	public Usuario findUsuarioLogado(){
+
+	public Usuario findUsuarioLogado() {
 		return this.findByLogin(loginUsuarioLogado());
 	}
-	
-	public String loginUsuarioLogado(){
+
+	public String loginUsuarioLogado() {
 		return SecurityContextHolder.getContext().getAuthentication().getName();
 	}
-		
-	
+
 	@Override
 	protected BooleanBuilder aniadirFiltrosCustom(List<FiltroDTO> filtros) {
 		return new BooleanBuilder();
 	}
 
-	public List<Usuario> findUsuariosActivos(){
+	public List<Usuario> findUsuariosActivos() {
 		return usuarioRepository.findUsuariosActivos();
 	}
 }

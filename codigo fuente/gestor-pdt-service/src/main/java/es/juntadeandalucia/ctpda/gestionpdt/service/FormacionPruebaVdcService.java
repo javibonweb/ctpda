@@ -30,7 +30,7 @@ public class FormacionPruebaVdcService extends AbstractCRUDService<FormacionPrue
 	 */
 	public FormacionPruebaVdcService(@Autowired MathsQueryService mathsQueryService,
 			@Autowired FormacionPruebaVdcRepository formacionPruebasBlhRepository) {
-		super(mathsQueryService, formacionPruebasBlhRepository, QFormacionPruebaVdc);
+		super(mathsQueryService, formacionPruebasBlhRepository, null);
 	}
 
 	@Override
