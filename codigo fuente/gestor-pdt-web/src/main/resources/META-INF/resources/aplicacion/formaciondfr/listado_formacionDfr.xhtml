@@ -135,6 +135,11 @@
 
             </p:panel>
 
+            <br/>
+            <p:commandButton id="volver" value="#{mensaje['volver']}"
+                             oncomplete="document.location.href='#{request.contextPath}/aplicacion/bienvenido.xhtml'">
+            </p:commandButton>
+
         </h:form>
     </ui:define>
 
