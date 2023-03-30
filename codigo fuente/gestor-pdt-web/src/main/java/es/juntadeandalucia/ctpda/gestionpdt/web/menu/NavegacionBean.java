@@ -88,6 +88,9 @@ public class NavegacionBean implements Serializable{
 		//Formacion DFR
 		LISTADO_FORMACIONDFR,
 		FORM_FORMACIONDFR,
+		//FormacionBlh
+		LISTADO_FORMACIONBLH,
+		FORM_FORMACIONBLH,
 
 		
 

@@ -82,6 +82,10 @@ public class UsuarioService extends AbstractCRUDService<Usuario> {
 	protected BooleanBuilder aniadirFiltrosCustom(List<FiltroDTO> filtros) {
 		return new BooleanBuilder();
 	}
+	
+	public List<Usuario> findUsuariosActivos(){
+		return usuarioRepository.findUsuariosActivos();
+	}
 
 	// Método para obtener los usuarios activos
     public List<Usuario> findUsuariosActivos() {
