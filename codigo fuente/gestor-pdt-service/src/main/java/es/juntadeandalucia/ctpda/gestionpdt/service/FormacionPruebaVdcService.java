@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import com.querydsl.core.BooleanBuilder;
 
 import es.juntadeandalucia.ctpda.gestionpdt.model.FormacionPruebaVdc;
-import es.juntadeandalucia.ctpda.gestionpdt.model.QFormacionPruebaVdc;
 import es.juntadeandalucia.ctpda.gestionpdt.repository.FormacionPruebaVdcRepository;
 import es.juntadeandalucia.ctpda.gestionpdt.service.core.AbstractCRUDService;
 import es.juntadeandalucia.ctpda.gestionpdt.service.core.MathsQueryService;
@@ -31,7 +30,7 @@ public class FormacionPruebaVdcService extends AbstractCRUDService<FormacionPrue
 	 */
 	public FormacionPruebaVdcService(@Autowired MathsQueryService mathsQueryService,
 			@Autowired FormacionPruebaVdcRepository formacionPruebasBlhRepository) {
-		super(mathsQueryService, formacionPruebasBlhRepository, QFormacionPruebasVdc.formacionPruebasVdc);
+		super(mathsQueryService, formacionPruebasBlhRepository, QFormacionPruebaVdc);
 	}
 
 	@Override
