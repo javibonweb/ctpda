@@ -197,7 +197,7 @@
 		<dependency>
 			<groupId>es.juntadeandalucia.ctpda.gestionpdt</groupId>
 			<artifactId>gestor-pdt-service</artifactId>
-			<version>${parent.version}</version>
+			<version>0.0.1</version>
 		</dependency>
 		<dependency>
 			<groupId>es.juntadeandalucia.ctpda.gestionpdt</groupId>
