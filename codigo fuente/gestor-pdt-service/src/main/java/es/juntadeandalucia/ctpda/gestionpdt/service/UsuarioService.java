@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.querydsl.core.BooleanBuilder;
 
+import es.juntadeandalucia.ctpda.gestionpdt.model.QUsuario;
 import es.juntadeandalucia.ctpda.gestionpdt.model.Usuario;
 import es.juntadeandalucia.ctpda.gestionpdt.repository.UsuarioRepository;
 import es.juntadeandalucia.ctpda.gestionpdt.service.core.AbstractCRUDService;
@@ -29,7 +30,7 @@ public class UsuarioService extends AbstractCRUDService<Usuario> {
 
 	protected UsuarioService(@Autowired MathsQueryService mathsQueryService,
 			@Autowired UsuarioRepository usuarioRepository) {
-		super(mathsQueryService, usuarioRepository, null);
+		super(mathsQueryService, usuarioRepository, QUsuario.usuario);
 		// también lo guardo para mi por si quiero hacer consultas personalizadas.
 		this.usuarioRepository = usuarioRepository;
 	}
