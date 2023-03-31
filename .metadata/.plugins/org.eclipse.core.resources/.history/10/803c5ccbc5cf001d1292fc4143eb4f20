@@ -1,0 +1,1005 @@
+#-----------------------------
+# Tildes y otros caracteres
+#-----------------------------
+# a -> \u00e1
+# e -> \u00e9
+# i -> \u00ed
+# o -> \u00f3
+# u -> \u00fa
+# � -> \u00f1
+
+
+# A -> \u00c1
+# E -> \u00c9
+# I -> \u00cd
+# O -> \u00d3
+# U -> \u00da
+
+# ' -> \u2018
+# " -> \u0022
+
+# abre interr.   -> \u00bf
+# cierra interr. -> \u003f
+#-----------------------------
+
+
+#Hola Mundo
+pdt.start-anonimo=Estas como usuario an\u00f3nimo
+pdt.holamundo=HOLA MUNDO
+pdt.starter=Inicio
+pdt.custom-input=Input Customizado
+pdt.my-tag=Ej Tag
+pdt.hi-cc=Ej com. custom
+pdt.idioma=Cambiar idioma
+pdt.idioma.es=Espa\u00f1ol
+pdt.idioma.en=Ingl\u00e9s
+pdt.pueblo-de=es un pueblo de
+pdt.data-table=Tabla Datos
+pdt.data-table-reactive=Tabla Datos (Reactivo)
+pdt.data-table.nombre=Nombre
+pdt.data-table.provincia=Provincia
+pdt.data-table.habitantes=Habitantes
+
+#ACCESO
+bienvenido=Bienvenido
+login=Login
+usuario=Usuario
+contrasenya=Contrase\u00f1a
+acceder=Acceder
+menu=Men\u00fa
+login.usuario.no.registrado=El usuario introducido no se encuentra dado de alta en el sistema.
+login.usuario.campos.obligatorios=Debe rellenar los campos obligatorios (*) para acceder al sistema.
+perfiles.asociados=Perfiles asociados
+pregunta.confirmar.salir.sistema=\u00bfEst\u00e1 seguro que desea salir del sistema\u003f
+cambio.perfil.asociado=Cambio de perfil asociado
+texto.bienvenida=Para la utilizaci\u00f3n de esta aplicaci\u00f3n inform\u00e1tica se debe tener en consideraci\u00f3n el C\u00f3digo de Conducta en el uso de las Tecnolog\u00edas de la Informaci\u00f3n y la Comunicaci\u00f3n para profesionales p\u00fablicos de la Administraci\u00f3n de la Junta de Andaluc\u00eda (BOJA n\u00fam. 22 de Octubre de 2020).
+ultimo.login=Anterior acceso del usuario al sistema 
+seleccione.perfil=Seleccione un perfil
+usuarios=Usuarios
+menu.aplicacion=Men\u00fa de la aplicaci\u00f3n
+ocultar.menu=Ocultar men\u00fa
+mostrar.menu=Mostrar men\u00fa
+
+
+## Monitor Actividad
+idle.message1=Su sesi\u00f3n ha expirado.
+idle.message2=Debe reiniciar la carga del sistema en el navegador.
+
+
+#CTPDA
+nombre.aplicacion=Gestor de Expedientes de CTPDA
+nombre.organismo=CONSEJO DE TRANSPARENCIA Y PROTECCI\u00d3N DE DATOS DE ANDALUC\u00cdA
+
+#Genericos
+inicio=Inicio
+filtros.busqueda=Filtros de b\u00fasqueda
+filtrar=Buscar
+limpiar.filtro=Inicializar b\u00fasqueda
+acciones=Acciones
+si=S\u00ed
+no=No
+guardar=Guardar
+activo=Activo
+activa=Activa
+descripcion=Descripci\u00f3n
+descripcion.abreviada=Descripci\u00f3n abreviada
+seleccione.una=Seleccione una
+seleccione.un=Seleccione un
+seleccione.una.opcion=Seleccione una opci\u00f3n
+seleccione.opciones=Seleccione las opciones
+confirmar.operacion=Confirmar operaci\u00f3n
+otras.operaciones=Otras operaciones
+aceptar=Aceptar
+cancelar=Cancelar
+todos=Todos
+volver=Volver
+quitar = Quitar
+cerrar = Cerrar
+tipo=Tipo
+paginador.template=(P\u00e1gina {currentPage} de {totalPages}) Total de {totalRecords} registros
+counter.template={0} caracteres restantes.
+etiqueta.pendiente.definir=Etiqueta pendiente definir
+
+#Mensajes validaciones
+error=Se produjo un error en la aplicaci\u00f3n. Consulte con su administrador.
+pregunta.confirma.eliminar=\u00bfEst\u00e1 seguro que desea eliminar este elemento\u003f
+pregunta.confirma.finalizar=\u00bfEst\u00e1 seguro que desea finalizar este elemento\u003f
+pregunta.confirma.activar=\u00bfEst\u00e1 seguro que desea activar de nuevo este elemento\u003f
+pregunta.confirma.desactivar=\u00bfEst\u00e1 seguro que desea desactivar este elemento\u003f
+pregunta.confirma.cancelar=\u00bfEst\u00e1 seguro que desea salir de la pantalla\u003f Los cambios no guardados se perder\u00e1n
+pregunta.confirma.cancelar.datos.modificados=\u00bfEst\u00e1 seguro que desea salir de la pantalla\u003f Existen valores modificados que a\u00fan no han sido guardados.
+campos.obligatorios=Debe rellenar los campos obligatorios (*)
+campos.obligatorios.guardar=Debe rellenar y guardar los campos obligatorios (*)
+campos.obligatorios.pestanya.general=Debe rellenar los campos obligatorios (*) de la pesta\u00f1a Datos generales.
+campos.obligatorios.pestanya.personas=Debe a\u00f1adir un registro a la pesta\u00f1a Datos de las personas.
+campos.obligatorios.pestanya.sujetos=Debe a\u00f1adir un registro a la pesta\u00f1a Datos de los organismos/sujetos obligados.
+guardado.correctamente=guardado correctamente
+guardada.correctamente=guardada correctamente
+guardados.correctamente=guardados correctamente
+guardadas.correctamente=guardadas correctamente
+anyadido.correctamente=a\u00f1adido correctamente
+anyadida.correctamente=a\u00f1adida correctamente
+actualizado.correctamente=actualizado correctamente
+actualizada.correctamente=actualizada correctamente
+actualizadas.correctamente=actualizadas correctamente
+anyadido.correctamente=a\u00f1adido correctamente
+eliminado.correctamente=eliminado correctamente
+eliminada.correctamente=eliminada correctamente
+eliminadas.correctamente=eliminadas correctamente
+finalizado.correctamente=finalizado correctamente
+finalizada.correctamente=finalizada correctamente
+desactivado.correctamente=desactivado correctamente
+desactivada.correctamente=desactivada correctamente
+reactivado.correctamente=reactivado correctamente
+reactivada.correctamente=reactivada correctamente
+existe.sistema=ya existe en el sistema
+otro.valor.dominio=para otro valor de dominio
+el.campo=El campo
+tipos.agrupacion.asociados.activos=no se puede eliminar, existen tipos de agrupaciones activos asociados a este.
+sujetos.obligados.asociados.activos=no se puede eliminar, existen organismos/sujetos obligados activos asociados a este.
+no.valido=no es v\u00e1lido.
+cambios.efectivos.boton.guardar=. Cuando pulse Guardar, los cambios se har\u00e1n efectivos.
+formato.fecha.invalido=Formato de fecha inv\u00e1lido
+debe.vacio=debe estar vac\u00edo.
+pregunta.confirma.erroneo=Este es un proceso irreversible. \u00bfEst\u00e1 seguro que desea marcar como err\u00f3neo este elemento\u003f
+sujeto.ya.erroneo=El sujeto ya ha sido marcado como err\u00f3neo
+no.existe.registro.config=No se encuentra el registro de configuraci\u00f3n. Consulte con su administrador.
+vinculado.correcto=El documento ha sido vinculado correctamente a la resoluci\u00f3n.
+#----------------------------------------------
+
+#Personas
+personas=Personas
+gestion.personas=Gesti\u00f3n de personas
+nombre.razonsocial=Nombre/Raz\u00f3n social
+primer.apellido=Primer apellido
+segundo.apellido=Segundo apellido
+apellidos=Apellidos
+nueva.persona=Nueva persona
+alta.persona=Alta de persona
+consulta.persona=Consulta de persona
+edicion.persona=Edici\u00f3n de persona
+tipo.persona=Tipo de persona
+seleccione.tipopersona=Seleccione un tipo de persona
+iniciales=Iniciales
+tipo.identificador=Tipo de identificador
+identificador=Identificador
+ident.persona=NIF/CIF de la Persona
+sexo=Sexo
+direccion=Direcci\u00f3n
+pais=Pais
+provincia=Provincia
+localidad=Municipio
+municipio=Localidad
+codigo.postal=C\u00f3digo postal
+razon.social=Raz\u00f3n social
+telefono.fijo=Tel\u00e9fono fijo
+telefono.movil=Tel\u00e9fono m\u00f3vil
+email=E-mail
+via.comunicacion=V\u00eda de comunicaci\u00f3n
+tipologia=Tipolog\u00eda
+datos.identificativos= Datos identificativos
+domicilio=Domicilio
+datos.contacto=Datos de contacto
+debe.seleccionar.tipo.persona=Debe seleccionar el tipo de persona para mostrar los campos correspondientes
+existe.sistema.persona.inactiva=ya existe en el sistema para una persona inactiva. Consulte con su administrador.
+representante.legal=Representante legal
+representantes=Representantes
+buscador.representante=Buscador de representante para la persona
+buscar.persona=Buscar persona
+buscador.persona=Buscador de persona
+representante.anyadido=Representante legal a\u00f1adido con \u00e9xito.
+representante.no.puede.eliminar=El representante legal no se puede eliminar. La persona jur\u00eddica siempre debe tener un representante principal relacionada con ella.
+representante.principal=El representante debe ser principal. La persona jur\u00eddica siempre debe tener un representante principal relacionada con ella.
+representante.principal.unico=La Entidad Jur\u00eddica va a quedar sin Representante Legal.\u00bfEst\u00e1 seguro quiere eliminar el registro\u003f
+formulario.persona=Formulario de la persona
+#--------------------------------------------------------
+#Administraci\u00f3n
+administracion=Administraci\u00f3n
+
+#Materias
+gestion.materias=Gesti\u00f3n de materias
+tipo.expediente=Tipo de expediente
+tipos.expedientes=Tipos de Expedientes
+nombre=Nombre
+nueva.materia=Nueva Materia
+materias=Materias
+alta.materia=Alta de Materia
+consulta.materia=Consulta de Materia
+edicion.materia=Edici\u00f3n de Materia
+
+#Parametros
+listado.parametros=Listado de par\u00e1metros
+nuevo.parametro=Nuevo par\u00e1metro
+nuevo.motivo.relacion=Nuevo motivo de relaci\u00f3n
+campo=Campo
+valor=Valor
+parametros=Par\u00e1metros
+gestion.parametros=Gesti\u00f3n de par\u00e1metros
+
+#Motivos de relaci\u00f3n
+motivos.relacion=Motivos de relaci\u00f3n
+gestion.motivos.relacion=Gesti\u00f3n de motivos de relaci\u00f3n entre expedientes
+nuevo.motivo.relacion=Nuevo motivo de relaci\u00f3n
+interesado=Interesado
+
+#Dominios
+dominios=Dominios
+gestion.dominios=Gesti\u00f3n de dominios
+nivel.anidamiento.max=Nivel anidamiento m\u00e1ximo
+bloqueado=Bloqueado
+punto.menu=Punto de men\u00fa
+
+#Valores dominio
+codigo.valor.dominio=C\u00f3digo
+codigo=Codigo
+orden=Orden
+gestion.de=Gesti\u00f3n de 
+consulta.de=Consulta de
+alta.de=Alta de
+edicion.de=Edici\u00f3n de
+datos.de=Datos de
+abreviatura=Abreviatura
+seleccione.tipo.expediente=Seleccione un tipo de expediente
+anidamientos.orden.valor.dominio=Los anidamientos se muestran en orden de descendencia para la entidad seleccionado
+crear=Crear
+crear.registro=Crear registro
+valor.dominio.asociados.activos=El valor de dominio no se puede eliminar, existen valores de dominios activos asociados a este.
+valor.dominio.nivel.anidamiento=El valor del nivel de anidamiento es superior al m\u00e1ximo permitido para el dominio asociado.
+formulario.de=Formulario de
+#-------------------------------------------
+#Administraci\u00f3n funcional
+administracion.funcional=Administraci\u00f3n Funcional
+
+#Tipos de agrupaciones
+tipos.agrupaciones=Tipos de agrupaciones
+gestion.tipos.agrupaciones=Gesti\u00f3n de tipos de agrupaciones
+datos.tipo.agrupacion=Datos de tipo de agrupaci\u00f3n
+tipo.agrupacion.superior=Tipo de agrupaci\u00f3n superior
+tipo.agr.superior=Tipo agr. superior
+tipo.agrupacion=Tipo de agrupaci\u00f3n 
+nivel.anidamiento=Nivel anidamiento
+nuevo.tipo.agrupacion=Nuevo Tipo Agrupaci\u00f3n
+anidamientos=Anidamientos
+anidamientos.orden.agrupacion=Los anidamientos se muestran en orden de descendencia para el tipo de agrupaci\u00f3n seleccionado
+alta.tipo.agrupacion=Alta tipo de agrupaci\u00f3n
+consulta.tipo.agrupacion=Consulta tipo de agrupaci\u00f3n
+edicion.tipo.agrupacion=Edici\u00f3n tipo de agrupaci\u00f3n
+agrupacion= Agrupaci\u00f3n
+gestion.agrupaciones= Gesti\u00f3n de agrupaciones
+nueva.agrupacion= Nueva agrupaci\u00f3n
+gestion.documentos.agrupacion= Gesti\u00f3n de documentos de agrupaci\u00f3n
+validacion.documentos.agrupacion= En una agrupaci\u00f3n debe haber siempre al menos 2 documentos
+agrupacion.eliminada= Agrupaci\u00f3n eliminada con \u00e9xito
+pregunta.confirma.rehabilitar.agrupacion=\u00bfEst\u00e1 seguro que desea rehabilitar este elemento\u003f
+agrupacion.rehabilitada= Agrupaci\u00f3n rehabilitada con \u00e9xito
+agrupacion.guardada= Agrupaci\u00f3n guardada con \u00e9xito
+agrupacion.editada= Agrupaci\u00f3n editada con \u00e9xito
+documentos.agrupacion= Documentos de la agrupaci\u00f3n
+formulario.tipo.agrupacion=Formulario de tipo de agrupaci\u00f3n
+
+#Sujetos obligados
+sujetos.obligados=Organismos/Sujetos obligados
+gestion.sujetos.obligados=Listado de organismos/sujetos obligados
+sujeto.obligado.superior=Organismo/Sujeto obligado superior
+tipo.agrupacion=Tipo de agrupaci\u00f3n
+nuevo.sujeto.obligado=Nuevo organismo/sujeto obligado
+datos.sujeto=Datos de los organismos/sujetos obligados
+sujeto.oblig.nivel.anidamiento=El nivel de anidamiento es mayor a 5 que es el valor de anidamiento m\u00e1ximo permitido.
+erroneo=Err\u00f3neo
+no.activo.erroneo=(err\u00f3neo)
+tiene.dpd=Tiene DPD
+#anidamientos=Anidamientos
+orden.visualizacion=Orden de visualizaci\u00f3n
+abreviatura1=Abreviatura 1
+abreviatura2=Abreviatura 2
+abreviatura3=Abreviatura 3
+ab1=Ab. 1
+abrev2=Abrev. 2
+email.contacto=Email de contacto
+codigo.dir3=C\u00f3digo DIR3
+organismo=Organismo
+seleccione.sujeto.obligado.superior=Seleccione un organismo/sujeto obligado superior
+seleccione.tipo.agrupacion=Seleccione un tipo de agrupaci\u00f3n
+seleccione.provincia=Seleccione una provincia
+alta.sujetos.obligados=Alta organismo/sujeto obligado
+consulta.sujetos.obligados=Consulta organismos/sujetos obligados
+edicion.sujetos.obligados=Edici\u00f3n organismos/sujetos obligados
+anidamientos.orden.sujeto=Los anidamientos se muestran en orden de descendencia para el organismo/sujeto obligado seleccionado
+anidamientos=Anidamientos
+valor.orden.visualizacion.no.valido=Valor de orden de visualizaci\u00f3n no v\u00e1lido.
+seleccione.tipo.agrupacion.superior=Seleccione un tipo de agrupaci\u00f3n superior
+sujeto.obligado=Organismo/Sujeto obligado
+puesto.titular=Puesto titular
+contacto.unidad.transparencia=Contacto de la unidad de transparencia
+contacto.dpd=Contacto del DPD
+es.dpd=DPD
+unidad.transparencia=Unidad de transparencia
+filtrar.sujeto.superior=Filtrar por Organismo/Sujeto obligado superior
+formulario.sujetos.obligados=Formulario de organismo/sujeto obligado
+incorporacion.autom.suj.oblig=Se han incorporado autom\u00e1ticamente datos del DPD para el sujeto obligado
+suj.oblig.existe.ultim.exp=existentes en su \u00faltimo expediente
+datos.del.dpd=Datos del DPD
+
+#Tramites abiertos
+tramites.abiertos=Tr\u00e1mites en curso
+notificaciones.en.curso=Notificaciones en curso
+notificaciones.pendientes.acuse=Notificaciones pendientes de acuse
+firmas.en.curso=Firmas en curso
+buscador.tramites.abiertos=Buscador de tr\u00e1mites en curso
+buscador.notificaciones.abiertas=Buscador de notificaciones en curso
+buscador.notificaciones.pendientes=Buscador de notificaciones pendientes de acuse
+buscador.firmas.abiertas=Buscador de firmas en curso
+firmante=Firmante
+fecha.firma=Fecha firma
+tipo.tramite=Tipo de Tr\u00e1mite
+responsable.tramite=Responsable Tr\u00e1mite  
+resp.tramite=Resp Tr\u00e1mite
+aviso.responsable.tramite.cambiado=Se ha modificado el responsable del tr\u00e1mite. Como consecuencia, todas las tareas asociadas en este tr\u00e1mite a ''{0}'' se han reasignado a ''{1}''.
+aviso.responsable.subtramite.cambiado=Se ha modificado el responsable del subtr\u00e1mite. Como consecuencia, todas las tareas asociadas en este subtr\u00e1mite a ''{0}'' se han reasignado a ''{1}''.
+rango.inicial=Rango inicial fecha inicio
+rango.final=Rango final fecha inicio
+rango.fechas.incompleto=Para filtrar por rango de fechas debe introducir ambas fechas.
+suj.oblig=Sujeto obligado
+fecha.rango.ini.posterior=La fecha inicial del rango no puede ser posterior a la fecha final.
+acuse.recibo=Acuse de recibo
+registro=registro
+datos.notificacion=Datos notificaci\u00f3n
+
+#Notificaciones abiertas
+tipo.interviniente=Tipo interviniente
+
+
+#Expedientes
+expedientes=Expedientes
+gestion.expedientes=Gesti\u00f3n de expedientes
+gestion.entradas=Gesti\u00f3n de entradas
+entrada.no.calificada=Entrada no calificada
+tipo.expedientes=Tipo de expediente
+num.expediente=N\u00fam. expediente
+num.exp=N\u00fam. exp.
+numero.expediente=N\u00famero de expediente
+numero.entrada=N\u00famero de entrada
+situacion=Situaci\u00f3n
+subsituacion=Subsituaci\u00f3n
+situacion.libre=Situaci\u00f3n libre
+fecha.entrada=Fecha de Entrada
+fecha.entrada.consejo=Fecha Entrada en el Consejo
+rango.fecha.entrada.inicial=Rango inicial Fecha Entrada
+rango.fecha.entrada.final=Rango final Fecha Entrada
+persona=Persona
+representate=Representante
+nuevo.expediente=Nuevo expediente
+nueva.entr=Nueva entrada
+nueva.entrada=Nueva entrada documentaci\u00f3n
+alta.expedientes=Alta de expediente
+consulta.expedientes=Consulta de expediente
+edicion.expedientes=Edici\u00f3n de expediente
+seleccionar.tipo.expediente=Seleccionar tipo de expediente
+crear.tipo.expediente=Para crear un expediente debe seleccionar previamente el tipo de expediente que sea a\u00f1adir
+expediente.pestania.principal=Principal
+aviso.tramitacion.anonima=TRAMITACI\u00d3N AN\u00d3NIMA
+aviso.abstencion.recusacion=ABSTENCI\u00d3N/RECUSACI\u00d3N
+actualizado=Actualizado
+acuerdo=Acuerdo
+resolucion=Resoluci\u00f3n
+datos.generales=Datos generales
+datos.persona=Datos de las personas 
+reclamante=Reclamante
+datos.sujeto.obligado=Datos de los organismos/sujetos obligados
+reclamado=Reclamado
+expedientado=Incoado
+involucrado=Involucrado
+documentos=Documentos
+tramitacion=Tramitaci\u00f3n
+entrada.documentacion=Incorporaci\u00f3n documentos
+evolucion.expedinte=Evoluci\u00f3n del expediente
+evolucion=Evoluci\u00f3n
+evol=Evol.
+#seleccionar.tipo.infraccion=Seleccione un tipo de infraccion
+seleccionar.tipo.infraccion=Seleccione una opci\u00f3n
+tipo.infraccion=Tipo de infracci\u00f3n
+datos.generales=Datos generales
+seleccionar.tipo.situacion=Seleccione una situaci\u00f3n
+nombre.expediente=Nombre del expediente
+materia=Materia
+seleccionar.tipo.materia=Seleccione una materia
+motivo.expediente=Motivo
+fecha.registro=Fecha de registro
+numRegistro=N\u00famero de registro
+canal.entrada=Canal de entrada
+seleccionar.canal.entrada=Seleccione un canal de entrada
+etiquetas=Etiquetas
+competencia.ctpda=Competencia CTPDA
+organismo.competente=Organismo competente
+autoridad.competente=Autoridad competente
+seleccionar.organismo.competente=Seleccione el organismo competente
+seleccionar.autoridad.competente=Seleccione la autoridad competente
+aepd=AEPD
+origen.aepd=Origen
+tramitacion.anonima=Tramitaci\u00f3n an\u00f3nima
+abstencion.recusacion=Abstenci\u00f3n/Recusaci\u00f3n
+tipo.admision=Tipo de admisi\u00f3n
+motivo.inadmision=Motivo inadmisi\u00f3n
+seleccionar.tipo.admision=Seleccione el tipo de admisi\u00f3n
+imposicion.medidas=Imposici\u00f3n de medidas
+api=API (Actuaciones previa de investigaci\u00f3n)
+instructor=Instructor PSAN
+seleccionar.instructor=Seleccione el instructor
+articulo.afectado=Art\u00edculo afectado
+seleccionar.articulo.afectado=Seleccione el art\u00edculo afectado
+derecho.reclamado=Derecho reclamado
+seleccionar.derecho.reclamado=Seleccione el derecho reclamado
+oposicion.solicitante=Oposici\u00f3n a consulta de datos de identidad de la persona solicitante
+oposicion.representante=Oposici\u00f3n a consulta de datos de identidad del representante
+solo.no.finalizados=S\u00f3lo no finalizados
+solo.no.finalizadas=S\u00f3lo no finalizadas
+expediente.identificado= Expediente preidentificado
+ultima.modificacion.motivo=\u00daltima modificaci\u00f3n: 
+formulario.expediente=Formulario del expediente
+formulario.entrada=Formulario de entrada de documentaci\u00f3n
+#personas expedientes
+datos.personas=Datos de la persona
+datos.interesado=Datos del interesado
+principal=Principal
+representante=Representante
+nombre.razon.social=Nombre/Raz\u00f3n social
+buscar.persona=Buscar persona
+motivo.relacion=Nombre del motivo de relaci\u00f3n
+asignar.motivo.relacion=Para terminar de relacionar la persona con el expediente debe marcar un motivo de relaci\u00f3n entre ambos.
+debe.ser.principal=La persona debe ser principal. El expediente siempre debe tener una persona principal relacionada con \u00e9l.
+persona.no.puede.eliminar=La persona no se puede eliminar. El expediente siempre debe tener una persona principal relacionada con \u00e9l.
+seleccionar.motivo.relacion=Seleccionar motivo de relaci\u00f3n
+instructor.api.noseleccionar=Si el check \u0022API\u0022 est\u00e1 sin marcar no debe haber un instructor seleccionado.
+instructor.api.seleccionar=Si el check \u0022API\u0022 est\u00e1 marcado debe seleccionar un instructor.
+datos.representante = Datos del representante
+ver.persona = Ver persona
+ver.expediente = Consultar expediente
+#sujetos expedientes
+datos.sujeto.obligado = Datos del sujeto
+buscar.sujeto=Buscar organismo/sujeto obligado
+buscador.sujeto=Buscador de organismo/sujeto obligado
+alta.sujetos.obligados.expediente=Alta del organismo/sujeto obligado del expediente
+sujeto.debe.ser.principal=El organismo/sujeto obligado debe ser principal. El expediente siempre debe tener un organismo/sujeto obligado principal relacionado con \u00e9l.
+sujeto.no.puede.eliminar=El organismo/sujeto obligado no se puede eliminar. El expediente siempre debe tener un organismo/sujeto obligado principal relacionado con \u00e9l.
+dpd=DPD (Delegado Protecci\u00f3n Datos)
+datos.dpd=Datos del delegado de protecci\u00f3n de datos
+#relacion expedientes
+expedientes.origen=Expedientes origen
+buscar.expediente=Buscar expediente
+seleccionar.motivo.relacion=Seleccionar motivo de relaci\u00f3n
+editar.motivo.relacion=Editar motivo de relaci\u00f3n
+asignar.motivo.relacion.expedientes.relacionados=Para terminar de relacionar los expedientes debe marcar un motivo de relaci\u00f3n entre expedientes.
+expediente.seleccionado=Expediente seleccionado
+expedientes.relacionados=Expedientes relacionados
+mod.relacion=Editar relaci\u00f3n
+borrar.relacion=Eliminar relaci\u00f3n
+#observaciones
+observaciones=Observaciones
+obs=Obs.
+nueva.observacion=Nueva observaci\u00f3n
+fecha=Fecha
+tipo.observacion=Tipo de observaci\u00f3n
+texto=Texto
+seleccionar.tipo.observacion=Seleccione un tipo de observaci\u00f3n
+crear.expediente=Crear expediente
+incorporar.expediente=Incorporar a expediente
+buscador.expedientes=Buscador de expedientes
+pregunta.seleccionar.expediente=\u00bfEst\u00e1 seguro que desea seleccionar este expediente para incorporar la entrada de documentaci\u00f3n\u003f
+pregunta.cambiar.responsable=Revise la "Mesa destino" (actualmente
+pregunta.cambiar.responsable2=) antes de crear un nuevo expediente. \u00bfEst\u00e1 seguro que desea continuar\u003f
+origen=Origen
+observacion=Texto de la observaci\u00f3n
+observacion.usu.alta=Usuario Alta
+observacion.fecha.alta=Fecha Alta
+observacion.usu.mod=Usuario Modif
+observacion.fecha.mod=Fecha Modif
+observacion.usu.modif=Usuario Modificaci\u00f3n
+observacion.fecha.modif=Fecha Modificaci\u00f3n
+
+edicion.observacion.exp.exp=Edici\u00f3n de observaci\u00f3n del expediente para el expediente
+edicion.observacion.exp=Edici\u00f3n de observaci\u00f3n del expediente
+consulta.observacion.exp.exp=Consulta de observaci\u00f3n del expediente para el expediente
+consulta.observacion.exp=Consulta de observaci\u00f3n del expediente 
+consulta.obsexp=Consulta de observaci\u00f3n
+ver.observacion=Ver observaci\u00f3n
+editar.observacion=Editar observaci\u00f3n
+alta.observacion.exp.exp=Alta de observaci\u00f3n del expediente
+alta.observacion.exp=Alta de observaci\u00f3n del expediente
+responsable.expediente = Responsable expediente
+aviso.responsable.expediente.cambiado=Se ha modificado el responsable del expediente. Como consecuencia, todas las tareas asociadas en este expediente a ''{0}'' se han reasignado a ''{1}''.
+fecha.infraccion=Fecha infracci\u00f3n
+fecha.infraccion.mayor.fecha.entrada.expediente=La fecha de infracci\u00f3n no puede ser mayor a la fecha de entrada del expediente
+infraccion.continuada=Infracci\u00f3n continuada
+gravedad=Gravedad
+fecha.prescripcion=Fecha prescripci\u00f3n
+fecha.solicitud=Fecha solicitud
+fecha.solicitud.ej=Fecha solicitud ej. dchos.
+indicador.no.respuesta=Indicador de no respuesta
+indicador.respuesta.insatisfactoria=Indicador de respuesta insatisfactoria
+fecha.solicitud.mayor.fecha.actual=La fecha de solicitud no puede ser mayor a la fecha actual
+fecha.respuesta.mayor.fecha.actual=La fecha de respuesta no puede ser mayor a la fecha actual
+
+
+#Documentos
+documento=Documento
+tipo.documento=Tipo de documento
+nombre.fichero=Nombre de fichero
+ext=Ext.
+extension=Extensi\u00f3n
+extension.fichero=Extensi\u00f3n de fichero
+ext.fichero=Ext. Fichero
+f.crea=F. Crea.
+#f.creacion=F. Creaci\u00f3n
+fecha.creacion=Fecha de creaci\u00f3n
+f.modif=F. Modif.
+fecha.modificacion=Fecha de modificaci\u00f3n
+usr.ult.mod=Usr. Ult. Mod.
+usuario.ultima.modificacion=Usuario de la \u00faltima modificaci\u00f3n
+fec.ult.mod=F/H Ult. Mod.
+fecha.hora.ultima.modificacion=Fecha y hora de la \u00faltima modificaci\u00f3n
+firmado=Firmado
+sellado=Sellado
+origen.interno=Origen interno
+origen.externo=Origen externo
+editable=Editable
+doc.trabajo=Doc. de trabajo
+anonimizado=Apto para publicaci\u00f3n
+apto.publicacion=Apto para publicaci\u00f3n
+anonimizado.parcial=Apto para traslado
+documento.sensible=Documento sensible
+apto.traslado=Apto para traslado
+descargar.documento=Descargar documento
+origen.documento.tramite=Origen del documento al ser asociado al tr\u00e1mite
+editar.documento=Editar documento en editor online
+convertir.doc.pdf=Convertir documento a PDF
+desactivar.documento=Desactivar documento
+eliminar.asociacion.tramite=Eliminar asociaci\u00f3n con tr\u00e1mite
+asociacion.tramite=Asociaci\u00f3n con tr\u00e1mite
+asociacion.tramite.expediente=Asociaciones con tr\u00e1mite y expediente
+pregunta.eliminarDocTr=El documento no se encuentra en ning\u00fan otro tr\u00e1mite. Si confirma, se borrar\u00e1 tambi\u00e9n el documento del expediente. \u00bfEst\u00e1 seguro que desea continuar\u003f
+pregunta.confirma.eliminarDocTr=\u00bfEst\u00e1 seguro que desea eliminar la asociaci\u00f3n con este tr\u00e1mite\u003f Esto no eliminar\u00e1 el documento del expediente.
+pregunta.confirma.eliminarDocTr.completo=El documento se va a borrar tanto del tr\u00e1mite como del expediente. Esta operaci\u00f3n es irreversible. \u00bfEst\u00e1 seguro que desea continuar\u003f
+pregunta.confirma.vincularDocTrSup=\u00bfEst\u00e1 seguro que desea vincular el documento al tr\u00e1mite superior\u003f.
+pregunta.confirma.vincularDocResol=\u00bfEst\u00e1 seguro que desea vincular el documento a la resoluci\u00f3n\u003f.
+pasar.documento.trabajo=Pasar a documentos de trabajo
+pasar.documento.expediente=Pasar a documentos de expediente
+editar.props.documento=Editar propiedades de documento
+subir.nuevos=Subir nuevos
+seleccionar.ficheros=Seleccionar ficheros
+subir.seleccionados=Subir seleccionados
+vaciar.lista=Vaciar lista
+documentos.expediente=Documentos del Expediente
+documentos.trabajo=Documentos de Trabajo
+documentos.tramite=Documentos del Tr\u00e1mite
+documentos.subtramite=Documentos del Subtr\u00e1mite
+fecha.creacion.ini=F. inicial creaci\u00f3n
+fecha.creacion.fin=F. final creaci\u00f3n
+fecha.modificacion.ini=F. inicial modif.
+fecha.modificacion.fin=F. final modif.
+categoria=Categor\u00eda
+abrir.categoria=Abrir todos los paneles de la categor\u00eda
+cerrar.categoria=Cerrar todos los paneles de la categor\u00eda
+subir.documentos=Subir documentos
+subir.seleccionados=Subir seleccionados
+extension.no.permitida=S\u00f3lo se permiten ficheros con extensi\u00f3n
+tam.maximo.superado=Tama\u00f1o m\u00e1ximo superado
+limite.ficheros.superado=Superado el l\u00edmite de ficheros a subir de una vez
+incorporar=Incorporar
+incorporar.documentos=Incorporar documentos
+seleccione.documentos.incorporar=Seleccione los documentos a incorporar
+exito.incorporados=Documentos incorporados con \u00e9xito
+exito.vinculados=Documentos vinculados con \u00e9xito
+exito.empujados=Documentos vinculados con \u00e9xito
+editar.propiedades.doc=Editar propiedades del documento
+filtro.fecha.creacion.incorrecto=La fecha de inicio de creaci\u00f3n no puede ser posterior a la de fin.
+filtro.fecha.modificacion.incorrecto=La fecha de inicio de modificaci\u00f3n no puede ser posterior a la de fin.
+reordenacion.no.permitida.filtro=Para usar esta funcionalidad debe pulsar previamente el bot\u00f3n Limpiar Filtro.
+reordenacion.no.permitida.ordendesc=Para usar esta funcionalidad la lista debe estar ordenada ascendentemente.
+exito.reordenacion=Documentos reordenados con \u00e9xito.
+campo.orden.falta=No se encuentra el campo Orden en la lista de SortMeta del datatable.
+elegir.descripcion.defecto=Elegir una descripci\u00f3n por defecto.
+texto.descripcion.defecto=Si lo desea puede elegir una descripci\u00f3n por defecto para el documento.
+descripcion.puntos.no.permitidos=No es posible incluir caracteres punto en la descripci\u00f3n de un documento.
+documentos.vinculables.no.encontrados=No se encuentran documentos vinculables.
+
+plantilla=Plantilla
+generar=Generar
+generar.documento=Generar documento
+documento.generado.correcto=Documento generado correctamente.
+
+relacionar.documentos=Relacionar documentos existentes
+vincular.documentos=Vincular documentos
+vincular.documento.sup=Vincular documento a tr\u00e1mite superior
+vincular.documento.resol=Vincular documento a resoluci\u00f3n
+vincular.solo.tramite.sup=Solo documentos del tr\u00e1mite superior
+desde.tramite=desde el tr\u00e1mite
+ver.vinculados=Ver ocultos
+ver.documentos=Ver documentos
+texto.documento.vinculado=Documento vinculado. Existen documentos cuyo origen de vinculaci\u00f3n es este.
+ver.documento=Ver documento en editor online
+aplicar.numexp.actual=Aplicar n\u00famero de expediente actual
+expediente.no.encontrado=Debe introducir un n\u00famero de expediente v\u00e1lido.
+expediente.origen.sin.documentos=El expediente de origen indicado no tiene ning\u00fan documento asociado.
+tramite.origen.sin.documentos=El tr\u00e1mite de origen no tiene ning\u00fan documento asociado.
+documentos.no.seleccionados=Debe seleccionar al menos un documento.
+tramite.no.seleccionado=Debe seleccionar al menos un tr\u00e1mite.
+aceptar.seleccion=Aceptar selecci\u00f3n
+
+ver.registro.accesos=Ver registro de accesos
+registro.accesos.documento=Registro de accesos a documento
+accesos.documento=Accesos al documento
+tipo.acceso=Tipo de acceso
+acceso.desde.evolucion=Acceso desde evoluci\u00f3n
+acceso.desde.resolucion=Acceso desde resoluci\u00f3n
+
+
+#Tramitacion expedientes
+tramite=Tr\u00e1mite
+tramite.superior=Tr\u00e1mite superior
+iniciar.tramite=Nuevo Tr\u00e1mite
+iniciar.evento=Nuevo Tr\u00e1mite Libre
+iniciar.tramite.libre=Nuevo Tr\u00e1mite No Reglado
+anyadir.tarea=A\u00f1adir Tarea
+anyadir.plazo=A\u00f1adir Plazo
+plazo=Plazo
+revisar.docs=Revisar Docs
+enviar.firmar.notificar=Enviar a Firmar y Notificar
+ver.firmar.notificar=Ver Firmar y Notificar
+finalizar=Finalizar
+finalizar.tramite=Finalizar tr\u00e1mite
+finalizar.subtramite=Finalizar subtr\u00e1mite
+finalizar.entrada=Finalizar entrada
+eliminar=Eliminar
+iniciar.actividad=Nuevo subtr\u00e1mite
+seleccionar.tramite=Seleccione un Tr\u00e1mite 
+tipo.tramite=Tipo Tr\u00e1mite
+tramite.iniciado.correcto=Tr\u00e1mite iniciado correctamente.
+tramite.traslado=Traslado
+tramite.traslado.dpd=Traslado DPD
+tramite.inicio=Inicio
+tramite.acadmision=Acuerdo Admisi\u00f3n
+tramite.entrada.espont=Entrada documento no solicitado
+tramite.abierto=Tr\u00e1mite abierto
+tramite.req.cumpl=Requerimiento acreditaci\u00f3n cumplimiento
+tramite.req.cumpl.aviso=Requerimiento acreditaci\u00f3n cumplimiento con Aviso
+tramite.req.inform.adic=Requerimiento Informaci\u00f3n Adicional
+tramite.req.subsan=Requerimiento Subsanaci\u00f3n
+tramite.resolucion=Resoluci\u00f3n
+tramite.respuesta=Respuesta a interesado
+tramite.traslado.ac=Traslado autoridad competente
+descripcion.abrev=Descripci\u00f3n abreviada
+crear.tipo.tramite=Para crear un tr\u00e1mite debe seleccionar previamente el tipo de tr\u00e1mite que sea a\u00f1adir
+crear.tipo.actividad=Para crear un subtr\u00e1mite debe seleccionar previamente el tipo de subtr\u00e1mite que sea a\u00f1adir
+responsable=Responsable
+mesa.destino=Mesa destino
+fecha.inicio=Fecha Inicio
+f.inicio=F. Inicio
+usuario.creacion= Usuario creador
+finalizar.subtramites.activos=No se puede finalizar el tr\u00e1mite. Alg\u00fan subtr\u00e1mite sigue abierto.
+eliminar.subtramites.activos=No se puede eliminar el tr\u00e1mite. Alg\u00fan subtr\u00e1mite sigue abierto.
+eliminar.tiene.docs=No se puede eliminar el tr\u00e1mite. Tiene documentos asociados. Eliminelos previamente.
+crear.tipo.tramite.existe=Ya existe el tr\u00e1mite asociado a este expediente. Para inicar este tr\u00e1mite debe finalizar el que existe y guardar el expediente.
+crear.tipo.subtramite.existe=Ya existe el subtr\u00e1mite asociado a este expediente. Para inicar este subtr\u00e1mite debe finalizar el que existe y guardar el expediente.
+seleccione.tipo.interesado=Seleccione un registro
+seleccione.canal.salida=Seleccione un Canal de Salida
+seleccione.identif.interesado=Seleccione un registro
+seleccione.resultado.notificacion=Seleccione un resultado
+resultado.notificacion.noinformado=No se puede finalizar el tr\u00e1mite sin informar el resultado de la notificaci\u00f3n.
+interesado.finalizar.tramite=No se puede finalizar el tr\u00e1mite sin informar el interesado.
+fecha.envio.finalizar.tramite=No se puede finalizar el tr\u00e1mite sin informar la fecha de env\u00edo. Debe rellenarla y guardar dicha fecha.
+fecha.firmar.finalizar.tramite=La fecha de firma es obligatoria para cerrar el tr\u00e1mite.
+firmante.finalizar.tramite=El firmante es obligatorio.
+tipo.firma.finalizar.tramite=El tipo de firma es obligatorio.
+fecha.respuesta.finalizar.tramite=La fecha de revisi\u00f3n es obligatoria para cerrar el tr\u00e1mite. Debe rellenarla y guardar dicha fecha.
+fecha.respuesta.post.fecha.envio.tramite=La fecha de revisi\u00f3n no puede ser anterior a la fecha de env\u00edo.
+fecha.entrada.post.fecha.sistema.tramite=La fecha de entrada debe ser anterior o igual a la fecha del sistema.
+fecha.entrada.post.fecha.envio=La fecha de entrada debe ser anterior o igual a la fecha de env\u00edo.
+fecha.acuerdo.post.fecha.envio=La fecha de acuerdo debe ser anterior o igual a la fecha de env\u00edo.
+fecha.firma.no.anterior.fecha.envio=La fecha de firma no puede ser anterior a la fecha de env\u00edo.
+fecha.envio.no.anterior.fecha.entrada=La fecha de env\u00edo no puede ser anterior a la fecha de entrada.
+fecha.notif.oblig=La fecha de notificaci\u00f3n es obligatoria para cerrar el tr\u00e1mite. Debe rellenarla y guardar dicha fecha.
+fecha.notif.no.anterior.fecha.envio=La fecha de notificaci\u00f3n no puede ser anterior a la fecha de env\u00edo.
+fecha.acredit.no.anterior.fecha.notif=La fecha de acreditaci\u00f3n no puede ser anterior a la fecha de notificaci\u00f3n.
+fecha.resp.no.anterior.fecha.notif=La fecha de respuesta no puede ser anterior a la fecha de notificaci\u00f3n.
+documento.activo.tramite=No se puede finalizar el tr\u00e1mite sin documentos asociados.
+documento.activo.subtramite=Debe existir al menos 1 documento asociado al tr\u00e1mite.
+no.finalizar.sin.datos.informados=No se puede finalizar el tr\u00e1mite sin informar todos los datos.
+fecha.notificacion.infructuosa.informada=Si la fecha de notificaci\u00f3n est\u00e1 informada no se puede marcar la casilla de notificaci\u00f3n infructuosa.
+fecha.notificacion.noinfructuosa.noinformada=Si la fecha de notificaci\u00f3n no est\u00e1 informada se debe marcar la casilla de notificaci\u00f3n infructuosa.
+fecha.notificacion=Fecha de notificaci\u00f3n
+motivo.inadmision.oblig=Tiene que seleccionar el motivo de inadmisi\u00f3n.
+formal = Formal
+informal = Informal
+fecha.fin.real= Fecha y hora de finalizaci\u00f3n real 
+fecha.fin.tramite= Fecha de finalizaci\u00f3n
+usuario.fin.tramite= Usuario de finalizaci\u00f3n
+rehabilitar= Volver a tramitar
+activarextantec=Activar
+preguntar.rehabilitar.tramite= \u00bfEst\u00e1 seguro que quiere cambiar el tr\u00e1mite a la situaci\u00f3n de Pendiente\u003f
+mensaje.cambio.situacion=El expediente {0} ha cambiado autom\u00e1ticamente a la situaci\u00f3n \u0022{1}\u0022.
+tramites.abiertos.fin.expediente=El cambio de situaci\u00f3n implica la finalizaci\u00f3n del expediente. No se puede ejecutar mientras haya otros tr\u00e1mites abiertos.
+tramites.abiertos.situ.final=La finalizaci\u00f3n de este tr\u00e1mite implica la finalizaci\u00f3n del expediente. No se puede ejecutar mientras haya otros tr\u00e1mites abiertos.
+finalizar.sin.propuesta.api=No se puede finalizar el tr\u00e1mite sin informar la Propuesta API.
+instrucciones.tramite=Instrucciones del tr\u00e1mite
+instrucciones.subtramite=Instrucciones del subtr\u00e1mite
+pregunta.generar.expediente.psan=La generaci\u00f3n del expediente Procedimiento sancionador no es un proceso reversible. \u00bfEst\u00e1 seguro que quiere continuar\u003f
+buscador.expedientes.psan=Buscador de expedientes Procedimiento sancionador
+pregunta.confirma.vincular.expediente.psan.primeraparte=\u00bfConfirma la asociaci\u00f3n del expediente 
+pregunta.confirma.vincular.expediente.psan.segundaparte= al expediente 
+pregunta.confirma.vincular.expediente.psan.terceraparte= \u003f
+fecha.informe.igual.anterior.actual.parte2= debe ser igual o anterior a la fecha actual.
+finalizar.comportamientoc14.elcampo= El campo 
+finalizar.comportamientoc14.tener.valor= debe tener un valor.
+tipo.firma=Tipo firma
+cerrar.tareas=Se va a proceder a cerrar la(s) tareas (s) 
+
+indicador.extracto.expediente=Incluir en plantilla
+extracto=Rese\u00f1a
+extractos=Rese\u00f1as
+editar.extracto=Editar rese\u00f1a
+indicador.antecedentes.expediente=Incluir en plantilla
+antecedentes=Antecedentes
+editar.antecedentes=Editar antecedentes
+indicador.extracto.marcado=No se puede marcar la casilla de rese\u00f1a si el texto de la rese\u00f1a est\u00e1 vac\u00edo.
+indicador.antecedentes.marcado=No se puede marcar la casilla de antecedentes si el texto de los antecedentes est\u00e1 vac\u00edo.
+incluir=Incluir en plantilla
+f.genera=F.generaci\u00f3n
+
+
+#Tareas
+tarea=Tarea
+tareas=Tareas
+mi.mesa=Mi mesa
+mi.mesa.tareas=Mi mesa de trabajo
+mesa.tareas.de=Mesa de trabajo de
+incluyendo.equipo=(incluyendo al equipo)
+crear.tarea=Crear tarea
+editar.tarea=Editar tarea
+consultar.tarea=Consultar tarea
+de.expediente=de expediente
+de.tramite=de tr\u00e1mite
+de.documento=de documento
+tipo.tarea=Tipo de tarea
+equipo=Equipo
+urgente=Urgente
+tarea.urgente=Tarea urgente
+tarea.dependiente=Tarea realizable
+aviso.tareas.relacionadas=TAREAS RELACIONADAS
+crear.tarea.documento=Crear tarea de documento
+ver.tarea.documento=Ver tarea de documento
+pregunta.confirma.rehabilitar.tarea=\u00bfEst\u00e1 seguro que desea rehabilitar este elemento\u003f
+pregunta.confirma.finalizar.tarea.listado=\u00bfRealmente quiere finalizar la tarea ''{0}'' del expediente ''{1}''\u003f
+pregunta.confirma.finalizar.tarea=\u00bfEst\u00e1 seguro que desea finalizar la tarea\u003f
+eliminar.tarea=Eliminar tarea
+reactivar.tarea=Reactivar tarea
+rehabilitar.tarea=Rehabilitar tarea
+usuario.alta.tarea=Usuario de alta
+responsable.tramitacion=Responsable de tramitaci\u00f3n
+responsable.tarea=Responsable tarea
+fecha.inicio.tarea=Fecha de inicio
+fecha.limite.tarea=Fecha l\u00edmite
+usuario.cierre.tarea=Usuario de cierre
+fecha.de.cierre.tarea=Fecha de cierre
+fecha.cierre.tarea=Fecha cierre
+situacion.tarea=Situaci\u00f3n
+situacion.tarea.pendiente=Pendiente
+situacion.tarea.cerrada=Cerrada
+tipo.alta.tarea=Tipo de alta
+tipo.alta.tarea.manual=Manual
+tipo.alta.tarea.automatica=Autom\u00e1tica
+indicaciones.tarea=Indicaciones
+indicaciones.nota=Anotaciones a tener en cuenta en la tarea que sigue a la actual.
+tramite.tarea=Tr\u00e1mite
+av=Av.
+tarea.aviso=Aviso
+sin.avisos=Sin avisos
+solo.avisos=Solo avisos
+dep=Actuar
+ultimo.responsable=Mesa actual
+mesa=Mesa
+seleccionar.responsable.cambio.auto=Seleccionar responsable
+cierre.tareas=Cierre tareas
+tareas.cerrar.auto=TAREAS QUE SE VAN A CERRAR AUTOMÁTICAMENTE
+aviso.tareas.cerrar.auto=Se van a cerrar autom\u00e1ticamente {0} tareas. ¿Est\u00e1 seguro que desea continuar?
+aviso.tareas.cerrar.auto.1=Se va a cerrar autom\u00e1ticamente 1 tarea. ¿Est\u00e1 seguro que desea continuar?
+
+rechazar=Rechazar
+rechazar.tarea=Rechazar tarea
+motivo.rechazo=Motivo de rechazo
+aviso.motivo.rechazo=La tarea va a ser devuelta a su creador. Indique el motivo del rechazo:
+motivo.rechazo.obligatorio=Debe indicar el motivo del rechazo de la tarea.
+responsable.tramitacion.inactivo=El responsable seleccionado no est\u00e1 activo. Debe asignar un responsable activo a la tarea.
+finalizar.tarea=Finalizar tarea
+tramitar.tarea=Tramitar tarea
+no.existe.tarea.documento=El documento ya no tiene asociada una tarea de revisi\u00f3n. 
+existe.tarea.documento=El documento ya tiene asociada una tarea de revisi\u00f3n. 
+fecha.limite.tarea.anterior.inicio=La fecha l\u00edmite no puede ser anterior a la de inicio.
+
+#Formulario expediente - evolucion de expediente
+rango.fecha.inicial = Rango fecha inicial
+rango.fecha.final = Rango fecha final
+solo.nivel.superior = S\u00f3lo nivel superior
+estado = Estado
+abierto = Abierto
+finalizado = Finalizado
+tipo.interesado = Tipo de interesado
+interesado = Interesado
+canal.salida = Canal salida
+datos.canal.salida = Datos canal salida
+fecha.envio = Fecha env\u00edo
+descripcion.tramite=Descripci\u00f3n tr\u00e1mite
+descripcion.tramite.superior=Descripci\u00f3n tr\u00e1mite superior
+fecha.respuesta = Fecha respuesta
+fecha.respuesta.ej=Fecha respuesta ej. dchos.
+fecha.alta=Fecha de alta
+fecha.tramite=Fecha del tr\u00e1mite
+info.relevante=Informaci\u00f3n relevante
+
+
+# Plazos del expediente
+control.plazos = Control de plazos
+gestion.control.plazos = Gesti\u00f3n de control de plazos
+tipo.plazo = Tipo de plazo
+fecha.limite = Fecha l\u00edmite
+dias.restantes = D\u00edas restantes
+situacion.expediente = Situaci\u00f3n del expediente
+responsable.expediente = Responsable del expediente
+
+#PLAZOS
+no.existe.registro.config.aut=No se encuentra el registro de configuraci\u00f3n de plazo autom\u00e1tico.
+mas.de.un.registro.config.aut=Existe m\u00e1s de un registro de configuraci\u00f3n para el plazo solicitado en la tabla de configuraci\u00f3n.
+solicitud.creacion.plazo.existe=Solicitud de creaci\u00f3n de plazo ya existente.
+solicitud.modif.plazo.no.existe=Solicitud de modificaci\u00f3n de plazo no existente.
+solicitud.final.plazo.no.existe=Solicitud de finalizaci\u00f3n de plazo no existente.
+plazo.creado.aut.tram=Plazo creado autom\u00e1ticamente por tr\u00e1mite
+plazo.creado.alta.expediente=Plazo creado autom\u00e1ticamente en el alta del expediente.
+plazo.cerrado.aut.tram=Plazo cerrado autom\u00e1ticamente por tr\u00e1mite
+plazo.modificado.aut.tram=Plazo modificado autom\u00e1ticamente por tr\u00e1mite
+y.subtramite=y subtr\u00e1mite
+seleccione.tipoplazo=Seleccione un tipo de plazo
+dar.cumplido = Dar por cerrado
+pregunta.confirma.cumplirplazo = \u00bfEst\u00e1 seguro que desea dar por cerrado este plazo\u003f
+plazos = Plazos
+pendiente = Pendiente
+pregunta.confirma.rehabilitar = \u00bfEst\u00e1 seguro que desea rehabilitar este plazo\u003f
+plazo.cumplido = Plazo cerrado
+usuario.dio.cumplido = Usuario cierre
+fecha.dio.cumplido = Fecha cierre
+fecha.notif.post.fecha.envio.notif=La fecha de notificaci\u00f3n no puede ser anterior a la fecha de env\u00edo de la notificaci\u00f3n.
+
+
+#USUARIOS
+gestion.usuarios= Gesti\u00f3n de usuarios
+nuevo.usuario= Nuevo usuario
+fecha.ultimo.acceso= Fecha \u00faltimo acceso
+telefono=Tel\u00e9fono
+alta.usuario= Alta de usuario
+consulta.usuario= Consulta de usuario
+editar.usuario= Edici\u00f3n de usuario
+nuevo.usuario=Nuevo usuario
+perfiles.asginados=Perfiles asignados
+buscar.perfiles=Buscar perfiles
+descripcion.corta=Descripci\u00f3n corta
+buscador.perfiles= Buscador de perfiles
+formulario.usuario=Formulario de usuario
+
+#Resoluciones
+res=Res.
+resol=Resol.
+crear.resolucion=Crear Resoluci\u00f3n
+asociar.resolucion=Asociar Resoluci\u00f3n
+ver.resolucion=Ver Resoluci\u00f3n 
+seleccione.serie.numeracion=Seleccione la serie para la numeraci\u00f3n
+numero.resolucion.vincular=N\u00famero de resoluci\u00f3n a vincular
+confirmar.serie=Se va a asignar un n\u00famero de resoluci\u00f3n para el tipo
+proceso.irreversible=Este proceso es irreversible. \u00bfEst\u00e1 seguro\u003f
+confirmar.serie.irreversible=Se va a asignar un n\u00famero de resoluci\u00f3n. Este proceso es irreversible. \u00bfEst\u00e1 seguro\u003f
+info.seleccione.serie=Por favor, seleccione una serie.
+resolucion.creada.creada=Se ha creado correctamente la resoluci\u00f3n.
+resolucion.asociada.creada=Se ha asociado correctamente la resoluci\u00f3n.
+num.resol.no.existe=El n\u00famero de resoluci\u00f3n no existe.
+confirmar.vinculacion.resolucion=Confirmar la vinculaci\u00f3n con la resoluci\u00f3n
+pregunta.confirmar.vinculacion.resolucion=\u00bfDesea la vincular el elemento con la resoluci\u00f3n\u003f
+datos.resolucion=Datos de la resoluci\u00f3n
+num.resol=N\u00famero resoluci\u00f3n
+sentido.resol=Sentido
+tipo.resol=Tipo
+fecha.resol=Fecha Resoluci\u00f3n
+tipologia.resol=Tipolog\u00eda
+fecha.resol.no.superior.actual=La fecha de resoluci\u00f3n no puede ser superior a la fecha actual.
+fecha.envio.no.superior.actual=La fecha de env\u00edo no puede ser superior a la fecha actual.
+fecha.notif.no.superior.actual=La fecha de notificaci\u00f3n no puede ser superior a la fecha actual.
+fecha.acred.no.superior.actual=La fecha de acreditaci\u00f3n no puede ser superior a la fecha actual.
+fecha.resp.no.superior.actual=La fecha de respuesta no puede ser superior a la fecha actual.
+fecha.entrada.no.superior.actual=La fecha de entrada no puede ser superior a la fecha actual.
+fecha.registro.no.superior.actual=La fecha de registro no puede ser superior a la fecha actual.
+fecha.entrada.superior.igual.fecha.registro=La fecha de entrada tiene que ser igual o superior a la fecha de registro.
+fecha.firma.no.superior.actual=La fecha de firma no puede ser superior a la fecha actual.
+fecha.acuerdo.no.superior.actual=La fecha del acuerdo no puede ser superior a la fecha actual.
+fecha.informe.no.superior.actual=La fecha del informe no puede ser superior a la fecha actual.
+fecha.resol.finalizar.tramite=La fecha de resoluci\u00f3n es obligatoria para cerrar el tr\u00e1mite.
+num.resol.oblig=El n\u00famero de resoluci\u00f3n es obligatorio para cerrar el tr\u00e1mite.
+sentido.resol.oblig=El sentido de la resoluci\u00f3n es obligatorio para cerrar el tr\u00e1mite.
+fecha.resol.oblig=La fecha de resoluci\u00f3n es obligatoria para cerrar el tr\u00e1mite.
+tipo.resol.oblig=El tipo de resoluci\u00f3n es obligatorio para cerrar el tr\u00e1mite.
+seleccionar.serie.oblig=Debe seleccionar una serie para crear una resoluci\u00f3n.
+imposicion.medidas=Imposici\u00f3n medidas
+
+resoluciones=Resoluciones
+resolucion=Resoluci\u00f3n
+alta.resolucion=Alta de resoluci\u00f3n
+edicion.resolucion=Edici\u00f3n de resoluci\u00f3n
+editar.resolucion=Edicitar resoluci\u00f3n
+consulta.resolucion=Consulta de resoluci\u00f3n
+consultar.resolucion=Consultar resoluci\u00f3n
+datos.resolucion=Datos de la resoluci\u00f3n
+num.resolucion=N\u00fam. resoluci\u00f3n
+numero.resolucion=N\u00famero de resoluci\u00f3n
+fecha.resolucion=Fecha de resoluci\u00f3n
+sentido=Sentido
+derechos.reclamados=Derechos reclamados
+articulos.afectados=Art\u00edculos afectados
+seleccionar.articulos=Seleccionar art\u00edculos
+seleccionar.derechos=Seleccionar derechos
+resumen=Resumen
+seleccionar.tipo.resolucion=Seleccionar tipo de resoluci\u00f3n
+seleccionar.sentido.resolucion=Seleccionar sentido de resoluci\u00f3n
+anonimizada=Anonimizada
+totalmente.notificada=Totalmente notificada
+fecha.publicacion.web=Fecha de publicaci\u00f3n en Web
+f.pub.web=F. pub. Web
+nueva.relacion.expediente=Nueva relaci\u00f3n expediente
+listado.expedientes.asociados=Expedientes asociados a la resoluci\u00f3n
+listado.personas.relacionadas.resolucion=Personas relacionadas con la resoluci\u00f3n
+listado.sujetos.relacionados.resolucion=Organismos/Sujetos obligados relacionados con la resoluci\u00f3n
+listado.documentos.relacionados.resolucion=Documentos relacionados con la resoluci\u00f3n
+
+editar.expediente.relacionado.resolucion=Editar relaci\u00f3n con expediente
+editar.persona.relacionada.resolucion=Editar relaci\u00f3n con persona
+editar.sujeto.relacionado.resolucion=Editar relaci\u00f3n con sujeto obligado
+editar.documento.relacionado.resolucion=Editar relaci\u00f3n con documento
+eliminar.relacion=Eliminar relaci\u00f3n
+
+confirmar.borrar.relacion=\u00bfSeguro que quiere borrar la relaci\u00f3n\u003f Este proceso es irreversible.
+
+fecha.notificacion.posterior=La fecha de notificaci\u00f3n no puede ser posterior a la actual.
+fecha.publicacion.web.posterior=La fecha de publicaci\u00f3n en Web no puede ser posterior a la actual.
+formulario.resolucion=Formulario de la resoluci\u00f3n
+gestion.resoluciones=Gesti\u00f3n de resoluciones
+
+#Plantillas
+plantilla=Plantilla
+plantillas=Plantillas
+gestion.plantillas.doc=Gesti\u00f3n de plantillas de documentos
+codigo.plan=Codigo
+fichero=Fichero
+nueva.plantilla=Nueva plantilla
+alta.plantilla=Alta de plantilla
+consulta.plantilla=Consulta de plantilla
+edicion.plantilla=Edici\u00f3n de plantilla
+seleccionar.fichero=Seleccionar fichero
+fichero.plantilla=Fichero de plantilla
+extensiones.permitidas=Extensiones permitidas
+descargar.fichero.actual=Descargar fichero actual
+plantillas.documentos=Plantillas de documentos
+variables.posibles = Variables posibles a incorporar a las plantillas de documentos
+
+
+#Notificaciones
+tipo.interv=Tipo interv.
+fecha.remision=Fecha remisi\u00f3n
+medio.remision=Medio remisi\u00f3n
+referencia.remision=Referencia remisi\u00f3n
+interviniente=Interviniente
+fecha.envio=Fecha env\u00edo
+fecha.notif=Fecha notificaci\u00f3n
+resultado=Resultado
+requiere.acuse=Requiere Acuse
+resultado.notificacion=Resultado notificaci\u00f3n
+
+
+#Export
+csv=Exportar
+
+#Tareas enviadas pendientes
+tareas.enviadas.pendientes=Tareas enviadas pendientes
