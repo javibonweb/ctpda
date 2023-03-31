@@ -32,7 +32,7 @@ import lombok.Setter;
 @Audited
 @AuditTable(value = "GE_TIPO_TRAMITE_H")
 @Table(name = "GE_TIPO_TRAMITE")
-public class TipoTramite extends Auditable{
+public class TipoTramite extends Auditable {
 
 	/**
 	 * serial id
@@ -51,38 +51,37 @@ public class TipoTramite extends Auditable{
 	@Column(name = "N_VERSION")
 	private Long nVersion;
 
-
 	@Column(name = "T_CODIGO")
 	@NotNull
 	@Size(max = 10)
 	@Getter
 	@Setter
 	private String codigo;
-	
+
 	@Column(name = "D_DESCRIPCION")
 	@Size(max = 255)
 	@Getter
 	@Setter
 	private String descripcion;
-	
+
 	@Column(name = "C_COLOR_TRAMITE")
 	@Size(max = 255)
 	@Getter
 	@Setter
 	private String colorTramite;
-	
+
 	@Column(name = "C_COLOR_SUB_TRAMITE")
 	@Size(max = 255)
 	@Getter
 	@Setter
 	private String colorSubTramite;
-	
+
 	@Column(name = "T_INSTRUCCIONES")
 	@Size(max = 4000)
 	@Getter
 	@Setter
 	private String instrucciones;
-	
+
 	@Column(name = "D_DESC_ABREV")
 	@Size(max = 100)
 	@Getter
@@ -95,7 +94,7 @@ public class TipoTramite extends Auditable{
 	@Getter
 	@Setter
 	private Boolean activo;
-	
+
 	@Column(name = "T_COMPORTAMIENTO")
 	@NotNull
 	@Size(max = 50)
@@ -108,52 +107,58 @@ public class TipoTramite extends Auditable{
 	@Getter
 	@Setter
 	private Boolean informal;
-	
+
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "TIPTRA_VALDOM_TIPINT_ID", foreignKey = @ForeignKey(name = "GE_TIPTRA_VALDOM_TIPINT_ID_FK"))
 	private ValoresDominio valorTipoInteresadoDefecto;
-	
+
 	@Column(name = "L_TIPO_INTERESADO_BLOQUEADO")
 	@Getter
 	@Setter
 	private Boolean tipoInteresadoBloqueado;
-	
+
 	@Column(name = "L_MODIF_DESCRIPCION")
 	@ColumnDefault("0")
 	@Getter
 	@Setter
 	private Boolean modifDescripcion;
 
-	
 	@Column(name = "L_VER_DOC_TRAM")
 	@ColumnDefault("1")
 	@Getter
 	@Setter
 	private Boolean verDocumentosTramite;
-	
+
 	@Column(name = "L_VER_DOC_SUBTRAM")
 	@ColumnDefault("0")
 	@Getter
 	@Setter
 	private Boolean verDocumentosSubtramite;
-	
+
 	@Column(name = "D_SUBSITUACION")
 	@Size(max = 50)
 	@Getter
 	@Setter
 	private String descSubsituacion;
-	
+
 	@Column(name = "L_SUBSITUACION_SUP")
 	@ColumnDefault("0")
 	@Getter
 	@Setter
 	private Boolean subsituacionSuperior;
-	
+
 	@Column(name = "L_TRAT_VINCULADOS")
 	@ColumnDefault("0")
 	@NotNull
 	@Getter
 	@Setter
 	private Boolean tratarVinculados;
-		
+
+//	@Column(name = "L_ESPERA_DOC")
+//	@ColumnDefault("0")
+//	@NotNull
+//	@Getter
+//	@Setter
+//	private Boolean tramitePendiente;
+
 }
