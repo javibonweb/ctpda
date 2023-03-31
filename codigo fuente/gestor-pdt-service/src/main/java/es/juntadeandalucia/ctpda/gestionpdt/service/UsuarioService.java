@@ -83,4 +83,8 @@ public class UsuarioService extends AbstractCRUDService<Usuario> {
 		return new BooleanBuilder();
 	}
 
+	// Método para obtener los usuarios activos
+    public List<Usuario> findUsuariosActivos() {
+		return usuarioRepository.findUsuariosActivos();
+    }
 }

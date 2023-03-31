@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+				xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:pe="http://primefaces.org/ui/extensions"                
+                xmlns:sec="https://joinfaces.org/security">
+ 
+<ui:composition template="#{navegacionBean.get('TEMPLATE_LAYOUT_GENERICO')}">  
+                
+    <ui:define name="content" >
+    
+    	<h:form id="formListadoFormacionjmc">
+    	
+    		<p:messages for="messagesListadoFormacionjmc" id="messagesListadoFormacionjmc" showDetail="true" closable="true">
+				<p:autoUpdate />
+			</p:messages>
+			
+			<p:panel header="#{mensaje['formacion.jmc']}">
+				<p:fieldset legend="#{mensaje['filtros.busqueda']}" id="bloqueFiltroBusquedaListadoFormacionjmc" toggleable="true" toggleSpeed="250">
+					<div>
+						<div class="celda-form">
+							<p:outputLabel for="codigo_filtro" value="#{mensaje['codigo']}" />
+							<p:inputText id="codigo_filtro" maxlength="50" size="30" value="#{formacionJmcBean.codigoFiltro}" />
+						</div>
+						
+						<div class="celda-form">
+							<p:outputLabel for="descripcion_filtro" value="#{mensaje['descripcion']}" />
+							<p:inputText id="descripcion_filtro" maxlength="255" size="50" value="#{formacionJmcBean.descripcionFiltro}" />
+						</div>
+					</div>
+					
+					<div>
+						<div class="celda-form">
+							<p:outputPanel styleClass="celda-form">
+								<p:outputLabel for="activo_filtro" value="#{mensaje['activo']}" />
+								<p:selectBooleanCheckbox id="activo_filtro" value="#{formacionJmcBean.activoFiltro}" itemLabel="#{mensaje['si']}" />
+							</p:outputPanel>
+						</div>
+						
+						<div class="celda-form">
+							<p:outputLabel for="version_filtro" value="#{mensaje['version']}" />
+							<p:inputNumber id="version_filtro" value="#{formacionJmcBean.versionFiltro}" minValue="1" decimalPlaces="0"/>
+						</div>
+					</div>
+					
+					<div>
+						<div class="celda-form">
+							<p:outputLabel for="fechaCreacion_filtro" value="#{mensaje['fecha.creacion']}" />
+							<p:datePicker id="fechaCreacion_filtro" value="#{formacionJmcBean.fechaCreacionFiltro}" 
+								locale="es" monthNavigator="true" pattern="dd/MM/yyyy"
+								converterMessage="#{mensaje['formato.fecha.invalido']}" mask="true"/>
+							<p:message for="fechaCreacion_filtro"/>
+						</div>
+						
+						<div class="celda-form">
+							<p:outputLabel value="#{mensaje['usuarios']}" for="usuarios_filtro" />
+							<p:selectOneMenu id="usuarios_filtro" value="#{formacionJmcBean.selectedUsuarioFiltro}"
+								style="min-width: 150px;" filter="true" filterMatchMode="contains">
+								<f:selectItem itemLabel="#{mensaje['todos']}" itemValue="" />
+								<f:selectItems value="#{formacionJmcBean.listaUsuarios}"
+									var="usuarios" itemLabel="#{usuarios.login}"
+									widgetVar="comboFiltroUsuarios" itemValue="#{usuarios.id}" />
+							</p:selectOneMenu>
+						</div>					
+					</div>
+					
+					<div class="botonera-form">
+						<p:commandButton id="nuevoFormacionJmc" icon="pi pi-plus"
+							value="#{mensaje['nueva.formacionjmc']}"
+							action="#{formacionJmcBean.onCrear}" />
+						<p:commandButton id="filtrar" value="#{mensaje['filtrar']}"
+							icon="pi pi-filter"
+							update="formListadoFormacionjmc:listadoFormacionJmc"
+							onstart="PF('formacionJmcWV').paginator.setPage(0);"/>
+							
+						<p:commandButton id="limpiarFiltro" icon="pi pi-filter-slash"
+							value="#{mensaje['limpiar.filtro']}"
+							actionListener="#{formacionJmcBean.limpiarFiltro()}"
+							update="formListadoFormacionjmc:codigo_filtro,formListadoFormacionjmc:descripcion_filtro,
+								formListadoFormacionjmc:activo_filtro,formListadoFormacionjmc:version_filtro,
+								formListadoFormacionjmc:fechaCreacion_filtro,formListadoFormacionjmc:usuarios_filtro,
+								formListadoFormacionjmc:listadoFormacionJmc"
+							onstart="PF('formacionJmcWV').paginator.setPage(0);" />
+					</div>
+				</p:fieldset>
+				
+				<p:outputPanel id="panelListadoFormacionJmc">
+					<p:dataTable var="formacionJmc" id="listadoFormacionJmc"
+						value="#{formacionJmcBean.lazyModalFormacionPruebasJmc}" paginator="true"
+						paginatorTemplate=" {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+						rowsPerPageTemplate="10,20,50,100" rows="10"
+						currentPageReportTemplate="#{mensaje['paginador.template']}"
+						selectionMode="single" sortBy="#{formacionJmcBean.defaultOrdenListadoFormacionJmc}"
+						sortOrder="ascending" selection="#{formacionJmcBean.selectedFormacionJmc}"
+						rowKey="#{formacionJmcBean.id}" paginatorPosition="bottom"
+						widgetVar="formacionJmcWV">
+
+						<p:column headerText="#{mensaje['codigo']}" sortBy="#{formacionJmc.codigo}">
+							<h:outputText value="#{formacionJmc.codigo}" />
+						</p:column>
+						
+						<p:column headerText="#{mensaje['descripcion']}" sortBy="#{formacionJmc.descripcion}">
+							<h:outputText value="#{formacionJmc.descripcion}" />
+						</p:column>
+						
+						<p:column headerText="#{mensaje['activo']}" sortBy="#{formacionJmc.activa}">
+							<h:outputText rendered="#{formacionJmc.activa eq true}" value="#{mensaje['si']}" />
+							<h:outputText rendered="#{formacionJmc.activa eq false}" value="#{mensaje['no']}" />
+						</p:column>
+						
+<!-- 						<p:column headerText="#{mensaje['version']}" sortBy="#{formacionJmc.nVersion}"> -->
+<!-- 							<h:outputLabel value="#{formacionJmc.nVersion}" /> -->
+<!-- 						</p:column> -->
+						
+						<p:column headerText="#{mensaje['fecha.creacion']}" sortBy="#{formacionJmc.fechaCreacion}">
+							<h:outputText value="#{formacionJmc.fechaCreacion}" >
+								<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+							</h:outputText>
+						</p:column>
+						
+						<p:column headerText="#{mensaje['usuario']}" sortBy="#{formacionJmc.usuario.login}">
+							<h:outputText value="#{formacionJmc.usuario.login}" />
+						</p:column>
+						
+						<p:column headerText="#{mensaje['usuario.creacion']}" sortBy="#{formacionJmc.usuCreacion}">
+							<h:outputText value="#{formacionJmc.usuCreacion}" />
+						</p:column>
+
+						<p:column headerText="#{mensaje['acciones']}">
+							<p:commandButton id="edicionFormacionJmc" widgetVar="edicionFormacionJmc"
+								icon="pi pi-pencil" action="#{formacionJmcBean.onEditar(formacionJmc.id)}"
+								immediate="true" >
+							</p:commandButton>
+							
+							<p:commandButton id="consultaFormacionJmc" widgetVar="consultaFormacionJmc"
+								icon="pi pi-eye" action="#{formacionJmcBean.onConsultar(formacionJmc.id)}"
+								immediate="true" >
+							</p:commandButton>
+							
+							<p:commandButton id="eliminarFormacionJmc" icon="pi pi-trash"
+								actionListener="#{formacionJmcBean.eliminarFormacionJmc(formacionJmc)}"
+								update="formListadoFormacionJmc:listadoFormacionJmc">
+								<p:confirm header="#{mensaje['confirmar.operacion']}" message="#{mensaje['pregunta.confirma.eliminar']}" icon="pi pi-info-circle" />
+							</p:commandButton>
+							
+							<p:commandButton id="desactivarFormacionJmc" icon="pi pi-times"
+								actionListener="#{formacionJmcBean.desactivarFormacionJmc(formacionJmc)}"
+								update="formListadoFormacionJmc:listadoFormacionJmc">
+								<p:confirm header="#{mensaje['confirmar.operacion']}" message="#{mensaje['pregunta.confirma.eliminar']}" icon="pi pi-info-circle" />
+							</p:commandButton>
+							
+							<p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true">
+								<div class="botonera-form" align="right">
+									<p:commandButton value="#{mensaje['si']}" type="button" styleClass="ui-confirmdialog-yes" />
+									<p:commandButton value="#{mensaje['no']}" type="button" styleClass="ui-confirmdialog-no ui-button-flat" />
+								</div>								
+							</p:confirmDialog>
+						</p:column>
+						
+					</p:dataTable>
+				</p:outputPanel>
+			
+			</p:panel>
+			
+			<br/>
+			
+			<p:commandButton id="volver" value="#{mensaje['volver']}"
+				oncomplete="document.location.href='#{request.contextPath}/aplicacion/bienvenido.xhtml'">
+			</p:commandButton>
+    	
+    	</h:form>
+    
+    </ui:define>
+    
+</ui:composition>
+
+</html>

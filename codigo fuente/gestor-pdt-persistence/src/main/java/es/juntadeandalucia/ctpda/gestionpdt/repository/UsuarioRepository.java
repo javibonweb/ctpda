@@ -20,4 +20,7 @@ public interface UsuarioRepository extends AbstractCrudRepository<Usuario>, Join
 	
 	public Usuario findByLogin(String usuario);
 
+	// Muestra los usuarios activos con el Query
+	@Query("SELECT usu FROM Usuario usu WHERE usu.activa = 1")
+    List<Usuario> findUsuariosActivos();
 }
