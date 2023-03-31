@@ -1,0 +1,15 @@
+rem  Comprobación UTF8: Esto aparece en árabe: أنا تظهر في اللغة العربية
+
+SPOOL logs/FORMACION_UNDO.LOG
+ALTER SESSION SET "_ORACLE_SCRIPT"= TRUE;
+
+----------------------------
+-- VERSION GONZALO RANDO --
+----------------------------
+
+DROP TABLE GESTOR.FOR_PRUEBAS_GRS CASCADE CONSTRAINTS;
+DROP TABLE GESTOR.FOR_PRUEBAS_GRS_H CASCADE CONSTRAINTS;
+
+DROP SEQUENCE GESTOR.S_FOR_PRUEBAS_GRS;
+
+SPOOL OFF;

@@ -67,9 +67,16 @@ public class FormacionPruebasGonzalo extends Auditable{
 	
 
 	@Column(name = "N_VERSION")
+	@Version
 	@Getter
 	@Setter
-	private Long nVersion;	
+	private int nVersion;
+
+
+	public String getIdentificador() {
+		// TODO Auto-generated method stub
+		return this.id.toString();
+	}	
 
 
 }
