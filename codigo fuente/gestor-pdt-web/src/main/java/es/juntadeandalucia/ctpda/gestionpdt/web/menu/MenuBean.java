@@ -161,14 +161,44 @@ public class MenuBean extends BaseBean implements Serializable{
     	DefaultSubMenu submenuAdmon = new DefaultSubMenu();
     	submenuAdmon.setLabel(mensajesProperties.getString("administracion"));
     	menuAdmon(submenuAdmon);
-    	    	
+
+		/*
+		 * 	MENU FORMACION
+		 * */
+		DefaultSubMenu submenuFormacionDfr = new DefaultSubMenu();
+		submenuFormacionDfr.setLabel(mensajesProperties.getString("formacion.dfr"));
+		menuFormacionDfr(submenuFormacionDfr);
+
+        /*
+         * 	MENU FOMRACION BLH
+         * */
+    	DefaultSubMenu submenuFormacionBlh = new DefaultSubMenu();
+    	submenuFormacionBlh.setLabel(mensajesProperties.getString("formacion.blh"));
+    	menuFormacionBlh(submenuFormacionBlh);
+
 
     	    	
     	PrimeFaces.current().ajax().update("menuForm");
     	
     }
-    
-    private void menuMiMesa(DefaultSubMenu submenuMiMesa) {
+
+	private void menuFormacionDfr(DefaultSubMenu submenuFormacionDfr) {
+		if ((listaCodigoPermisos != null) && listaCodigoPermisos.contains(Constantes.PERMISO_MENU_RESOL)) {
+			DefaultMenuItem itemFormacionDfr = new DefaultMenuItem();
+			itemFormacionDfr.setAjax(false);
+			itemFormacionDfr.setAsync(false);
+			itemFormacionDfr.setUpdate(DATAFORM);
+			itemFormacionDfr.setValue(mensajesProperties.getString("formacion.dfr"));
+			itemFormacionDfr.setCommand("#{formacionDfrBean.redireccionMenu}");
+			submenuFormacionDfr.getElements().add(itemFormacionDfr);
+		}
+
+		if (!submenuFormacionDfr.getElements().isEmpty()) {
+			model.getElements().add(submenuFormacionDfr);
+		}
+	}
+
+	private void menuMiMesa(DefaultSubMenu submenuMiMesa) {
         if((listaCodigoPermisos!= null) && listaCodigoPermisos.contains(Constantes.PERMISO_MI_MESA)) {
         	DefaultMenuItem itemTareas = new DefaultMenuItem();
         	itemTareas.setAjax(false);
@@ -486,6 +516,21 @@ public class MenuBean extends BaseBean implements Serializable{
         	itemResoluciones.setCommand("#{resolucionesBean.redireccionMenu}");
         	
         	submenuExpedientes.getElements().add(itemResoluciones);
+        }
+	}
+
+	private void menuFormacionBlh (DefaultSubMenu submenuFormacionBlh) {
+    	DefaultMenuItem itemFormacionBlh = new DefaultMenuItem();
+    	itemFormacionBlh.setAjax(false);
+    	itemFormacionBlh.setAsync(false);
+    	itemFormacionBlh.setUpdate(DATAFORM);
+    	itemFormacionBlh.setValue(mensajesProperties.getString("formacion.blh"));
+    	itemFormacionBlh.setCommand("#{formacionBlhBean.redireccionMenu}");
+
+    	submenuFormacionBlh.getElements().add(itemFormacionBlh);
+
+		if(!submenuFormacionBlh.getElements().isEmpty()) {
+        	model.getElements().add(submenuFormacionBlh);
         }
 	}
 
