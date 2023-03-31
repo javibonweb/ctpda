@@ -1,0 +1,10 @@
+package es.juntadeandalucia.ctpda.gestionpdt.model;
+
+import javax.swing.Scrollable;
+
+import es.juntadeandalucia.ctpda.gestionpdt.persitence.core.AbstractCrudRepository;
+import es.juntadeandalucia.ctpda.gestionpdt.persitence.core.JoinedQDSLPredicateExecutorCustom;
+
+public interface FormacionPruebasDdlRepository {
+
+}

@@ -13,24 +13,113 @@
 			<f:facet name="header">
 				<h:outputText value="#{mensaje['bienvenido']}" styleClass="textoPanelPrincipal"/>
 			</f:facet>
-			<h:outputText value ="#{mensaje['texto.bienvenida']}" />		
+
+			<h:outputText value="#{mensaje['texto.bienvenida']}" />		
 			
+			<h:outputText style="color:#ff0000" value ="David Fernández Rodríguez" />		
 			<h:outputText id="nombreAntonioLeon2" value="Antonio Leon2"/>	
 			<h:outputText id="nombreAntonioLeon" value="Antonio Leon"/>		
-			
-			<h:outputText id="nombreBeatrizLamorena" value ="Beatriz Lamorena" />			
+			<h:outputText id="nombreGonzaloRandoSerna" value=" Gonzalo Rando Serna " styleClass="textoGonzalo"/>
+			<h:outputText id="nombreBeatrizLamorena" value="Beatriz Lamorena" />			
+			<h:outputText id="nombreAntonioMunoz" value= "Antonio Munoz dsdsdsdsds" />	
+					
 		</p:panel>
+		
 		<p:panel>
 			<ul>
 				<li>
-				<h:outputText value ="#{mensaje['ultimo.login']}: #{loginBean.ultimoLogin}" />		
+				<h:outputText value="#{mensaje['ultimo.login']}: #{loginBean.ultimoLogin}" />		
 				</li>
 			</ul>
 		</p:panel>
-		<p:panel>
-			<h:outputText style="color:#ff0000" value ="David Fernández Rodríguez" />		
-		</p:panel>
+		
+		
+		<p:dataTable var="formacionPruebas" id="formacionPruebas"
+			value="#{loginBean.lazyModelFormacionPruebas}" paginator="true"
+			paginatorTemplate=" {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+			rowsPerPageTemplate="10,20,50,100" rows="10"
+			currentPageReportTemplate="#{mensaje['paginador.template']}"
+			selectionMode="single"
+			sortBy="#{formacionPruebas.codigo}"
+			sortOrder="ascending"
+			rowKey="#{formacionPruebas.id}" paginatorPosition="bottom"
+			widgetVar="formacionPruebasWV">
 
+			<p:column headerText="Codigo">
+				<h:outputText value="#{formacionPruebas.codigo}" /> 
+			</p:column>
+			
+			<p:column headerText="Descripcion">
+				<h:outputText value="#{formacionPruebas.descripcion}" /> 
+			</p:column>
+			
+			<p:column headerText="Activa">
+				<h:outputText value="#{formacionPruebas.activa}" /> 
+			</p:column>
+			
+<!-- 			<p:column headerText="Version"> -->
+<!-- 				<h:outputText value="#{formacionPruebas.nVersion}" />  -->
+<!-- 			</p:column> -->
+			
+<!-- 			<p:column headerText="Fecha de creación"> -->
+<!-- 				<h:outputText value="#{formacionPruebas.fechaCreacion}" />  -->
+<!-- 			</p:column> -->
+			
+<!-- 			<p:column headerText="Usuario de creación"> -->
+<!-- 				<h:outputText value="#{formacionPruebas.usuCreacion}" />  -->
+<!-- 			</p:column> -->
+		</p:dataTable>
+		
+		
+		
+		<p:panel>
+			<ul>
+				<li>
+				<h:outputText value="Tabla Gonzalo Rando" />		
+				</li>
+			</ul>
+		</p:panel>	
+		<p:dataTable var="formacionPruebasGonzalo" id="formacionPruebasGonzalo"
+			value="#{loginBean.lazyModelFormacionPruebasGonzalo}" paginator="true"
+			paginatorTemplate=" {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+			rowsPerPageTemplate="10,20,50,100" rows="10"
+			currentPageReportTemplate="#{mensaje['paginador.template']}"
+			selectionMode="single"
+			sortBy="#{formacionPruebasGonzalo.codigo}"
+			sortOrder="ascending"
+			rowKey="#{formacionPruebasGonzalo.id}" paginatorPosition="bottom"
+			widgetVar="formacionPruebasWV">
+
+			<p:column headerText="Codigo">
+				<h:outputText value="#{formacionPruebasGonzalo.codigo}" /> 
+			</p:column>
+			
+			<p:column headerText="Descripcion">
+				<h:outputText value="#{formacionPruebasGonzalo.descripcion}" /> 
+			</p:column>
+			
+			<p:column headerText="Activa">
+				<h:outputText value="#{formacionPruebasGonzalo.activa}" /> 
+			</p:column>
+			
+ 			<!--- <p:column headerText="Version"> 
+				<h:outputText value="#{formacionPruebasGonzalo.nVersion}" />  
+			</p:column> -->
+			
+ 			<p:column headerText="Fecha de creación">
+				<h:outputText value="#{formacionPruebasGonzalo.fechaCreacion}" />  
+ 			</p:column> 
+			
+			<p:column headerText="Usuario de creación"> 
+				<h:outputText value="#{formacionPruebasGonzalo.usuCreacion}" /> 
+ 			</p:column> 
+		</p:dataTable>
+		
+		
+
+		<p:panel>
+				<h:outputText id="nombreDanielMera" value ="Daniel Mera Sachse" />		
+		</p:panel>
 	</ui:define>
 </ui:composition>
 </html>
