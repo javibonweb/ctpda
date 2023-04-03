@@ -42,7 +42,7 @@ public class FormacionPruebasGRS extends Auditable{
 	@Id
 	@Column(name = "PRU_ID")
 	@NotNull
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "FOR_PRUEBAS_GRS")
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "S_FOR_PRUEBAS_GRS")
 	@SequenceGenerator(name = "S_FOR_PRUEBAS_GRS", sequenceName = "S_FOR_PRUEBAS_GRS", allocationSize = 1)
 	@Getter
 	@Setter

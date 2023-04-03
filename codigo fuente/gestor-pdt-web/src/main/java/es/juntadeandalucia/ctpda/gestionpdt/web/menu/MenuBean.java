@@ -504,7 +504,7 @@ public class MenuBean extends BaseBean implements Serializable{
         }
 	}
 	
-<<<<<<< HEAD
+
 	private void menuFormacionGRS (DefaultSubMenu submenuFormacionGRS) {
 
 		DefaultMenuItem itemGonzalo = new DefaultMenuItem();
@@ -517,12 +517,12 @@ public class MenuBean extends BaseBean implements Serializable{
     	submenuFormacionGRS.getElements().add(itemGonzalo);
     
 	
-		if(!submenuFormacionGRS.getElements().isEmpty())
-        {
+		if(!submenuFormacionGRS.getElements().isEmpty()){
             model.getElements().add(submenuFormacionGRS);
-        }
+		}
+    }
         
-=======
+
 	private void menuFormacionBlh (DefaultSubMenu submenuFormacionBlh) {
     	DefaultMenuItem itemFormacionBlh = new DefaultMenuItem();
     	itemFormacionBlh.setAjax(false);
@@ -536,7 +536,7 @@ public class MenuBean extends BaseBean implements Serializable{
 		if(!submenuFormacionBlh.getElements().isEmpty()) {
         	model.getElements().add(submenuFormacionBlh);
         }
->>>>>>> branch 'master' of https://github.com/beatriz-lamorena/ctpda.git
+
 	}
 
 

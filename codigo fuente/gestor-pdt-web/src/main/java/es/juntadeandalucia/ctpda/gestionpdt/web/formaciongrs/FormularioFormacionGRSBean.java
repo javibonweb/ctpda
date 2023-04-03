@@ -23,18 +23,25 @@ import java.util.Map;
 import java.util.ArrayList;
 
 import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 
+import org.primefaces.PrimeFaces;
 import org.primefaces.model.FilterMeta;
 import org.primefaces.model.SortMeta;
 import org.primefaces.model.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import es.juntadeandalucia.ctpda.gestionpdt.model.FormacionPruebasBlh;
 import es.juntadeandalucia.ctpda.gestionpdt.model.FormacionPruebasGRS;
 import es.juntadeandalucia.ctpda.gestionpdt.model.Usuario;
+import es.juntadeandalucia.ctpda.gestionpdt.service.FormacionPruebasBlhService;
 import es.juntadeandalucia.ctpda.gestionpdt.service.FormacionPruebasGRSService;
 import es.juntadeandalucia.ctpda.gestionpdt.service.UsuarioService;
+import es.juntadeandalucia.ctpda.gestionpdt.service.core.exception.BaseException;
+import es.juntadeandalucia.ctpda.gestionpdt.web.core.JsfUtils;
 import es.juntadeandalucia.ctpda.gestionpdt.web.core.LazyDataModelByQueryService;
 import es.juntadeandalucia.ctpda.gestionpdt.web.core.MyFilterMeta;
 import es.juntadeandalucia.ctpda.gestionpdt.web.menu.NavegacionBean.ListadoNavegaciones;
@@ -52,54 +59,38 @@ public class FormularioFormacionGRSBean extends BaseBean implements Serializable
 	
 	private static final long serialVersionUID = 1L;
 	
-	@Getter
-	@Setter
+	@Getter @Setter
 	private String modoAcceso;
 	
+	@Getter @Setter
+	private String codigo;
 	
-	@Getter
-	private LazyDataModelByQueryService<FormacionPruebasGRS> lazyModel;
+	@Getter @Setter
+	private String descripcion;
+	
+	@Getter @Setter
+	private Boolean activo;
+	
+	@Getter @Setter
+	private FormacionPruebasGRS formacionPruebasGRS;
 	
 	@Autowired
 	private FormacionPruebasGRSService formacionPruebasGRSService;
-
-	@Getter
-	private  SortMeta ordenGRS;
 	
-	@Getter
-	@Setter
-	private FormacionPruebasGRS selectedFormacionPruebasGRS;
-
-	@Getter
-	@Setter
-	private String codigoFiltro;	
+	@Getter @Setter
+	private Long selectedUsuario;
 	
-	@Getter
-	@Setter
-	private String descripcionFiltro;	
-	
-	@Getter
-	@Setter
-	private Boolean activaFiltro;
-	
-	@Getter
-	@Setter
-	private Long versionFiltro;
-	
-	@Getter
-	@Setter
-	private Date fechaCreacionFiltro;
-	
-	@Getter
-	@Setter
-	private Long selectedUsuarioFiltro;
-	
-	@Getter
-	@Setter
-	private List<Usuario> listaUsuarios;
+	@Getter @Setter
+	private List<Usuario> listadoUsuarios;
 	
 	@Autowired
 	private UsuarioService usuarioService;
+	
+	@Getter @Setter
+	private Long idFormacionGRS;
+	
+	@Getter @Setter
+	private boolean editableFormulario;
 	
 	
 	@PostConstruct
@@ -107,63 +98,54 @@ public class FormularioFormacionGRSBean extends BaseBean implements Serializable
 	public void init(){
 		super.init();
 		
-		activaFiltro = true;
+		modoAcceso = (String) JsfUtils.getSessionAttribute("modoAcceso");
+		idFormacionGRS = (Long) JsfUtils.getFlashAttribute("idFormacionGRS");
+		editableFormulario = (boolean) JsfUtils.getFlashAttribute("editable");
 		
-		listaUsuarios = new ArrayList<>();
+		formacionPruebasGRS = new FormacionPruebasGRS();
 		
-		listaUsuarios = usuarioService.findUsuariosActivos();
+		if(idFormacionGRS != null) {
+			formacionPruebasGRS = formacionPruebasGRSService.obtener(idFormacionGRS);
+			codigo = formacionPruebasGRS.getCodigo();
+			descripcion = formacionPruebasGRS.getDescripcion();
+			activo = formacionPruebasGRS.getActiva();
+			selectedUsuario = (formacionPruebasGRS.getUsuario() != null)?formacionPruebasGRS.getUsuario().getId():null;
+		}else {
+			codigo = "";
+			descripcion = "";
+			activo = true;
+			selectedUsuario = null;
+		}
 		
-		inicializaLazyModel();
+		listadoUsuarios = new ArrayList<>();
+		listadoUsuarios = usuarioService.findUsuariosActivos();
 	}
 	
-	public String redireccionMenu() {
-		init();
-		return ListadoNavegaciones.LISTADO_FORMACIONGRS.getRegla();
-	}
-	
-	public String onCrear() {
-		init();
-		return ListadoNavegaciones.FORM_FORMACIONGRS.getRegla();
-	}
-	
-	public void limpiarFiltro () {
-		codigoFiltro = "";
-		descripcionFiltro = "";
-		activaFiltro = true;
-		versionFiltro = null;
-		fechaCreacionFiltro = null;
-		selectedUsuarioFiltro = null;		
-	}
-	
-	
-	private void inicializaLazyModel() {
-		lazyModel = new LazyDataModelByQueryService<>(FormacionPruebasGRS.class, formacionPruebasGRSService);
-		lazyModel.setPreproceso((a, b, c, filters) ->
-			filtrosLazyModel(filters)
-		);
+	public void saveFormacionGRS() {
+		if(codigo != null && codigo.isEmpty()) {
+			FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "", "El código tiene que ser obligatorio");
+			PrimeFaces.current().dialog().showMessageDynamic(message);
 		
-		ordenGRS = SortMeta.builder().field("codigo").order(SortOrder.ASCENDING).priority(1).build();
-	}
-	
-	
-	private void filtrosLazyModel(Map<String, FilterMeta> filters) {
-		if (codigoFiltro != null && !codigoFiltro.isEmpty()) {
-			filters.put("codigo", new MyFilterMeta(codigoFiltro));
-		}
-		if (descripcionFiltro != null && !descripcionFiltro.isEmpty()) {
-			filters.put("descripcion", new MyFilterMeta(descripcionFiltro));
-		}
-		if (Boolean.TRUE.equals(activaFiltro)) {
-			filters.put("activa", new MyFilterMeta(activaFiltro));
-		}
-		if (versionFiltro != null && !Long.toString(versionFiltro).isEmpty()) {
-			filters.put("nVersion", new MyFilterMeta(versionFiltro));
-		}
-		if (fechaCreacionFiltro != null) {
-			filters.put("fechaCreacion", new MyFilterMeta(fechaCreacionFiltro));
-		}
-		if (selectedUsuarioFiltro != null) {
-			filters.put("usuario.id", new MyFilterMeta(selectedUsuarioFiltro));
+		}else {
+			try {
+				formacionPruebasGRS.setCodigo(codigo);
+				formacionPruebasGRS.setDescripcion(descripcion);
+				formacionPruebasGRS.setActiva(activo);
+				
+				if(selectedUsuario != null) {
+					Usuario usuarioSeleccionado = usuarioService.obtener(selectedUsuario);
+					formacionPruebasGRS.setUsuario(usuarioSeleccionado);
+				}				
+								
+				formacionPruebasGRSService.guardar(formacionPruebasGRS);
+				log.info("Formacion GRS guardado");
+				FacesContext.getCurrentInstance().addMessage("messagesFormularioFormacionGRS",new FacesMessage(FacesMessage.SEVERITY_INFO, "", "Formacion " +formacionPruebasGRS.getCodigo()+ " GRS guardado correctamente"));
+				
+			} catch (BaseException e) {
+				FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "",mensajesProperties.getString("error"));
+				PrimeFaces.current().dialog().showMessageDynamic(message);
+				log.error(e.getMessage());
+			}
 		}
 	}
 }

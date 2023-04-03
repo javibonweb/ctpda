@@ -58,6 +58,9 @@ public class FormacionGRSBean extends BaseBean implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	
+	private static final String MODOACCESO = "modoAcceso";
+	private static final String EDITABLE = "editable";
+	
 	
 	@Getter
 	private LazyDataModelByQueryService<FormacionPruebasGRS> lazyModel;
@@ -117,6 +120,8 @@ public class FormacionGRSBean extends BaseBean implements Serializable {
 		listaUsuarios = usuarioService.findUsuariosActivos();
 		
 		inicializaLazyModel();
+		
+		//ordenGRS = SortMeta.builder().field("codigo").order(SortOrder.ASCENDING).priority(1).build();
 	}
 	
 	public String redireccionMenu() {
@@ -141,11 +146,11 @@ public class FormacionGRSBean extends BaseBean implements Serializable {
 	public String onConsultar(Long idFormacionGRS) {
 		JsfUtils.setFlashAttribute(EDITABLE, false);
 		JsfUtils.setSessionAttribute(MODOACCESO, "consulta");
-		JsfUtils.setFlashAttribute("idFormacionBlh", idFormacionGRS);
+		JsfUtils.setFlashAttribute("idFormacionGRS", idFormacionGRS);
 		return ListadoNavegaciones.FORM_FORMACIONGRS.getRegla();
 	}
 	
-	public void eliminarFormacionBlh (FormacionPruebasGRS formacionPruebasGRS) {
+	public void eliminarFormacionGRS (FormacionPruebasGRS formacionPruebasGRS) {
 		try {
 			formacionPruebasGRSService.delete(formacionPruebasGRS.getId());
 			FacesContext.getCurrentInstance().addMessage("messagesListadoFormaciongrs",new FacesMessage(FacesMessage.SEVERITY_INFO, "", "Formacion GRS borrado correctamente"));
@@ -156,7 +161,7 @@ public class FormacionGRSBean extends BaseBean implements Serializable {
 		}
 	}
 	
-	public void desactivarFormacionBlh (FormacionPruebasGRS formacionPruebasGRS) {
+	public void desactivarFormacionGRS (FormacionPruebasGRS formacionPruebasGRS) {
 		try {
 			formacionPruebasGRS.setActiva(false);		
 			formacionPruebasGRSService.guardar(formacionPruebasGRS);
@@ -183,8 +188,6 @@ public class FormacionGRSBean extends BaseBean implements Serializable {
 		lazyModel.setPreproceso((a, b, c, filters) ->
 			filtrosLazyModel(filters)
 		);
-		
-		ordenGRS = SortMeta.builder().field("codigo").order(SortOrder.ASCENDING).priority(1).build();
 	
 		JsfUtils.removeSessionAttribute(MODOACCESO);
 		

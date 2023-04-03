@@ -8,7 +8,7 @@
                 xmlns:p="http://primefaces.org/ui"
                 xmlns:pe="http://primefaces.org/ui/extensions"                
                 xmlns:sec="https://joinfaces.org/security">
-
+                
 <ui:composition  template="#{navegacionBean.get('TEMPLATE_LAYOUT_GENERICO')}">
 
 	<ui:define name="content">
@@ -40,7 +40,6 @@
 					</div>
 					<div>
 						<div class="celda-form">
-
 							<p:outputPanel styleClass="celda-form">
 								<p:outputLabel for="activa_filtro" value="#{mensaje['activo']}" />
 								<p:selectBooleanCheckbox id="activa_filtro"
@@ -50,7 +49,7 @@
 						</div>
 						<div class="celda-form">
 							<p:outputLabel for="version_filtro" value="#{mensaje['version']}" />
-							<p:inputNumber id="version_filtro" maxlength="255" size="50"
+							<p:inputNumber id="version_filtro"  decimalPlaces="0"
 								value="#{formacionGRSBean.versionFiltro}" minValue="1" />
 						</div>
 					</div>
@@ -60,6 +59,7 @@
 							<p:datePicker id="fechaCreacion_filtro" value="#{formacionGRSBean.fechaCreacionFiltro}" 
 								locale="es" monthNavigator="true" pattern="dd/MM/yyyy"
 								converterMessage="#{mensaje['formato.fecha.invalido']}" mask="true"/>
+							<p:message for="fechaCreacion_filtro"/>
 						</div>
 						<div class="celda-form">
 							<p:outputLabel for="usuarios_filtro" value="#{mensaje['usuarios']}" />
@@ -78,9 +78,9 @@
 							action="#{formacionGRSBean.onCrear}" />
 						<p:commandButton id="filtrar" value="#{mensaje['filtrar']}"
 							icon="pi pi-filter"
-							update=""
+							update="formListadoFormacionGRS:listadoFormacionPruebasGRS"
 							onstart="PF('formacionPruebasGRSWV').paginator.setPage(0);"
-							 /><!-- onstart="PF('usuarioWV').paginator.setPage(0);" -->
+							 />
 						<p:commandButton id="limpiarFiltro" icon="pi pi-filter-slash"
 							value="#{mensaje['limpiar.filtro']}"
 							actionListener="#{formacionGRSBean.limpiarFiltro()}"
@@ -88,71 +88,90 @@
 								formListadoFormacionGRS:activa_filtro,formListadoFormacionGRS:version_filtro,
 								formListadoFormacionGRS:fechaCreacion_filtro,formListadoFormacionGRS:usuarios_filtro"
 							onstart="PF('formacionPruebasGRSWV').paginator.setPage(0);"
-							 /> <!-- onstart="PF('usuarioWV').paginator.setPage(0);" -->
+							 /> 
 					</div>
-						
-						
-					
 				</p:fieldset>
 			</p:panel>
-			<p:outputPanel>
-				<p:dataTable var="formacionPruebasGRS" id="formacionPruebasGRS"
-					value="#{formacionPruebasGRSBean.lazyModel}" paginator="true"
+			
+			<p:outputPanel id="panelListadoFormacionGRS">
+				<p:dataTable var="formacionPruebasGRS" id="listadoFormacionPruebasGRS"
+					value="#{formacionGRSBean.lazyModel}" paginator="true"
 					paginatorTemplate=" {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
 					rowsPerPageTemplate="10,20,50,100" rows="10"
 					currentPageReportTemplate="#{mensaje['paginador.template']}"
 					selectionMode="single"
-					selection="#{formacionPruebasGRSBean.selectedFormacionPruebasGRS}"
-					sortBy="#{formacionPruebasGRS.ordenGRS}"
+					selection="#{formacionGRSBean.selectedFormacionPruebasGRS}"
+					sortBy="#{formacionGRSBean.ordenGRS}"
 					sortOrder="ascending"
-					rowKey="#{formacionPruebasGRS.id}" paginatorPosition="bottom"
+					rowKey="#{formacionGRSBean.id}" paginatorPosition="bottom"
 					widgetVar="formacionPruebasGRSWV">
 		
-					<p:column headerText="Codigo">
+					<p:column headerText="#{mensaje['codigo']}">
 						<h:outputText value="#{formacionPruebasGRS.codigo}" /> 
 					</p:column>
 					
-					<p:column headerText="Descripcion">
+					<p:column headerText="#{mensaje['descripcion']}">
 						<h:outputText value="#{formacionPruebasGRS.descripcion}" /> 
 					</p:column>
 					
-					<p:column headerText="Activa">
+					<p:column headerText="#{mensaje['activo']}">
 						<h:outputText rendered="#{formacionPruebasGRS.activa eq true}" value="#{mensaje['si']}"/> 
 						<h:outputText rendered="#{formacionPruebasGRS.activa eq false}" value="#{mensaje['no']}" /> 
 					</p:column>
 					
 					
-		 			<p:column headerText="Fecha de creación">
+		 			<p:column headerText="#{mensaje['fecha.creacion']}">
 						<h:outputText value="#{formacionPruebasGRS.fechaCreacion}" >  
 							<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
 						</h:outputText>
 		 			</p:column> 
+		 			
+		 			<p:column headerText="#{mensaje['usuario']}" sortBy="#{formacionPruebasGRS.usuario.login}">
+							<h:outputText value="#{formacionPruebasGRS.usuario.login}" />
+						</p:column>
 					
-					<p:column headerText="Usuario de creación"> 
+					<p:column headerText="#{mensaje['usuario.creacion']}"> 
 						<h:outputText value="#{formacionPruebasGRS.usuCreacion}" /> 
 		 			</p:column> 
 		 			
-		 			<p:column headerText="Acciones">
-		 				<div class="botonera-form">
-							<p:commandButton id="nuevoUsuario" icon="pi pi-plus"
-								value="#{mensaje['nuevo.usuario']}"
-								action="#{usuariosBean.onCrear}"
-								rendered="#{usuariosBean.permisoNewUsu == true}" />
-							<p:commandButton id="filtrar" value="#{mensaje['filtrar']}"
-								icon="pi pi-filter"
-								update="formListadoUsuarios:nombre_filtro,formListadoUsuarios:primerApellido_filtro,formListadoUsuarios:segundoApellido_filtro,formListadoUsuarios:identificador_filtro,formListadoUsuarios:login_filtro,formListadoUsuarios:activo_filtro,formListadoUsuarios:tablaUsuario"
-								onstart="PF('usuarioWV').paginator.setPage(0);" />
-							<p:commandButton id="limpiarFiltro" icon="pi pi-filter-slash"
-								value="#{mensaje['limpiar.filtro']}"
-								actionListener="#{usuariosBean.limpiarFiltro()}"
-								update="formListadoUsuarios:nombre_filtro,formListadoUsuarios:primerApellido_filtro,formListadoUsuarios:segundoApellido_filtro,formListadoUsuarios:identificador_filtro,formListadoUsuarios:login_filtro,formListadoUsuarios:activo_filtro,formListadoUsuarios:tablaUsuario"
-								onstart="PF('usuarioWV').paginator.setPage(0);" />
-						</div>
-		 			</p:column>
+		 			<p:column headerText="#{mensaje['acciones']}">
+							<p:commandButton id="edicionFormacionGRS" widgetVar="edicionFormacionGRS"
+								icon="pi pi-pencil" action="#{formacionGRSBean.onEditar(formacionPruebasGRS.id)}"
+								immediate="true" >
+							</p:commandButton>
+							
+							<p:commandButton id="consultaFormacionGRS" widgetVar="consultaFormacionGRS"
+								icon="pi pi-eye" action="#{formacionGRSBean.onConsultar(formacionPruebasGRS.id)}"
+								immediate="true" >
+							</p:commandButton>
+							
+							<p:commandButton id="eliminarFormacionGRS" icon="pi pi-trash"
+								actionListener="#{formacionGRSBean.eliminarFormacionGRS(formacionPruebasGRS)}"
+								update="formListadoFormacionGRS:listadoFormacionPruebasGRS">
+								<p:confirm header="#{mensaje['confirmar.operacion']}" message="#{mensaje['pregunta.confirma.eliminar']}" icon="pi pi-info-circle" />
+							</p:commandButton>
+							
+							<p:commandButton id="desactivarFormacionGRS" icon="pi pi-times"
+								actionListener="#{formacionGRSBean.desactivarFormacionGRS(formacionPruebasGRS)}"
+								update="formListadoFormacionGRS:listadoFormacionPruebasGRS">
+								<p:confirm header="#{mensaje['confirmar.operacion']}" message="#{mensaje['pregunta.confirma.eliminar']}" icon="pi pi-info-circle" />
+							</p:commandButton>
+							
+							<p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true">
+								<div class="botonera-form" align="right">
+									<p:commandButton value="#{mensaje['si']}" type="button" styleClass="ui-confirmdialog-yes" />
+									<p:commandButton value="#{mensaje['no']}" type="button" styleClass="ui-confirmdialog-no ui-button-flat" />
+								</div>								
+							</p:confirmDialog>
+						</p:column>
 				</p:dataTable >
 			</p:outputPanel>
 			
+			<br/>
 			
+			<p:commandButton id="volver" value="#{mensaje['volver']}"
+				oncomplete="document.location.href='#{request.contextPath}/aplicacion/bienvenido.xhtml'">
+			</p:commandButton>
 		
 		</h:form>
 	
