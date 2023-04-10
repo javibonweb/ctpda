@@ -6,43 +6,48 @@
 	xmlns:ui="http://java.sun.com/jsf/facelets"
 	xmlns:p="http://primefaces.org/ui">
 <f:view locale="#{localeSwitcher.locale}" contentType="text/html">
-	
-	<style>	
-		body {
-			margin:0;
-		}
-		#cabeceraSuperior {
-			top: 0;
-			left: 8px;
-			right: 8px;
-	   		position: fixed;
-	   		z-index:100;
-	   		background-color: #ffffff;
-		}
-		#panelMenu {
-			top: 132px;
-			left:0;
-			bottom:0;
-	  		position: fixed;	
-		}	
-		#panelMenu .inner {
-			height:100%;
-			overflow-x: hidden;
-	  		overflow-y: auto;
-		}	
-		#panelContenido {
-			margin-top: 114px;
-	 		float: right;
-		}	
-		#panelContenido .inner {
-			top: 0;
-			bottom:0;
-			height:100%;
-			margin-top:0;
-			overflow-x: hidden;
-	  		overflow-y: auto;
-		}	
-	</style>
+
+	<style>
+body {
+	margin: 0;
+}
+
+#cabeceraSuperior {
+	top: 0;
+	left: 8px;
+	right: 8px;
+	position: fixed;
+	z-index: 100;
+	background-color: #ffffff;
+}
+
+#panelMenu {
+	top: 132px;
+	left: 0;
+	bottom: 0;
+	position: fixed;
+}
+
+#panelMenu .inner {
+	height: 100%;
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+
+#panelContenido {
+	margin-top: 114px;
+	float: right;
+}
+
+#panelContenido .inner {
+	top: 0;
+	bottom: 0;
+	height: 100%;
+	margin-top: 0;
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+</style>
 
 
 	<h:head>
@@ -156,9 +161,6 @@
 							</h:form>
 							<ui:insert name="content" />
 						</p:outputPanel>
-
-						<h:outputText id="nombreVictor" style="color: black"
-							value="VíctorDíazCastro" />
 
 					</div>
 				</div>

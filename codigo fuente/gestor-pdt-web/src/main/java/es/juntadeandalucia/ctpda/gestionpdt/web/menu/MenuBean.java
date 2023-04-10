@@ -152,6 +152,13 @@ public class MenuBean extends BaseBean implements Serializable {
 		menuAdmon(submenuAdmon);
 
 		/*
+		 * MENU FOMRACION TRAMITES PENDIENTES
+		 */
+		DefaultSubMenu submenuTramitesPdtes = new DefaultSubMenu();
+		submenuTramitesPdtes.setLabel(mensajesProperties.getString("formacion.tramites.pdtes"));
+		menuTramitesPdtes(submenuTramitesPdtes);
+
+		/*
 		 * MENU FOMRACION VDC
 		 */
 		DefaultSubMenu submenuForVictor = new DefaultSubMenu();
@@ -474,12 +481,27 @@ public class MenuBean extends BaseBean implements Serializable {
 		itemForVictor.setAsync(false);
 		itemForVictor.setUpdate(DATAFORM);
 		itemForVictor.setValue(mensajesProperties.getString("formacion.vdc"));
-		itemForVictor.setCommand("#{forVictor.redireccionMenu}");
+		itemForVictor.setCommand("#{forVictorBean.redireccionMenu}");
 
 		submenuForVictor.getElements().add(itemForVictor);
 
 		if (!submenuForVictor.getElements().isEmpty()) {
 			model.getElements().add(submenuForVictor);
+		}
+	}
+
+	private void menuTramitesPdtes(DefaultSubMenu submenuTramitesPdtes) {
+		DefaultMenuItem itemTramitesPdtes = new DefaultMenuItem();
+		itemTramitesPdtes.setAjax(false);
+		itemTramitesPdtes.setAsync(false);
+		itemTramitesPdtes.setUpdate(DATAFORM);
+		itemTramitesPdtes.setValue(mensajesProperties.getString("tramites.pdtes.respuesta"));
+		itemTramitesPdtes.setCommand("#{tramitesPdtesBean.redireccionMenu}");
+
+		submenuTramitesPdtes.getElements().add(itemTramitesPdtes);
+
+		if (!submenuTramitesPdtes.getElements().isEmpty()) {
+			model.getElements().add(submenuTramitesPdtes);
 		}
 	}
 

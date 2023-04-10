@@ -88,7 +88,8 @@ public class NavegacionBean implements Serializable{
 		//FormacionVDC
 		LISTADO_FORVICTOR,
 		FORM_FORVICTOR,
-		
+		//TramitesPdtes
+		LISTADO_TRAMITES_PDTES,
 
 		FIN //No se usa. Hace de terminador
 		;

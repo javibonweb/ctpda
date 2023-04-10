@@ -86,24 +86,27 @@
 
 					<div class="botonera-form">
 						<p:commandButton id="nuevoForVictor" icon="pi pi-plus"
-							value="#{mensaje['nueva.forvictor']}"
+							value="#{mensaje['nueva.formacionvdc']}"
 							action="#{forVictorBean.onCrear}" />
 						<p:commandButton id="filtrar" value="#{mensaje['filtrar']}"
-							icon="pi pi-filter" update="" />
+							icon="pi pi-filter"
+							update="formListadoForVictor:listadoForVictor"
+							onstart="PF('formacionVdcWV').paginator.setPage(0);" />
 						<!-- onstart="PF('usuarioWV').paginator.setPage(0);" -->
 						<p:commandButton id="limpiarFiltro" icon="pi pi-filter-slash"
 							value="#{mensaje['limpiar.filtro']}"
-							actionListener="#{forvictor.limpiarFiltro()}"
+							actionListener="#{forVictorBean.limpiarFiltro()}"
 							update="formListadoForVictor:codigo_filtro,formListadoForVictor:descripcion_filtro,
 								formListadoForVictor:activo_filtro,formListadoForVictor:version_filtro,
-								formListadoForVictor:fechaCreacion_filtro,formListadoForVictor:usuarios_filtro" />
+								formListadoForVictor:fechaCreacion_filtro,formListadoForVictor:usuarios_filtro"
+							onstart="PF('formacionVdcWV').paginator.setPage(0);" />
 						<!-- onstart="PF('usuarioWV').paginator.setPage(0);" -->
 					</div>
 				</p:fieldset>
 
 				<p:outputPanel id="panelListadoForVictor">
 					<p:dataTable var="forVictor" id="listadoForVictor"
-						value="#{forVictorBean.lazyModalFormacionPruebasVdc}"
+						value="#{forVictorBean.lazyModalFormacionPruebaVdc}"
 						paginator="true"
 						paginatorTemplate=" {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
 						rowsPerPageTemplate="10,20,50,100" rows="10"
@@ -179,7 +182,7 @@
 								actionListener="#{forVictorBean.desactivarForVictor(forVictor)}"
 								update="formListadoForVictor:listadoForVictor">
 								<p:confirm header="#{mensaje['confirmar.operacion']}"
-									message="#{mensaje['pregunta.confirma.eliminar']}"
+									message="#{mensaje['pregunta.confirma.desactivar']}"
 									icon="pi pi-info-circle" />
 							</p:commandButton>
 

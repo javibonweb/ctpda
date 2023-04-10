@@ -39,6 +39,8 @@ public class FormacionPruebaVdc extends Auditable {
 	 */
 	private static final long serialVersionUID = 1L;
 
+	// TODO: Eliminar NotNull's
+
 	@Id
 	@Column(name = "PRU_ID")
 	@NotNull
