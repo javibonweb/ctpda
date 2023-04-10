@@ -474,7 +474,7 @@ public class MenuBean extends BaseBean implements Serializable {
 		itemForVictor.setAsync(false);
 		itemForVictor.setUpdate(DATAFORM);
 		itemForVictor.setValue(mensajesProperties.getString("formacion.vdc"));
-		itemForVictor.setCommand("#{forvictor.redireccionMenu}");
+		itemForVictor.setCommand("#{forVictor.redireccionMenu}");
 
 		submenuForVictor.getElements().add(itemForVictor);
 

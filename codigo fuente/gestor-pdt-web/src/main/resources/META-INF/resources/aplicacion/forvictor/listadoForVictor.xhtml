@@ -28,14 +28,14 @@
 						<div class="celda-form">
 							<p:outputLabel for="codigo_filtro" value="#{mensaje['codigo']}" />
 							<p:inputText id="codigo_filtro" maxlength="50" size="30"
-								value="#{forvictor.codigoFiltro}" />
+								value="#{forVictorBean.codigoFiltro}" />
 						</div>
 
 						<div class="celda-form">
 							<p:outputLabel for="descripcion_filtro"
 								value="#{mensaje['descripcion']}" />
 							<p:inputText id="descripcion_filtro" maxlength="255" size="50"
-								value="#{forvictor.descripcionFiltro}" />
+								value="#{forVictorBean.descripcionFiltro}" />
 						</div>
 					</div>
 
@@ -44,14 +44,15 @@
 							<p:outputPanel styleClass="celda-form">
 								<p:outputLabel for="activo_filtro" value="#{mensaje['activo']}" />
 								<p:selectBooleanCheckbox id="activo_filtro"
-									value="#{forvictor.activoFiltro}" itemLabel="#{mensaje['si']}" />
+									value="#{forVictorBean.activoFiltro}"
+									itemLabel="#{mensaje['si']}" />
 							</p:outputPanel>
 						</div>
 
 						<div class="celda-form">
 							<p:outputLabel for="version_filtro" value="#{mensaje['version']}" />
 							<p:inputNumber id="version_filtro"
-								value="#{forvictor.versionFiltro}" minValue="1"
+								value="#{forVictorBean.versionFiltro}" minValue="1"
 								decimalPlaces="0" />
 						</div>
 					</div>
@@ -61,7 +62,7 @@
 							<p:outputLabel for="fechaCreacion_filtro"
 								value="#{mensaje['fecha.creacion']}" />
 							<p:datePicker id="fechaCreacion_filtro"
-								value="#{forvictor.fechaCreacionFiltro}" locale="es"
+								value="#{forVictorBean.fechaCreacionFiltro}" locale="es"
 								monthNavigator="true" pattern="dd/MM/yyyy"
 								converterMessage="#{mensaje['formato.fecha.invalido']}"
 								mask="true" />
@@ -72,13 +73,13 @@
 							<p:outputLabel value="#{mensaje['usuarios']}"
 								for="usuarios_filtro" />
 							<p:selectOneMenu id="usuarios_filtro"
-								value="#{forvictor.selectedUsuarioFiltro}"
+								value="#{forVictorBean.selectedUsuarioFiltro}"
 								style="min-width: 150px;" filter="true"
 								filterMatchMode="contains">
 								<f:selectItem itemLabel="#{mensaje['todos']}" itemValue="" />
-								<f:selectItems value="#{forvictor.listaUsuarios}" var="usuarios"
-									itemLabel="#{usuarios.login}" widgetVar="comboFiltroUsuarios"
-									itemValue="#{usuarios.id}" />
+								<f:selectItems value="#{forVictorBean.listaUsuarios}"
+									var="usuarios" itemLabel="#{usuarios.login}"
+									widgetVar="comboFiltroUsuarios" itemValue="#{usuarios.id}" />
 							</p:selectOneMenu>
 						</div>
 					</div>
@@ -86,7 +87,7 @@
 					<div class="botonera-form">
 						<p:commandButton id="nuevoForVictor" icon="pi pi-plus"
 							value="#{mensaje['nueva.forvictor']}"
-							action="#{forvictor.onCrear}" />
+							action="#{forVictorBean.onCrear}" />
 						<p:commandButton id="filtrar" value="#{mensaje['filtrar']}"
 							icon="pi pi-filter" update="" />
 						<!-- onstart="PF('usuarioWV').paginator.setPage(0);" -->

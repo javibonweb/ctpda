@@ -149,18 +149,18 @@ public class ForVictorBean extends BaseBean implements Serializable {
 	public String onEditar(Long idForVictor) {
 		JsfUtils.setFlashAttribute(EDITABLE, true);
 		JsfUtils.setSessionAttribute(MODOACCESO, "edicion");
-		JsfUtils.setFlashAttribute("idFormacionBlh", idForVictor);
+		JsfUtils.setFlashAttribute("idForVictor", idForVictor);
 		return ListadoNavegaciones.FORM_FORVICTOR.getRegla();
 	}
 
 	public String onConsultar(Long idForVictor) {
 		JsfUtils.setFlashAttribute(EDITABLE, false);
 		JsfUtils.setSessionAttribute(MODOACCESO, "consulta");
-		JsfUtils.setFlashAttribute("idFormacionBlh", idForVictor);
+		JsfUtils.setFlashAttribute("idForVictor", idForVictor);
 		return ListadoNavegaciones.FORM_FORVICTOR.getRegla();
 	}
 
-	public void eliminarFormacionBlh(FormacionPruebaVdc formacionPruebaVdc) {
+	public void eliminarForVictor(FormacionPruebaVdc formacionPruebaVdc) {
 		try {
 			formacionPruebaVdcService.delete(formacionPruebaVdc.getId());
 			FacesContext.getCurrentInstance().addMessage("messagesListadoForVictor",
@@ -173,7 +173,7 @@ public class ForVictorBean extends BaseBean implements Serializable {
 		}
 	}
 
-	public void desactivarFormacionBlh(FormacionPruebaVdc formacionPruebaVdc) {
+	public void desactivarForVictor(FormacionPruebaVdc formacionPruebaVdc) {
 		try {
 			formacionPruebaVdc.setActiva(false);
 			formacionPruebaVdcService.guardar(formacionPruebaVdc);
