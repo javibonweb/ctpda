@@ -94,8 +94,9 @@ public class NavegacionBean implements Serializable{
 		//FormacionGRS
 		LISTADO_FORMACIONGRS,
 		FORM_FORMACIONGRS,
-
-		
+		//FormacionDms
+		LISTADO_FORMACIONDMS,
+		FORM_FORMACIONDMS,
 
 		FIN //No se usa. Hace de terminador
 		;
