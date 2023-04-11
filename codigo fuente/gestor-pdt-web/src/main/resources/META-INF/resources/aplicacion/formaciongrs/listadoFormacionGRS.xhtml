@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+				xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:pe="http://primefaces.org/ui/extensions"                
+                xmlns:sec="https://joinfaces.org/security">
+                
+<ui:composition  template="#{navegacionBean.get('TEMPLATE_LAYOUT_GENERICO')}">
+
+	<ui:define name="content">
+	
+		<h:form id="formListadoFormacionGRS">
+		
+			<p:messages for="messagesListadoFormacionGRS" id="messagesListadoFormacionGRS"
+				showDetail="true" closable="true">
+				<p:autoUpdate />
+			</p:messages>
+			
+			
+			<p:panel header="#{mensaje['formacion.grs']}">
+
+				<!-- PANEL FILTRO DE BUSQUEDA DE REGISTROS -->
+				<p:fieldset legend="#{mensaje['filtros.busqueda']}"
+					id="bloqueFiltroBusquedaGRS" toggleable="true" toggleSpeed="250">
+					<div>
+						<div class="celda-form">
+							<p:outputLabel for="codigo_filtro" value="#{mensaje['codigo']}" />
+							<p:inputText id="codigo_filtro" maxlength="50" size="30"
+								value="#{formacionGRSBean.codigoFiltro}" />
+						</div>
+						<div class="celda-form">
+							<p:outputLabel for="descripcion_filtro" value="#{mensaje['descripcion']}" />
+							<p:inputText id="descripcion_filtro" maxlength="255" size="50"
+								value="#{formacionGRSBean.descripcionFiltro}" />
+						</div>
+					</div>
+					<div>
+						<div class="celda-form">
+							<p:outputPanel styleClass="celda-form">
+								<p:outputLabel for="activa_filtro" value="#{mensaje['activo']}" />
+								<p:selectBooleanCheckbox id="activa_filtro"
+									value="#{formacionGRSBean.activaFiltro}"
+									itemLabel="#{mensaje['si']}" />
+							</p:outputPanel>
+						</div>
+						<div class="celda-form">
+							<p:outputLabel for="version_filtro" value="#{mensaje['version']}" />
+							<p:inputNumber id="version_filtro"  decimalPlaces="0"
+								value="#{formacionGRSBean.versionFiltro}" minValue="1" />
+						</div>
+					</div>
+					<div>
+						<div class="celda-form">
+							<p:outputLabel for="fechaCreacion_filtro" value="#{mensaje['fecha.creacion']}" />
+							<p:datePicker id="fechaCreacion_filtro" value="#{formacionGRSBean.fechaCreacionFiltro}" 
+								locale="es" monthNavigator="true" pattern="dd/MM/yyyy"
+								converterMessage="#{mensaje['formato.fecha.invalido']}" mask="true"/>
+							<p:message for="fechaCreacion_filtro"/>
+						</div>
+						<div class="celda-form">
+							<p:outputLabel for="usuarios_filtro" value="#{mensaje['usuarios']}" />
+							<p:selectOneMenu id="usuarios_filtro" value="#{formacionGRSBean.selectedUsuarioFiltro}"
+								style="min-width: 150px;" filter="true" filterMatchMode="contains">
+								<f:selectItem itemLabel="#{mensaje['todos']}" itemValue="" />
+								<f:selectItems value="#{formacionGRSBean.listaUsuarios}"
+									var="usuarios" itemLabel="#{usuarios.login}"
+									widgetVar="comboFiltroUsuarios" itemValue="#{usuarios.id}" />
+							</p:selectOneMenu>
+						</div>
+					</div>
+					<div class="botonera-form">
+						<p:commandButton id="nuevoFormacionGRS" icon="pi pi-plus"
+							value="#{mensaje['nueva']}"
+							action="#{formacionGRSBean.onCrear}" />
+						<p:commandButton id="filtrar" value="#{mensaje['filtrar']}"
+							icon="pi pi-filter"
+							update="formListadoFormacionGRS:listadoFormacionPruebasGRS"
+							onstart="PF('formacionPruebasGRSWV').paginator.setPage(0);"
+							 />
+						<p:commandButton id="limpiarFiltro" icon="pi pi-filter-slash"
+							value="#{mensaje['limpiar.filtro']}"
+							actionListener="#{formacionGRSBean.limpiarFiltro()}"
+							update="formListadoFormacionGRS:codigo_filtro,formListadoFormacionGRS:descripcion_filtro,
+								formListadoFormacionGRS:activa_filtro,formListadoFormacionGRS:version_filtro,
+								formListadoFormacionGRS:fechaCreacion_filtro,formListadoFormacionGRS:usuarios_filtro"
+							onstart="PF('formacionPruebasGRSWV').paginator.setPage(0);"
+							 /> 
+					</div>
+				</p:fieldset>
+			</p:panel>
+			
+			<p:outputPanel id="panelListadoFormacionGRS">
+				<p:dataTable var="formacionPruebasGRS" id="listadoFormacionPruebasGRS"
+					value="#{formacionGRSBean.lazyModel}" paginator="true"
+					paginatorTemplate=" {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+					rowsPerPageTemplate="10,20,50,100" rows="10"
+					currentPageReportTemplate="#{mensaje['paginador.template']}"
+					selectionMode="single"
+					selection="#{formacionGRSBean.selectedFormacionPruebasGRS}"
+					sortBy="#{formacionGRSBean.ordenGRS}"
+					sortOrder="ascending"
+					rowKey="#{formacionGRSBean.id}" paginatorPosition="bottom"
+					widgetVar="formacionPruebasGRSWV">
+		
+					<p:column headerText="#{mensaje['codigo']}">
+						<h:outputText value="#{formacionPruebasGRS.codigo}" /> 
+					</p:column>
+					
+					<p:column headerText="#{mensaje['descripcion']}">
+						<h:outputText value="#{formacionPruebasGRS.descripcion}" /> 
+					</p:column>
+					
+					<p:column headerText="#{mensaje['activo']}">
+						<h:outputText rendered="#{formacionPruebasGRS.activa eq true}" value="#{mensaje['si']}"/> 
+						<h:outputText rendered="#{formacionPruebasGRS.activa eq false}" value="#{mensaje['no']}" /> 
+					</p:column>
+					
+					
+		 			<p:column headerText="#{mensaje['fecha.creacion']}">
+						<h:outputText value="#{formacionPruebasGRS.fechaCreacion}" >  
+							<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+						</h:outputText>
+		 			</p:column> 
+		 			
+		 			<p:column headerText="#{mensaje['usuario']}" sortBy="#{formacionPruebasGRS.usuario.login}">
+							<h:outputText value="#{formacionPruebasGRS.usuario.login}" />
+						</p:column>
+					
+					<p:column headerText="#{mensaje['usuario.creacion']}"> 
+						<h:outputText value="#{formacionPruebasGRS.usuCreacion}" /> 
+		 			</p:column> 
+		 			
+		 			<p:column headerText="#{mensaje['acciones']}">
+							<p:commandButton id="edicionFormacionGRS" widgetVar="edicionFormacionGRS"
+								icon="pi pi-pencil" action="#{formacionGRSBean.onEditar(formacionPruebasGRS.id)}"
+								immediate="true" >
+							</p:commandButton>
+							
+							<p:commandButton id="consultaFormacionGRS" widgetVar="consultaFormacionGRS"
+								icon="pi pi-eye" action="#{formacionGRSBean.onConsultar(formacionPruebasGRS.id)}"
+								immediate="true" >
+							</p:commandButton>
+							
+							<p:commandButton id="eliminarFormacionGRS" icon="pi pi-trash"
+								actionListener="#{formacionGRSBean.eliminarFormacionGRS(formacionPruebasGRS)}"
+								update="formListadoFormacionGRS:listadoFormacionPruebasGRS">
+								<p:confirm header="#{mensaje['confirmar.operacion']}" message="#{mensaje['pregunta.confirma.eliminar']}" icon="pi pi-info-circle" />
+							</p:commandButton>
+							
+							<p:commandButton id="desactivarFormacionGRS" icon="pi pi-times"
+								actionListener="#{formacionGRSBean.desactivarFormacionGRS(formacionPruebasGRS)}"
+								update="formListadoFormacionGRS:listadoFormacionPruebasGRS">
+								<p:confirm header="#{mensaje['confirmar.operacion']}" message="#{mensaje['pregunta.confirma.eliminar']}" icon="pi pi-info-circle" />
+							</p:commandButton>
+							
+							<p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true">
+								<div class="botonera-form" align="right">
+									<p:commandButton value="#{mensaje['si']}" type="button" styleClass="ui-confirmdialog-yes" />
+									<p:commandButton value="#{mensaje['no']}" type="button" styleClass="ui-confirmdialog-no ui-button-flat" />
+								</div>								
+							</p:confirmDialog>
+						</p:column>
+				</p:dataTable >
+			</p:outputPanel>
+			
+			<br/>
+			
+			<p:commandButton id="volver" value="#{mensaje['volver']}"
+				oncomplete="document.location.href='#{request.contextPath}/aplicacion/bienvenido.xhtml'">
+			</p:commandButton>
+		
+		</h:form>
+	
+	</ui:define>
+
+</ui:composition>
+</html>

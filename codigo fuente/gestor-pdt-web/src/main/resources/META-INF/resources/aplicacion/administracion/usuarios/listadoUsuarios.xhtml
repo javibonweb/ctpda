@@ -102,7 +102,7 @@
 						selectionMode="single" sortBy="#{usuariosBean.defaultOrden}"
 						sortOrder="ascending" selection="#{usuariosBean.selectedUsuario}"
 						rowKey="#{usuario.id}" paginatorPosition="bottom"
-						widgetVar="usuarioWV">
+						widgetVar="usuarioWV" >
 
 						<p:ajax event="rowDblselect" listener="#{usuariosBean.onUserRowDblClkSelect}" global="false" 
 							oncomplete="clickBotonFila(this.source, args.id, 'consultarUsuario');" />
