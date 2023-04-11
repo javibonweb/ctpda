@@ -192,12 +192,12 @@
 		<dependency>
 			<groupId>es.juntadeandalucia.ctpda.gestionpdt</groupId>
 			<artifactId>gestor-pdt-web-core</artifactId>
-			<version>${parent.version}</version>
+			<version>0.0.1</version>
 		</dependency>
 		<dependency>
 			<groupId>es.juntadeandalucia.ctpda.gestionpdt</groupId>
 			<artifactId>gestor-pdt-service</artifactId>
-			<version>${parent.version}</version>
+			<version>0.0.1</version>
 		</dependency>
 		<dependency>
 			<groupId>es.juntadeandalucia.ctpda.gestionpdt</groupId>
@@ -323,7 +323,17 @@
 		    <groupId>org.apache.poi</groupId>
 		    <artifactId>poi-ooxml</artifactId>
 		    <version>5.0.0</version>
-		</dependency>	
+		</dependency>
+		<dependency>
+			<groupId>es.juntadeandalucia.ctpda.gestionpdt</groupId>
+			<artifactId>gestor-pdt-model</artifactId>
+			<version>0.0.1</version>
+		</dependency>
+		<dependency>
+			<groupId>es.juntadeandalucia.ctpda.gestionpdt</groupId>
+			<artifactId>gestor-pdt-persistence</artifactId>
+			<version>0.0.1</version>
+		</dependency>
 	</dependencies>
 
 	<build>

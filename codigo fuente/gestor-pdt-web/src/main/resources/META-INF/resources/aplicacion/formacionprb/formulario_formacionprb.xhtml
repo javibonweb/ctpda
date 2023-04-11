@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:c="http://java.sun.com/jstl/core"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:sec="https://joinfaces.org/security"
+	template="#{navegacionBean.get('TEMPLATE_LAYOUT_GENERICO')}">
+
+	<ui:define name="content">
+
+		<h:form id="formFormularioFormacionPrb">
+
+			<p:messages for="messagesFormularioFormacionPrb" id="messagesFormularioFormacionPrb" showDetail="true" closable="true">
+				<p:autoUpdate />
+			</p:messages>
+
+			<p:panel id="panelFormularioFormacionBlh">
+
+				<f:facet name="header">
+					<h:outputText rendered="#{formularioFormacionPrbBean.modoAcceso eq 'alta'}" value="#{mensaje['formulario.alta.formacionprb']}" style="font-weight:bold" />
+					<h:outputText rendered="#{formularioFormacionPrbBean.modoAcceso eq 'edicion'}" value="#{mensaje['formulario.edicion.formacionprb']}" style="font-weight:bold" />
+					<h:outputText rendered="#{formularioFormacionPrbBean.modoAcceso eq 'consulta'}" value="#{mensaje['formulario.consulta.formacionprb']}" style="font-weight:bold" />
+				</f:facet>
+
+				<p:spacer height="10" />
+
+				<div>
+					<div class="celda-form">
+						<p:outputLabel rendered="#{formularioFormacionPrbBean.editableFormulario}" for="codigo" value="#{mensaje['codigo']} *" />
+						<p:outputLabel rendered="#{!formularioFormacionPrbBean.editableFormulario}" for="codigo" value="#{mensaje['codigo']}" />
+						<p:inputText id="codigo" maxlength="50" size="15"
+							value="#{formularioFormacionPrbBean.codigo}"
+							disabled="#{!formularioFormacionBlhBean.editableFormulario}" />
+					</div>
+
+					<div class="celda-form">
+						<p:outputLabel  for="descripcion" value="#{mensaje['descripcion']}" />
+						<p:inputText id="descripcion" maxlength="255" size="30"
+							value="#{formularioFormacionPrbBean.descripcion}"
+							disabled="#{!formularioFormacionPrbBean.editableFormulario}" />
+					</div>
+				</div>
+
+				<div>
+					<div class="celda-form">
+						<p:outputLabel for="activo"	value="#{mensaje['activo']}" />
+						<p:selectBooleanCheckbox id="activo" disabled="#{!formularioFormacionPrbBean.editableFormulario}"
+							value="#{formularioFormacionPrbBean.activo}"
+							itemLabel="#{mensaje['si']}">
+						</p:selectBooleanCheckbox>
+					</div>
+				</div>
+
+				<div>
+					<div class="celda-form">
+						<p:outputLabel for="listadoUsuarios" value="#{mensaje['usuarios']}" />
+						<p:selectOneMenu id="listadoUsuarios" value="#{formularioFormacionPrbBean.selectedUsuario}"
+							disabled="#{!formularioFormacionPrbBean.editableFormulario}">
+							<f:selectItem itemLabel="#{mensaje['seleccione.una.opcion']}" itemValue="#{null}" noSelectionOption="true" />
+							<f:selectItems value="#{formularioFormacionPrbBean.listadoUsuarios}"
+								var="usuario" itemLabel="#{usuario.login}" itemValue="#{usuario.id}" />
+						</p:selectOneMenu>
+					</div>
+				</div>
+
+				<div class="botonera-form" align="right">
+					<p:commandButton id="guardar" rendered="#{formularioFormacionPrbBean.editableFormulario}"
+						icon="pi pi-save" value="#{mensaje['guardar']}"
+						actionListener="#{formularioFormacionPrbBean.saveFormacionPrb()}" />
+				</div>
+
+			</p:panel>
+
+			<br/>
+
+			<p:commandButton id="volver" value="#{mensaje['volver']}"
+				oncomplete="document.location.href='#{request.contextPath}/aplicacion/formacionprb/listado_formacionprb.xhtml'">
+			</p:commandButton>
+
+		</h:form>
+
+
+
+	</ui:define>
+
+</ui:composition>
