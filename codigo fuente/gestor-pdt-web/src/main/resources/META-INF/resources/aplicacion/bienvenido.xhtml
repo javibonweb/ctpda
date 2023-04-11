@@ -30,6 +30,40 @@
 		<p:panel>
 			<h:outputText style="color:#ff0000" value ="David Fernández Rodríguez" />		
 		</p:panel>
+		
+		<p:dataTable var="formacionPruebasAntonioF" id="formacionPruebasAntonioF"
+						value="#{LoginBean.lazyModelFormacionPruebasAntonioF}" paginator="true"
+						paginatorTemplate=" {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+						rowsPerPageTemplate="10,20,50,100" rows="10"
+						currentPageReportTemplate="#{mensaje['paginador.template']}"
+						selectionMode="single"
+						sortBy="#{formacionPruebasAntonioF.codigo}"
+						sortOrder="ascending"
+						rowKey="#{formacionPruebasAntonioF.id}" paginatorPosition="bottom"
+						widgetVar="formacionPruebasWV">
+
+
+						<p:column headerText="Codigo" width="120px">
+							<h:outputText value="#{formacionPruebasAntonioF.codigo}" /> 
+						</p:column>
+						<p:column headerText="Decripcion" width="120px">
+							<h:outputText value="#{formacionPruebasAntonioF.descripcion}" /> 
+						</p:column>
+						<p:column headerText="Activa" width="120px">
+							<h:outputText value="#{formacionPruebasAntonioF.activa}" /> 
+						</p:column>
+						<p:column headerText="Version" width="120px">
+							<h:outputText value="#{formacionPruebasAntonioF.version}" /> 
+						</p:column>
+						<p:column headerText="Fecha de Creacion" width="120px">
+							<h:outputText value="#{formacionPruebasAntonioF.fechaCreacion}" /> 
+						</p:column>
+						<p:column headerText="Usuario de Creacion" width="120px">
+							<h:outputText value="#{formacionPruebasAntonioF.usuCreacion}" /> 
+						</p:column>
+
+						
+					</p:dataTable>
 
 	</ui:define>
 </ui:composition>
