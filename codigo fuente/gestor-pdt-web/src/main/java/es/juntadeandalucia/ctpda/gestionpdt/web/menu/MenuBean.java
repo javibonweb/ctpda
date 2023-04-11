@@ -194,6 +194,14 @@ public class MenuBean extends BaseBean implements Serializable{
     	    	
     	PrimeFaces.current().ajax().update("menuForm");
     	
+    	 /*
+         * 	MENU TRAMITE DMS
+         * */    	
+    	DefaultSubMenu submenuTramiteDms = new DefaultSubMenu();
+    	submenuTramiteDms.setLabel(mensajesProperties.getString("tramite.dms"));
+    	menuTramiteDms(submenuTramiteDms);
+    	    	
+    	PrimeFaces.current().ajax().update("menuForm");
     }
 
 	private void menuFormacionDfr(DefaultSubMenu submenuFormacionDfr) {
@@ -583,5 +591,18 @@ public class MenuBean extends BaseBean implements Serializable{
         	model.getElements().add(submenuFormacionDms);
         }
 	}
+	private void menuTramiteDms (DefaultSubMenu submenuTramiteDms) {
+    	DefaultMenuItem itemTramiteDms = new DefaultMenuItem();
+    	itemTramiteDms.setAjax(false);
+    	itemTramiteDms.setAsync(false);
+    	itemTramiteDms.setUpdate(DATAFORM);
+    	itemTramiteDms.setValue(mensajesProperties.getString("tramite.dms"));
+    	itemTramiteDms.setCommand("#{tramiteDmsBean.redireccionMenu}");
 
+    	submenuTramiteDms.getElements().add(itemTramiteDms);
+
+    	if(!submenuTramiteDms.getElements().isEmpty()) {
+        	model.getElements().add(submenuTramiteDms);
+        }
+	}
 }
