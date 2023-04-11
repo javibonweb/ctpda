@@ -191,10 +191,33 @@ public class MenuBean extends BaseBean implements Serializable{
     	DefaultSubMenu submenuFormacionDms = new DefaultSubMenu();
     	submenuFormacionDms.setLabel(mensajesProperties.getString("formacion.dms"));
     	menuFormacionDms(submenuFormacionDms);
+
+		/*
+		 *	MENU TIPO TRAMITE DFR
+		 */
+		DefaultSubMenu submenuTipoTramiteDfr = new DefaultSubMenu();
+		submenuTipoTramiteDfr.setLabel(mensajesProperties.getString("tipo.tramite.dfr"));
+		menuTipoTramiteDfr(submenuTipoTramiteDfr);
     	    	
     	PrimeFaces.current().ajax().update("menuForm");
     	
     }
+
+	private void menuTipoTramiteDfr(DefaultSubMenu submenuTipoTramiteDfr) {
+		if ((listaCodigoPermisos != null) && listaCodigoPermisos.contains(Constantes.PERMISO_MENU_RESOL)) {
+			DefaultMenuItem itemTipoTramiteDfr = new DefaultMenuItem();
+			itemTipoTramiteDfr.setAjax(false);
+			itemTipoTramiteDfr.setAsync(false);
+			itemTipoTramiteDfr.setUpdate(DATAFORM);
+			itemTipoTramiteDfr.setValue(mensajesProperties.getString("tipo.tramite.dfr"));
+			itemTipoTramiteDfr.setCommand("#{tipoTramiteDfrBean.redireccionMenu}");
+			submenuTipoTramiteDfr.getElements().add(itemTipoTramiteDfr);
+		}
+
+		if (!submenuTipoTramiteDfr.getElements().isEmpty()) {
+			model.getElements().add(submenuTipoTramiteDfr);
+		}
+	}
 
 	private void menuFormacionDfr(DefaultSubMenu submenuFormacionDfr) {
 		if ((listaCodigoPermisos != null) && listaCodigoPermisos.contains(Constantes.PERMISO_MENU_RESOL)) {
