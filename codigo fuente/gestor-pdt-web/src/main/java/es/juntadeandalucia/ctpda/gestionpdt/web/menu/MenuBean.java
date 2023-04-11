@@ -126,6 +126,14 @@ public class MenuBean extends BaseBean implements Serializable{
         
 
         /*
+         * 	MENU GONZALO
+         * */
+    	DefaultSubMenu submenuFormacionGRS = new DefaultSubMenu();
+    	submenuFormacionGRS.setLabel(mensajesProperties.getString("formacion.grs"));
+    	menuFormacionGRS(submenuFormacionGRS);
+
+
+        /*
          * 	SUBMENU MI MESA
          * */    	
     	DefaultSubMenu submenuMiMesa = new DefaultSubMenu();
@@ -161,14 +169,21 @@ public class MenuBean extends BaseBean implements Serializable{
     	DefaultSubMenu submenuAdmon = new DefaultSubMenu();
     	submenuAdmon.setLabel(mensajesProperties.getString("administracion"));
     	menuAdmon(submenuAdmon);
-    	
+
+		/*
+		 * 	MENU FORMACION
+		 * */
+		DefaultSubMenu submenuFormacionDfr = new DefaultSubMenu();
+		submenuFormacionDfr.setLabel(mensajesProperties.getString("formacion.dfr"));
+		menuFormacionDfr(submenuFormacionDfr);
+
         /*
          * 	MENU FOMRACION BLH
-         * */    	
+         * */
     	DefaultSubMenu submenuFormacionBlh = new DefaultSubMenu();
     	submenuFormacionBlh.setLabel(mensajesProperties.getString("formacion.blh"));
     	menuFormacionBlh(submenuFormacionBlh);
-    	    	
+
 
         /*
          * 	MENU FOMRACION DMS
@@ -180,8 +195,24 @@ public class MenuBean extends BaseBean implements Serializable{
     	PrimeFaces.current().ajax().update("menuForm");
     	
     }
-    
-    private void menuMiMesa(DefaultSubMenu submenuMiMesa) {
+
+	private void menuFormacionDfr(DefaultSubMenu submenuFormacionDfr) {
+		if ((listaCodigoPermisos != null) && listaCodigoPermisos.contains(Constantes.PERMISO_MENU_RESOL)) {
+			DefaultMenuItem itemFormacionDfr = new DefaultMenuItem();
+			itemFormacionDfr.setAjax(false);
+			itemFormacionDfr.setAsync(false);
+			itemFormacionDfr.setUpdate(DATAFORM);
+			itemFormacionDfr.setValue(mensajesProperties.getString("formacion.dfr"));
+			itemFormacionDfr.setCommand("#{formacionDfrBean.redireccionMenu}");
+			submenuFormacionDfr.getElements().add(itemFormacionDfr);
+		}
+
+		if (!submenuFormacionDfr.getElements().isEmpty()) {
+			model.getElements().add(submenuFormacionDfr);
+		}
+	}
+
+	private void menuMiMesa(DefaultSubMenu submenuMiMesa) {
         if((listaCodigoPermisos!= null) && listaCodigoPermisos.contains(Constantes.PERMISO_MI_MESA)) {
         	DefaultMenuItem itemTareas = new DefaultMenuItem();
         	itemTareas.setAjax(false);
@@ -501,7 +532,27 @@ public class MenuBean extends BaseBean implements Serializable{
         	submenuExpedientes.getElements().add(itemResoluciones);
         }
 	}
-	
+
+
+
+	private void menuFormacionGRS (DefaultSubMenu submenuFormacionGRS) {
+
+		DefaultMenuItem itemGonzalo = new DefaultMenuItem();
+    	itemGonzalo.setAjax(false);
+    	itemGonzalo.setAsync(false);
+    	itemGonzalo.setUpdate(DATAFORM);
+    	itemGonzalo.setValue(mensajesProperties.getString("formacion.grs"));
+    	itemGonzalo.setCommand("#{formacionGRSBean.redireccionMenu}");
+
+    	submenuFormacionGRS.getElements().add(itemGonzalo);
+
+
+		if(!submenuFormacionGRS.getElements().isEmpty()){
+            model.getElements().add(submenuFormacionGRS);
+		}
+    }
+
+
 	private void menuFormacionBlh (DefaultSubMenu submenuFormacionBlh) {
     	DefaultMenuItem itemFormacionBlh = new DefaultMenuItem();
     	itemFormacionBlh.setAjax(false);
@@ -509,12 +560,13 @@ public class MenuBean extends BaseBean implements Serializable{
     	itemFormacionBlh.setUpdate(DATAFORM);
     	itemFormacionBlh.setValue(mensajesProperties.getString("formacion.blh"));
     	itemFormacionBlh.setCommand("#{formacionBlhBean.redireccionMenu}");
-    	
+
     	submenuFormacionBlh.getElements().add(itemFormacionBlh);
-		
+
 		if(!submenuFormacionBlh.getElements().isEmpty()) {
         	model.getElements().add(submenuFormacionBlh);
         }
+
 	}
 
 	private void menuFormacionDms (DefaultSubMenu submenuFormacionDms) {
