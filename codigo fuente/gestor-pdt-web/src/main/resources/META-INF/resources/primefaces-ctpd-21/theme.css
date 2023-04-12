@@ -2246,7 +2246,7 @@ html .ui-button.ui-state-disabled:active {
   display: block;
 }
 
-/* Listados de documentos mostrados en acordeÃ³n */
+/* Listados de documentos mostrados en acordeón */
 .panel-documentos .ui-accordion .ui-accordion-content {
   padding-left: 1.5em;
   padding-right: 0;
@@ -2692,7 +2692,7 @@ $dark-grey: rgb(68, 68, 68) !default;
 
 #datosSituacionPanel .aviso-fecha-vencida .icono {
   background-position: 0 -96px;
-  /*-228px; sÃ­mbolo 'prohibido' */
+  /*-228px; símbolo 'prohibido' */
 }
 
 /*$color-reclamacion: #EBF3FF;
@@ -2738,8 +2738,8 @@ $dark-grey: rgb(68, 68, 68) !default;
 
 /* 
 Para eliminar los bordes de los panelGrid. 
-Cuando la pÃ¡gina se vuelve compleja salen muchos.
-AsÃ­ queda la vista mÃ¡s limpia
+Cuando la página se vuelve compleja salen muchos.
+Así queda la vista más limpia
 */
 .ui-panelgrid {
   /* valor que no sea 'collapse' */
@@ -2864,7 +2864,7 @@ AsÃ­ queda la vista mÃ¡s limpia
   content: 'No';
 }
 
-/* VersiÃ³n en negativo, cuando 'Si' es algo malo */
+/* Versión en negativo, cuando 'Si' es algo malo */
 .pastilla-si-neg {
   width: 2em;
 }

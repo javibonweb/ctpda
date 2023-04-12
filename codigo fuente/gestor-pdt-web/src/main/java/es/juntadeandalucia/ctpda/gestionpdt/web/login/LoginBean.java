@@ -26,16 +26,26 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import es.juntadeandalucia.ctpda.gestionpdt.model.ConexionUsuario;
 import es.juntadeandalucia.ctpda.gestionpdt.model.Dominio;
+<<<<<<< HEAD
 import es.juntadeandalucia.ctpda.gestionpdt.model.FormacionPruebasAntonioF;
+=======
+import es.juntadeandalucia.ctpda.gestionpdt.model.FormacionPruebas;
+import es.juntadeandalucia.ctpda.gestionpdt.model.FormacionPruebasGonzalo;
+>>>>>>> branch 'beatriz.lamorena' of https://github.com/beatriz-lamorena/ctpda.git
 import es.juntadeandalucia.ctpda.gestionpdt.model.Perfil;
 import es.juntadeandalucia.ctpda.gestionpdt.model.Usuario;
 import es.juntadeandalucia.ctpda.gestionpdt.service.ConexionUsuarioService;
+<<<<<<< HEAD
 import es.juntadeandalucia.ctpda.gestionpdt.service.FormacionPruebasAntonioFService;
+=======
+import es.juntadeandalucia.ctpda.gestionpdt.service.FormacionPruebasService;
+import es.juntadeandalucia.ctpda.gestionpdt.service.FormacionPruebasGonzaloService;
+import es.juntadeandalucia.ctpda.gestionpdt.service.ParametroService;
+>>>>>>> branch 'beatriz.lamorena' of https://github.com/beatriz-lamorena/ctpda.git
 import es.juntadeandalucia.ctpda.gestionpdt.service.PerfilService;
 import es.juntadeandalucia.ctpda.gestionpdt.service.PermisoPerfilService;
 import es.juntadeandalucia.ctpda.gestionpdt.service.UsuarioService;
 import es.juntadeandalucia.ctpda.gestionpdt.service.core.exception.BaseException;
-import es.juntadeandalucia.ctpda.gestionpdt.service.ParametroService;
 import es.juntadeandalucia.ctpda.gestionpdt.util.FechaUtils;
 import es.juntadeandalucia.ctpda.gestionpdt.web.SesionBean;
 import es.juntadeandalucia.ctpda.gestionpdt.web.core.Constantes;
@@ -140,11 +150,24 @@ public class LoginBean extends BaseBean implements Serializable {
 	private SesionBean sesionBean;
 	
 	@Getter
+<<<<<<< HEAD
     private LazyDataModelByQueryService<FormacionPruebasAntonioF> lazyModelFormacionPruebasAntonioF;
 
     @Autowired
     private FormacionPruebasAntonioFService formacionPruebasAntonioFService;
 
+=======
+	private LazyDataModelByQueryService<FormacionPruebas> lazyModelFormacionPruebas;
+	
+	@Getter
+	private LazyDataModelByQueryService<FormacionPruebasGonzalo> lazyModelFormacionPruebasGonzalo;
+	
+	@Autowired
+	private FormacionPruebasService formacionPruebasService;
+	
+	@Autowired
+	private FormacionPruebasGonzaloService formacionPruebasGonzaloService;
+>>>>>>> branch 'beatriz.lamorena' of https://github.com/beatriz-lamorena/ctpda.git
 
 	/**
 	 * Initialize default attributes.
@@ -178,9 +201,21 @@ public class LoginBean extends BaseBean implements Serializable {
 		PrimeFaces.current().ajax().update("formLogin");
 		PrimeFaces.current().ajax().update("formDialogPerfiles");
 		
+<<<<<<< HEAD
 		lazyModelFormacionPruebasAntonioF = new LazyDataModelByQueryService<>(FormacionPruebasAntonioF.class, formacionPruebasAntonioFService);
 		lazyModelFormacionPruebasAntonioF.setPreproceso((a,b,c,filters)->{});
 
+=======
+		lazyModelFormacionPruebas = new LazyDataModelByQueryService<>(FormacionPruebas.class, formacionPruebasService);
+		lazyModelFormacionPruebas.setPreproceso((a, b, c, filters) -> {
+			//filtros
+		});
+		
+		lazyModelFormacionPruebasGonzalo = new LazyDataModelByQueryService<>(FormacionPruebasGonzalo.class, formacionPruebasGonzaloService);
+		lazyModelFormacionPruebasGonzalo.setPreproceso((a, b, c, filters) -> {
+			//filtros
+		});
+>>>>>>> branch 'beatriz.lamorena' of https://github.com/beatriz-lamorena/ctpda.git
 
 	}
 
