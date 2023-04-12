@@ -51,21 +51,18 @@ public class FormacionPruebaVdc extends Auditable {
 	private Long id;
 
 	@Column(name = "L_ACTIVA")
-	@NotNull
 	@ColumnDefault("1")
 	@Getter
 	@Setter
 	private Boolean activa;
 
 	@Column(name = "D_DESCRIPCION")
-	@NotNull
 	@Size(max = 255)
 	@Getter
 	@Setter
 	private String descripcion;
 
 	@Column(name = "C_CODIGO")
-	@NotNull
 	@Size(max = 50)
 	@Getter
 	@Setter
