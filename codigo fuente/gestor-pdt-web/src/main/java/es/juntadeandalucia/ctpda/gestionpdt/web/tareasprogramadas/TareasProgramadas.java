@@ -232,32 +232,32 @@ public class TareasProgramadas extends BaseBean implements Serializable{
 		
 		escribeLog(PROCESOSINACTIVIDAD,FINPROCESO + registrosTotales + EXPEDIENTESFINALIZADOS+ registrosModificados);
 	}
-	
+
 	@Scheduled (cron = "${cron.presentacion.alegaciones.psan}", zone = TIME_ZONE)
 	@Transactional(TxType.REQUIRED)
 	public void presentacionAlegacionesPSAN () {
-		escribeLog(PRESENTACIONALEGACIONES,INICIOPROCESO);		
+		escribeLog(PRESENTACIONALEGACIONES,INICIOPROCESO);
 		registrosTotalesPresentacionAlegacionesPsan = 0;
-		registrosModificadosPresentacionAlegacionesPsan = 0;		
-		
+		registrosModificadosPresentacionAlegacionesPsan = 0;
+
 		List<Expedientes> expedientesPsanPdteRecepcionAlegaciones = expedientesService.findExpedientesByTipExpSituacion(Constantes.PSAN,Constantes.PRAI);
 		presentacionAlegacionesPSANExpedientesPsanPdteRecepcionAlegacionesAux(expedientesPsanPdteRecepcionAlegaciones);
-				
+
 		List<Expedientes> expedientesPsanPdteRecepcionAlegacionesPR = expedientesService.findExpedientesByTipExpSituacion(Constantes.PSAN,Constantes.PRAP);
 		presentacionAlegacionesPSANExpedientesPsanPdteRecepcionAlegacionesPRAux(expedientesPsanPdteRecepcionAlegacionesPR);
-		
+
 		escribeLog(PRESENTACIONALEGACIONES,FINPROCESO + registrosTotalesPresentacionAlegacionesPsan + EXPEDIENTESEVOLUCION+ registrosModificadosPresentacionAlegacionesPsan);
 	}
-	
+
 	private void presentacionAlegacionesPSANExpedientesPsanPdteRecepcionAlegacionesAux (List<Expedientes> expedientesPsanPdteRecepcionAlegaciones) {
 		for(int i = 0; i < expedientesPsanPdteRecepcionAlegaciones.size(); i++) {
-			
-			registrosTotalesPresentacionAlegacionesPsan ++;			
+
+			registrosTotalesPresentacionAlegacionesPsan ++;
 			List<DetalleExpdteTram> subtramNotificacionTramIniPsan = detalleExpdteTramService.findSubtramitesByExpYTipSubtramiteYTipTramiteSup(expedientesPsanPdteRecepcionAlegaciones.get(i).getId(), Constantes.COD_VAL_DOM_NOT, Constantes.TIP_TRAM_INIPSAN);
-			Date fechaMayorNotifTramIniPsan = detalleExpdteTramService.findFechaMayorNotifDetalleExpActivoByExpedienteAndTipoTramiteSup(expedientesPsanPdteRecepcionAlegaciones.get(i).getId(), Constantes.COD_VAL_DOM_NOT, Constantes.TIP_TRAM_INIPSAN); 
-			Date fechaMayorEnvioTramIniPsan = detalleExpdteTramService.findFechaMayorEnvioDetalleExpActivoByExpedienteAndTipoTramiteSup(expedientesPsanPdteRecepcionAlegaciones.get(i).getId(), Constantes.COD_VAL_DOM_NOT, Constantes.TIP_TRAM_INIPSAN); 
-			
-			try {				
+			Date fechaMayorNotifTramIniPsan = detalleExpdteTramService.findFechaMayorNotifDetalleExpActivoByExpedienteAndTipoTramiteSup(expedientesPsanPdteRecepcionAlegaciones.get(i).getId(), Constantes.COD_VAL_DOM_NOT, Constantes.TIP_TRAM_INIPSAN);
+			Date fechaMayorEnvioTramIniPsan = detalleExpdteTramService.findFechaMayorEnvioDetalleExpActivoByExpedienteAndTipoTramiteSup(expedientesPsanPdteRecepcionAlegaciones.get(i).getId(), Constantes.COD_VAL_DOM_NOT, Constantes.TIP_TRAM_INIPSAN);
+
+			try {
 				if(subtramNotificacionTramIniPsan.isEmpty() || (!subtramNotificacionTramIniPsan.isEmpty() && fechaMayorNotifTramIniPsan == null && fechaMayorEnvioTramIniPsan == null)) {
 					log.error("Durante el proceso automático de presentación de alegaciones a fecha "+FechaUtils.hoy()+ELEXPEDIENTE+expedientesPsanPdteRecepcionAlegaciones.get(i).getNumExpediente()+" ("+expedientesPsanPdteRecepcionAlegaciones.get(i).getValorSituacionExpediente().getDescripcion()+")"+" no cumple todas las condiciones para gestionar la espera de los tiempos de alegaciones'.");
 				}else {
@@ -270,21 +270,21 @@ public class TareasProgramadas extends BaseBean implements Serializable{
 			}
 		}
 	}
-	
+
 	private void presentacionAlegacionesPSANExpedientesPsanPdteRecepcionAlegacionesPRAux (List<Expedientes> expedientesPsanPdteRecepcionAlegacionesPR) {
 		for(int i = 0; i < expedientesPsanPdteRecepcionAlegacionesPR.size(); i++) {
-			
-			registrosTotalesPresentacionAlegacionesPsan ++;	
+
+			registrosTotalesPresentacionAlegacionesPsan ++;
 			List<DetalleExpdteTram> subtramNotificacionTramPres = detalleExpdteTramService.findSubtramitesByExpYTipSubtramiteYTipTramiteSup(expedientesPsanPdteRecepcionAlegacionesPR.get(i).getId(), Constantes.COD_VAL_DOM_NOT, Constantes.TIP_TRAM_PRES);
-			Date fechaMayorNotifTramPres = detalleExpdteTramService.findFechaMayorNotifDetalleExpActivoByExpedienteAndTipoTramiteSup(expedientesPsanPdteRecepcionAlegacionesPR.get(i).getId(), Constantes.COD_VAL_DOM_NOT, Constantes.TIP_TRAM_PRES); 
-			Date fechaMayorEnvioTramPres = detalleExpdteTramService.findFechaMayorEnvioDetalleExpActivoByExpedienteAndTipoTramiteSup(expedientesPsanPdteRecepcionAlegacionesPR.get(i).getId(), Constantes.COD_VAL_DOM_NOT, Constantes.TIP_TRAM_PRES); 
-			
+			Date fechaMayorNotifTramPres = detalleExpdteTramService.findFechaMayorNotifDetalleExpActivoByExpedienteAndTipoTramiteSup(expedientesPsanPdteRecepcionAlegacionesPR.get(i).getId(), Constantes.COD_VAL_DOM_NOT, Constantes.TIP_TRAM_PRES);
+			Date fechaMayorEnvioTramPres = detalleExpdteTramService.findFechaMayorEnvioDetalleExpActivoByExpedienteAndTipoTramiteSup(expedientesPsanPdteRecepcionAlegacionesPR.get(i).getId(), Constantes.COD_VAL_DOM_NOT, Constantes.TIP_TRAM_PRES);
+
 			try {
 				if(subtramNotificacionTramPres.isEmpty() || (!subtramNotificacionTramPres.isEmpty() && fechaMayorNotifTramPres == null && fechaMayorEnvioTramPres == null)) {
 					log.error("Durante el proceso automático de presentación de alegaciones a fecha "+FechaUtils.hoy()+ELEXPEDIENTE+expedientesPsanPdteRecepcionAlegacionesPR.get(i).getNumExpediente()+" ("+expedientesPsanPdteRecepcionAlegacionesPR.get(i).getValorSituacionExpediente().getDescripcion()+")"+" no cumple todas las condiciones para gestionar la espera de los tiempos de alegaciones'.");
 				}else {
 					registrosModificadosPresentacionAlegacionesPsan = registrosModificadosPresentacionAlegacionesPsan + presentacionAlegacionesPSANExpedientesPsanPdteRecepcionAlegacionesPRAux(fechaMayorNotifTramPres, fechaMayorEnvioTramPres, expedientesPsanPdteRecepcionAlegacionesPR.get(i));
-				}	
+				}
 			} catch (BaseException e) {
 				FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "", mensajesProperties.getString(ERROR));
 				PrimeFaces.current().dialog().showMessageDynamic(message);
@@ -292,26 +292,26 @@ public class TareasProgramadas extends BaseBean implements Serializable{
 			}
 		}
 	}
-	
+
 	private int presentacionAlegacionesPSANExpedientesPsanPdteRecepcionAlegacionesAux2 (Date fechaMayorNotifTramIniPsan, Date fechaMayorEnvioTramIniPsan, Expedientes expedientesPsanPdteRecepcionAlegacionesFor) throws BaseException {
 		int cambiosHechos = 0;
 		Date fechaMayorTramIniPsan = (fechaMayorNotifTramIniPsan != null)?fechaMayorNotifTramIniPsan:fechaMayorEnvioTramIniPsan;
 		CfgTipoExpediente cfgTipoExpediente = cfgTipoExpedienteService.obtenerCfgTipoExpedientePorValorTipoExpediente(expedientesPsanPdteRecepcionAlegacionesFor.getValorTipoExpediente().getId());
 		Date fechaMayorMasDiasAlegaciones = FechaUtils.sumarDiasAFecha(fechaMayorTramIniPsan, (cfgTipoExpediente.getDiasAlegaciones()).intValue());
 		List<TramiteExpediente> tramiteAlegacFinalizado = tramiteExpedienteService.findTramiteFinalizadoByExpYTipoTramite(expedientesPsanPdteRecepcionAlegacionesFor.getId(), Constantes.TIP_TRAM_ALEG);
-		
+
 		if(((FechaUtils.hoy()).after(fechaMayorMasDiasAlegaciones)) || (!(FechaUtils.hoy()).after(fechaMayorMasDiasAlegaciones) && !tramiteAlegacFinalizado.isEmpty())){
 			ValoresDominio valoresDominioSituacionPdteProResol = valoresDominioService.findValoresDominioByCodigoDomCodValDom(Constantes.COD_SIT, Constantes.PPR);
 			expedientesPsanPdteRecepcionAlegacionesFor.setValorSituacionExpediente(valoresDominioSituacionPdteProResol);
 			expedientesService.guardar(expedientesPsanPdteRecepcionAlegacionesFor);
-			
+
 			CfgExpedienteTramite cfgExpTramitePsanPres = cfgExpedienteTramiteService.findCfgExpTramiteByTipExpYTipTram(Constantes.PSAN, Constantes.TIP_TRAM_PRES);
 			altaTramite(cfgExpTramitePsanPres,expedientesPsanPdteRecepcionAlegacionesFor);
-			
+
 			escribeLog(PRESENTACIONALEGACIONES, "Situacion modificada a Pdte. propuesta resol. y alta del trámite Propuesta de resol. para el expediente "+expedientesPsanPdteRecepcionAlegacionesFor.getNumExpediente()+PORPROCESOAUTOMATICO);
 			cambiosHechos ++;
 		}
-		
+
 		return cambiosHechos;
 	}
 
@@ -320,126 +320,128 @@ public class TareasProgramadas extends BaseBean implements Serializable{
 		Date fechaMayorTramPres = (fechaMayorNotifTramPres != null)?fechaMayorNotifTramPres:fechaMayorEnvioTramPres;
 		CfgTipoExpediente cfgTipoExpediente = cfgTipoExpedienteService.obtenerCfgTipoExpedientePorValorTipoExpediente(expedientesPsanPdteRecepcionAlegacionesPRFor.getValorTipoExpediente().getId());
 		Date fechaMayorMasDiasAlegaciones = FechaUtils.sumarDiasAFecha(fechaMayorTramPres, (cfgTipoExpediente.getDiasAlegaciones()).intValue());
-		List<TramiteExpediente> tramitePresentacionAlegacFinalizado = tramiteExpedienteService.findTramiteFinalizadoByExpYTipoTramite(expedientesPsanPdteRecepcionAlegacionesPRFor.getId(), Constantes.TP_TRAM_ALEGPR);
-	
+		List<TramiteExpediente> tramitePresentacionAlegacFinalizado = tramiteExpedienteService.findTramiteFinalizadoByExpYTipoTramite(expedientesPsanPdteRecepcionAlegacionesPRFor.getId(), Constantes.TIP_TRAM_ALEGPR);
+
 		if(((FechaUtils.hoy()).after(fechaMayorMasDiasAlegaciones)) || (!(FechaUtils.hoy()).after(fechaMayorMasDiasAlegaciones) && !tramitePresentacionAlegacFinalizado.isEmpty())){
 			ValoresDominio valoresDominioSituacionPdteResolProcSanc = valoresDominioService.findValoresDominioByCodigoDomCodValDom(Constantes.COD_SIT, Constantes.PRPS);
 			expedientesPsanPdteRecepcionAlegacionesPRFor.setValorSituacionExpediente(valoresDominioSituacionPdteResolProcSanc);
 			expedientesService.guardar(expedientesPsanPdteRecepcionAlegacionesPRFor);
-			
+
 			CfgExpedienteTramite cfgExpTramiteResol = cfgExpedienteTramiteService.findCfgExpTramiteByTipExpYTipTram(Constantes.PSAN, Constantes.TIP_TRAM_RESOL);
 			altaTramite(cfgExpTramiteResol,expedientesPsanPdteRecepcionAlegacionesPRFor);
-			
+
 			escribeLog(PRESENTACIONALEGACIONES, "Situacion modificada a Pdte. resol. procedimiento sancionador y alta del trámite Resolución para el expediente "+expedientesPsanPdteRecepcionAlegacionesPRFor.getNumExpediente()+PORPROCESOAUTOMATICO);
 			cambiosHechos ++;
 		}
-		
+
 		return cambiosHechos;
 	}
-	
+
 	private void altaTramite (CfgExpedienteTramite cfgExpedienteTramite, Expedientes expedienteActual) throws BaseException{
 		ObservacionesExpedientes newObservacionExp = observacionesExpedientesService.guardarObservacionesExpedientes(null,null, Constantes.COD_VAL_DOM_TIPOBS_TRA, expedienteActual);
-				
-		TramiteExpediente newTramiteExp = new TramiteExpediente();			
-		newTramiteExp.setFechaIni(FechaUtils.hoy());		
+
+		TramiteExpediente newTramiteExp = new TramiteExpediente();
+		newTramiteExp.setFechaIni(FechaUtils.hoy());
 		newTramiteExp.setFechaFinReal(FechaUtils.fechaYHoraActualDate());
 		newTramiteExp.setFechaFin(FechaUtils.fechaYHoraActualDate());
 		newTramiteExp.setExpediente(expedienteActual);
 		newTramiteExp.setTipoTramite(cfgExpedienteTramite.getTipoTramite());
 		newTramiteExp.setNivel((long) 0);
 		newTramiteExp.setDescripcion(cfgExpedienteTramite.getDescripcion());
-		newTramiteExp.setDescripcionAbrev(cfgExpedienteTramite.getDescripcionAbrev());			
+		newTramiteExp.setDescripcionAbrev(cfgExpedienteTramite.getDescripcionAbrev());
 		newTramiteExp.setFinalizado(false);
 		newTramiteExp.setActivo(true);
 		Usuario usuarioLogado = usuarioService.findByLogin(Constantes.USUARIO_SISTEMA);
-		newTramiteExp.setUsuarioTramitador(usuarioLogado);				
-		newTramiteExp.setObservaciones(newObservacionExp);				
+		newTramiteExp.setUsuarioTramitador(usuarioLogado);
+		newTramiteExp.setObservaciones(newObservacionExp);
 		if(cfgExpedienteTramite.getResponsablesTramitacion() != null){
 			newTramiteExp.setResponsable(cfgExpedienteTramite.getResponsablesTramitacion());
 		}else {
 			newTramiteExp.setResponsable(expedienteActual.getResponsable());
-		}		
+		}
 		newTramiteExp = tramiteExpedienteService.altaTramite(usuarioLogado, newTramiteExp);
-				
+
 		newObservacionExp.setTramiteExpdte(newTramiteExp);
-		observacionesExpedientesService.guardar(newObservacionExp);		
-		
+		observacionesExpedientesService.guardar(newObservacionExp);
+
 		expedienteActual.setFechaUltimaPersistencia(newTramiteExp.getFechaModificacion()!=null ? newTramiteExp.getFechaModificacion() : newTramiteExp.getFechaCreacion());
 		expedienteActual.setUsuUltimaPersistencia(newTramiteExp.getUsuModificacion()!=null ? newTramiteExp.getUsuModificacion() : newTramiteExp.getUsuCreacion());
 		expedienteActual = expedientesService.guardar(expedienteActual);
-				
+
 		DetalleExpdteTram newDetalleExpTramite = new DetalleExpdteTram();
 		newDetalleExpTramite.setActivo(true);
 		newDetalleExpTramite.setExpediente(expedienteActual);
 		newDetalleExpTramite.setTramiteExpediente(newTramiteExp);
-		newDetalleExpTramite.setApi(false);				
+		newDetalleExpTramite.setApi(false);
 		newDetalleExpTramite.setExtractoExpediente(false);
 		newDetalleExpTramite.setAntecedentesExpediente(false);
-		newDetalleExpTramite.setImposicionMedidas(false);		
+		newDetalleExpTramite.setImposicionMedidas(false);
 		newDetalleExpTramite.setValorTipoInteresado(null);
 		newDetalleExpTramite.setPersonasInteresado(null);
 		newDetalleExpTramite.setSujetosObligadosInteresado(null);
 		newDetalleExpTramite.setValorDominioInteresado(null);
 		if(Constantes.C012.equals(cfgExpedienteTramite.getTipoTramite().getComportamiento())){
 			CfgTipoExpediente cfgTipoExpediente = cfgTipoExpedienteService.obtenerCfgTipoExpedientePorValorTipoExpediente(expedienteActual.getValorTipoExpediente().getId());
-			if(cfgTipoExpediente != null){				
-				ValoresDominio valorTipoResol = cfgTipoExpediente.getValorTipoResolucion();		
-					newDetalleExpTramite.setValorTipoResolucion(valorTipoResol);
+			if(cfgTipoExpediente != null){
+				ValoresDominio valorTipoResol = cfgTipoExpediente.getValorTipoResolucion();
+				newDetalleExpTramite.setValorTipoResolucion(valorTipoResol);
 			}
-		}			
+		}
 		newDetalleExpTramite = detalleExpdteTramService.guardar(newDetalleExpTramite);
-				
+
 		expedienteActual.setFechaUltimaPersistencia(newDetalleExpTramite.getFechaModificacion()!=null ? newDetalleExpTramite.getFechaModificacion() : newDetalleExpTramite.getFechaCreacion());
 		expedienteActual.setUsuUltimaPersistencia(newDetalleExpTramite.getUsuModificacion()!=null ? newDetalleExpTramite.getUsuModificacion() : newDetalleExpTramite.getUsuCreacion());
 		expedientesService.guardar(expedienteActual);
-		
-		situacionesAdicionalesExpedienteAux(expedienteActual);		
+
+		situacionesAdicionalesExpedienteAux(expedienteActual);
+
+		//copiarArticulosTipificadosUltimoTramiteAsociado(expedienteActual, newTramiteExp);
 	}
-	
+
 	private void situacionesAdicionalesExpedienteAux(Expedientes expedienteActual) throws BaseException {
-		String situacionesAdiocionalesExp = calculaSituacionesAdicionalesExp(expedienteActual.getId(),expedienteActual);	    
+		String situacionesAdiocionalesExp = calculaSituacionesAdicionalesExp(expedienteActual.getId(),expedienteActual);
 		List<TramiteExpediente> tramitesExpAbiertos = tramiteExpedienteService.findTramitesExpAbiertos(expedienteActual.getId());
-		final StringBuilder txt = new StringBuilder();		
+		final StringBuilder txt = new StringBuilder();
 		if (situacionesAdiocionalesExp != null) {
 			txt.append(situacionesAdiocionalesExp);
-		}		
-		for(TramiteExpediente trExp:tramitesExpAbiertos) {			
+		}
+		for(TramiteExpediente trExp:tramitesExpAbiertos) {
 			if (trExp.getSituacionAdicional() != null) {
 				if (txt.length() > 0) {
-					txt.append("; "); 
-				}			
-				txt.append(trExp.getSituacionAdicional()); 
-			}			
-		}			
+					txt.append("; ");
+				}
+				txt.append(trExp.getSituacionAdicional());
+			}
+		}
 		String txtSitAdicional = "";
 		if (txt.length() > 0) {
 			txtSitAdicional = txt.toString();
-		}		
+		}
 		expedienteActual.setSituacionAdicional(txtSitAdicional);
 		expedientesService.guardar(expedienteActual);
 	}
-		
-	private String calculaSituacionesAdicionalesExp(Long idExpedienteActual, Expedientes expedienteActual)  {		
-		final StringBuilder txt = new StringBuilder();	
-		
-		String situacionPdtePublicarWeb = situacionAdicionalPdtePublicarWeb(idExpedienteActual);		
+
+	private String calculaSituacionesAdicionalesExp(Long idExpedienteActual, Expedientes expedienteActual)  {
+		final StringBuilder txt = new StringBuilder();
+
+		String situacionPdtePublicarWeb = situacionAdicionalPdtePublicarWeb(idExpedienteActual);
 		if (situacionPdtePublicarWeb != null) {
 			txt.append(situacionPdtePublicarWeb);
 		}
-		
-		String situacionPdteResolucionRecurso = situacionAdicionalPdteResolRecurso(idExpedienteActual);		
+
+		String situacionPdteResolucionRecurso = situacionAdicionalPdteResolRecurso(idExpedienteActual);
 		if (situacionPdteResolucionRecurso != null) {
 			if (txt.length() > 0) {
-				txt.append("; "); 
-			}								
+				txt.append("; ");
+			}
 			txt.append(situacionPdteResolucionRecurso);
 		}
 
-		String situacionMedidasPdteAcreditar = situacionAdicionalMedidasPdteAcreditar(expedienteActual);		
+		String situacionMedidasPdteAcreditar = situacionAdicionalMedidasPdteAcreditar(expedienteActual);
 		if (situacionMedidasPdteAcreditar != null) {
 			if (txt.length() > 0) {
-				txt.append("; "); 
-			}								
+				txt.append("; ");
+			}
 			txt.append(situacionMedidasPdteAcreditar);
 		}
 
@@ -448,37 +450,37 @@ public class TareasProgramadas extends BaseBean implements Serializable{
 			txtSituacionAdicional = txt.toString();
 		}
 
-		return txtSituacionAdicional;		
+		return txtSituacionAdicional;
 	}
-	
-	private String situacionAdicionalPdtePublicarWeb(Long idExpedienteActual)  {		
-		String txtAux = null;		
-		List<ResolucionExpediente> resolucionesExpediente = resolucionExpedienteService.findListResolucionExpByIdExpediente(idExpedienteActual);		
-		for(ResolucionExpediente resolucionExp : resolucionesExpediente){			
+
+	private String situacionAdicionalPdtePublicarWeb(Long idExpedienteActual)  {
+		String txtAux = null;
+		List<ResolucionExpediente> resolucionesExpediente = resolucionExpedienteService.findListResolucionExpByIdExpediente(idExpedienteActual);
+		for(ResolucionExpediente resolucionExp : resolucionesExpediente){
 			if(resolucionExp.getResolucion().getFechaPublicacionWeb() == null) {
 				txtAux ="Pendiente publicación WEB";
-			}		
-		}		
-		return txtAux;	
+			}
+		}
+		return txtAux;
 	}
-	
 
-	private String situacionAdicionalPdteResolRecurso(Long idExpedienteActual)  {		
-		String txtAux = null;		
-		ValoresDominio valorDominioPlazoRecurso =  valoresDominioService.findValoresDominioByCodigoDomCodValDom(Constantes.COD_TIPO_PLAZO, Constantes.COD_VAL_DOM_REC);		
-		PlazosExpdte plazosExpediente = plazosExpdteService.findPlazosExpdteByExpTipPla(idExpedienteActual, valorDominioPlazoRecurso.getId());		
-		if (plazosExpediente != null) {		
-				txtAux ="Pendiente Res. Recurso";
-			}		
-		return txtAux;	
+
+	private String situacionAdicionalPdteResolRecurso(Long idExpedienteActual)  {
+		String txtAux = null;
+		ValoresDominio valorDominioPlazoRecurso =  valoresDominioService.findValoresDominioByCodigoDomCodValDom(Constantes.COD_TIPO_PLAZO, Constantes.COD_VAL_DOM_REC);
+		PlazosExpdte plazosExpediente = plazosExpdteService.findPlazosExpdteByExpTipPla(idExpedienteActual, valorDominioPlazoRecurso.getId());
+		if (plazosExpediente != null) {
+			txtAux ="Pendiente Res. Recurso";
+		}
+		return txtAux;
 	}
-	
-	private String situacionAdicionalMedidasPdteAcreditar(Expedientes expedienteActual)  {		
+
+	private String situacionAdicionalMedidasPdteAcreditar(Expedientes expedienteActual)  {
 		String txtAux = null;
 		if (Boolean.TRUE.equals(expedienteActual.getImposicionMedidas())) {
 			txtAux ="Medidas pdte. acreditar";
-		}		
-		return txtAux;		
+		}
+		return txtAux;
 	}
-	
+
 }

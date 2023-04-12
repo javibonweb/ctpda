@@ -9,7 +9,8 @@ import org.springframework.web.context.annotation.ApplicationScope;
 @ApplicationScope
 public class Constantes  implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+    public static final String TIP_TRAM_ALEGPR = "ALEGPR";
+    private static final long serialVersionUID = 1L;
 	
 	
 	/**
