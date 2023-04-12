@@ -4253,6 +4253,13 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 		if(ifFinalizarTramiteValidacionesComportamientos17Aux)		{
 			return "";
 		}
+		//HDU 1294
+		boolean validacionTramiteResolucionSinDocResolucion = validacionTramiteResolucionSinDocResolucion(tramExp);
+		if(validacionTramiteResolucionSinDocResolucion) {
+			FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "","No puede finalizar el trámite sin vincular el documento de Resolución con la Resolución actual");
+			PrimeFaces.current().dialog().showMessageDynamic(message);
+			return "";
+		}
 
 		Usuario usuario = (Usuario)JsfUtils.getSessionAttribute(Constantes.USUARIO);
 		Date tramFechaFin=FechaUtils.fechaYHoraActualDate();
@@ -4330,6 +4337,25 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 	PrimeFaces.current().executeScript("actualizar_documentos()");
 
 		return retorno;
+	}
+
+	//HDU 1294
+	private boolean validacionTramiteResolucionSinDocResolucion(TramiteExpediente tramExp) {
+		boolean res = true;
+		if(tramExp.getTipoTramite().getCodigo().equals(Constantes.TIP_TRAM_RESOL)) {
+			if(tramExp.getDetalleExpdteTram() != null && tramExp.getDetalleExpdteTram().getNumResolucion() != null) {
+				Resolucion resolucionAux = resolucionService.findResolucionByNumeroResolucion(tramExp.getDetalleExpdteTram().getNumResolucion());
+				if(resolucionAux != null && resolucionAux.getId() != null) {
+					List<DocumentoResolucion> documentoResolucion = documentoResolucionService.findDocumentosResolucionByIdResol(resolucionAux.getId());
+					if(!documentoResolucion.isEmpty()) {
+						res = false;
+					}
+				}
+			}
+		}else {
+			res = false;
+		}
+		return res;
 	}
 
 
