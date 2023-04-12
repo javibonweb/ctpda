@@ -105,4 +105,9 @@ public class SujetosObligadosExpedientes extends Auditable {
 	@Setter
 	private String email;
 
+	// HDU 1333
+	@Column(name = "L_NOVERIFICADO")
+	@Getter
+	@Setter
+	private Boolean noVerificado;
 }
