@@ -82,6 +82,13 @@
 								itemLabel="#{t.descripcion}" itemValue="#{t.id}" />
 						</p:selectOneMenu>
 					</div>
+					<!--HDU 1339 -->
+					<div class="celda-form">
+						<p:outputLabel
+								for="numResolucionOrig" value="#{mensaje['numero.resolucion.orig']}" />
+						<p:inputText id="numResolucionOrig" disabled="#{!editable}" size="15"
+									 value="#{bean.resolucion.codigoResolucionOrig}" />
+					</div>
 				</div>
 				
 				<div class="ui-g">

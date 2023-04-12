@@ -62,6 +62,12 @@ public class Resolucion  extends Auditable{
 	@Getter
 	@Setter
 	private String codigoResolucion;
+
+	@Column(name = " T_CODIGO_RESOL_ORIG")
+	@Size(max = 50)
+	@Getter
+	@Setter
+	private String codigoResolucionOrig;
 	
 	@Column(name = "F_FECHA_RESOLUCION")
 	@Getter
