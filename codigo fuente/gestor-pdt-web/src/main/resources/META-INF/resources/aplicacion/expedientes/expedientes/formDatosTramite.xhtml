@@ -3613,6 +3613,27 @@
 									<p:message for="fechaEnt" />
 								</div>
 								<div class="celda-form">
+									<!-- HDU 1313 -->
+									<p:outputLabel
+											rendered="#{editable and tramExp.cfgMetadatosTram != null and (tramExp.expediente.valorTipoExpediente.codigo == 'XPC')}"
+											for="fechaRegistroC005-#{tramExp.id}"
+											value="#{tramExp.cfgMetadatosTram.fechaRegistro}" />
+									<p:outputLabel
+											rendered="#{editable and tramExp.cfgMetadatosTram != null and (tramExp.expediente.valorTipoExpediente.codigo != 'XPC')}"
+											for="fechaRegistroC005-#{tramExp.id}"
+											value="#{tramExp.cfgMetadatosTram.fechaRegistro} *" />
+									<p:outputLabel
+											rendered="#{!editable and tramExp.cfgMetadatosTram != null}"
+											for="fechaRegistroC005-#{tramExp.id}" value="#{tramExp.cfgMetadatosTram.fechaRegistro}" />
+									<p:outputLabel
+											rendered="#{editable and tramExp.cfgMetadatosTram == null and (tramExp.expediente.valorTipoExpediente.codigo == 'XPC')}"
+											for="fechaRegistroC005-#{tramExp.id}"
+											value="#{mensaje['etiqueta.pendiente.definir']}" />
+									<p:outputLabel
+											rendered="#{editable and tramExp.cfgMetadatosTram == null and (tramExp.expediente.valorTipoExpediente.codigo != 'XPC')}"
+											for="fechaRegistroC005-#{tramExp.id}"
+											value="#{mensaje['etiqueta.pendiente.definir']} *" />
+									<!-- -->
 									<p:outputLabel
 										rendered="#{editable and tramExp.cfgMetadatosTram != null}"
 										for="fechaRegistroSubTr-#{subTramExp.id}"

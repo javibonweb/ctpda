@@ -6420,7 +6420,11 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 	private void detExpTramComportamientoC005(DetalleExpdteTram detExpTram) {
 		if(Constantes.C005.equals(cfgExpTramite.getTipoTramite().getComportamiento())) {
 			detExpTram.setFechaEntrada(expedientes.getFechaEntrada());
-			detExpTram.setFechaRegistro(expedientes.getFechaEntrada());
+			// Si el expediente es de tipo XPC, no se actualiza la fecha de registro. HDU 1313
+			if(!Constantes.XPC.equals(detExpTram.getExpediente().getValorTipoExpediente().getCodigo()))
+			{
+				detExpTram.setFechaRegistro(expedientes.getFechaEntrada());
+			}
 		}
 	}
 
