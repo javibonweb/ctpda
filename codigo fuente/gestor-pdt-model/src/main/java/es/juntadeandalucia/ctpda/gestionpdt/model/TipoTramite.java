@@ -155,5 +155,12 @@ public class TipoTramite extends Auditable{
 	@Getter
 	@Setter
 	private Boolean tratarVinculados;
+	
+	@Column(name = "L_ALTA_MASIVA")
+	@ColumnDefault("0")
+	@NotNull
+	@Getter
+	@Setter
+	private Boolean altaMasiva;
 		
 }

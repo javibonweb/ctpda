@@ -106,7 +106,14 @@
 						<p:remoteCommand name="recargar_responsable_tramite_#{tramExp.id}" 
 							update="responsablesTramite_#{tramExp.id}, botonesFYN_#{tramExp.id}"
 		        			action="#{datosTramiteExpedienteBean.recargaResponsable(tramExp)}" process="@this"/>
-						
+						<p:commandButton id="altaMasivaSubtramites_#{tramExp.id}" value="#{mensaje['crear.paquete.trabajo']}"
+						rendered="#{editable and datosTramiteExpedienteBean.permisoNewAltaMasivaSubtramites == true  and tramExp.expediente.valorTipoExpediente.codigo != 'XPC' and datosExpedientesTareasBean.existeTareaFYNTramite(tramExp)}"
+						action="#{datosTramiteExpedienteBean.altaMasivaSubtramites(tramExp)}" 
+						update="formFormularioExpedientes:tabViewPestanasExpediente:fechaInicioTramite,formFormularioExpedientes:tabViewPestanasExpediente:fechaInicioSubtramiteMasivo,formFormularioExpedientes:tabViewPestanasExpediente:dialogoAltaMasivaSubtramites"/>
+					<p:commandButton id="altaTareaTramite-VerFirmarNotificar_#{tramExp.id}" value="#{mensaje['ver.firmar.notificar']}"
+						rendered="#{editable and datosTramiteExpedienteBean.permisoNewTareaFYN == true  and (tramExp.expediente.valorTipoExpediente.codigo != 'XPC') and tramExp.mostrarTareaFYN and datosExpedientesTareasBean.existeTareaFYNTramite(tramExp)}"
+						action="#{datosExpedientesTareasBean.verTareaTramiteFirmarNotificar(tramExp)}"
+						process="@this" update="@form:dialogTarea" immediate="true"/>		
 					</div>
 				</div>
 
@@ -417,8 +424,28 @@
 								converterMessage="#{mensaje['formato.fecha.invalido']}"
 								mask="true" />
 							<p:message for="fechaEnt" />
+							
 						</div>
 						<div class="celda-form">
+						<p:outputLabel
+								rendered="#{editable and tramExp.cfgMetadatosTram != null and (tramExp.expediente.valorTipoExpediente.codigo == 'XPC')}"
+								for="fechaRegistroC005-#{tramExp.id}"
+								value="#{tramExp.cfgMetadatosTram.fechaRegistro}" />
+							<p:outputLabel
+								rendered="#{editable and tramExp.cfgMetadatosTram != null and (tramExp.expediente.valorTipoExpediente.codigo != 'XPC')}"
+								for="fechaRegistroC005-#{tramExp.id}"
+								value="#{tramExp.cfgMetadatosTram.fechaRegistro} *" />
+							<p:outputLabel
+								rendered="#{!editable and tramExp.cfgMetadatosTram != null}"
+								for="fechaRegistroC005-#{tramExp.id}" value="#{tramExp.cfgMetadatosTram.fechaRegistro}" />
+							<p:outputLabel
+								rendered="#{editable and tramExp.cfgMetadatosTram == null and (tramExp.expediente.valorTipoExpediente.codigo == 'XPC')}"
+								for="fechaRegistroC005-#{tramExp.id}"
+								value="#{mensaje['etiqueta.pendiente.definir']}" />
+							<p:outputLabel
+								rendered="#{editable and tramExp.cfgMetadatosTram == null and (tramExp.expediente.valorTipoExpediente.codigo != 'XPC')}"
+								for="fechaRegistroC005-#{tramExp.id}"
+								value="#{mensaje['etiqueta.pendiente.definir']} *" />
 							<p:outputLabel
 								rendered="#{editable and tramExp.cfgMetadatosTram != null}"
 								for="fechaRegistroC005-#{tramExp.id}"

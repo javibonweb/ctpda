@@ -217,16 +217,20 @@ public class DatosExpedientesTareasBean extends BaseBean implements Serializable
 	
 	public void altaTareaExpediente() {
 		reset();		
-		altaTarea();
+		altaTarea(idCfgTareaSeleccionada, cabeceraDialogoMotivoRelacion);
 	}
 	
 	//Método básico de alta
-	private void altaTarea() {
+	private void altaTarea(Long idTram, String codTipTarea) {
 		iniciarAlta();
 		
 		try {
 			cargarDatosDialogo();
 			PrimeFaces.current().executeScript(DIALOGTAREASHOW);
+			if(idTram != null && Constantes.COD_TIP_TAR_TRAM_FYN.equals(codTipTarea))
+			{
+				//generarAvisoRevisionUsuarios(tramiteExpedienteService.obtener(idTram));	
+			}
 		} catch (BaseException e) {
 			FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "", e.getMessage());
 			PrimeFaces.current().dialog().showMessageDynamic(message);
@@ -269,7 +273,7 @@ public class DatosExpedientesTareasBean extends BaseBean implements Serializable
 	
 	private void altaTareaTramite(Long idTram) {
 		cargarDatosTramite(idTram);
-		altaTarea();		
+		altaTarea(idTram, cabeceraDialogoMotivoRelacion);		
 	}
 	
 	public void altaTareaTramiteRevisarDocs(TramiteExpediente tramExp) {
@@ -285,7 +289,32 @@ public class DatosExpedientesTareasBean extends BaseBean implements Serializable
 		//FYN debe existir
 		cargarDatosSegunTipoTarea(Constantes.COD_TIP_TAR_TRAM_FYN);
 	}
-	
+	/*
+private void generarAvisoRevisionUsuarios(TramiteExpediente tramExp) {
+		
+		List<TareasExpediente> listadoTareasRev = tareasExpedienteService.findTareasExpActivasByTramExpTiposTar(tramExp.getId(), Constantes.COD_TIP_TAR_DOC_REV, Constantes.COD_TIP_TAR_TRAM_REVT);
+
+		
+    	if(listadoTareasRev != null && !listadoTareasRev.isEmpty())
+    	{	
+    		Boolean coincideUsuLogadoConResp = true;
+    		int i = listadoTareasRev.size();
+    		while( i > 0 && Boolean.TRUE.equals(coincideUsuLogadoConResp)) 
+    		{	
+    			i--;
+    			
+    			TareasExpediente tarExp = listadoTareasRev.get(i);
+				coincideUsuLogadoConResp = usuariosResponsablesService.esResponsableDeUsuario(tarExp.getResponsableTramitacion().getId(), sesionBean.getIdUsuarioSesion()); 
+	    		if(Boolean.FALSE.equals(coincideUsuLogadoConResp)) {
+	    			final String msg = mensajesProperties.getString("aviso.tareas.revisio.pendientes.otro.resp");
+	    			FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "", msg);	
+	    			PrimeFaces.current().dialog().showMessageDynamic(message);
+	    		}
+    		}
+    	}
+		
+	}
+	*/
 	public void verTareaTramiteFirmarNotificar(TramiteExpediente tramExp) {
 		tarea = this.tareasExpedienteService.getTareaFYNPendienteTramite(tramExp.getId());
 		this.consultarTarea();

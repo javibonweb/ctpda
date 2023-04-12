@@ -12,7 +12,6 @@ import org.primefaces.PrimeFaces;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-
 import es.juntadeandalucia.ctpda.gestionpdt.model.CfgExpedienteTramite;
 import es.juntadeandalucia.ctpda.gestionpdt.model.CfgTipoExpediente;
 import es.juntadeandalucia.ctpda.gestionpdt.model.DetalleExpdteTram;
@@ -112,7 +111,6 @@ public class TareasProgramadas extends BaseBean implements Serializable{
 	@Getter
 	@Setter
 	private int registrosModificadosPresentacionAlegacionesPsan;	
-	
 	
 	@Scheduled (cron = "${cron.resueltos.a.finalizados}", zone = TIME_ZONE)
 	@Transactional(TxType.REQUIRED)
@@ -233,6 +231,7 @@ public class TareasProgramadas extends BaseBean implements Serializable{
 		escribeLog(PROCESOSINACTIVIDAD,FINPROCESO + registrosTotales + EXPEDIENTESFINALIZADOS+ registrosModificados);
 	}
 	
+	// HdU 1346- Modificación de CRON de espera de alegaciones
 	@Scheduled (cron = "${cron.presentacion.alegaciones.psan}", zone = TIME_ZONE)
 	@Transactional(TxType.REQUIRED)
 	public void presentacionAlegacionesPSAN () {
@@ -320,7 +319,7 @@ public class TareasProgramadas extends BaseBean implements Serializable{
 		Date fechaMayorTramPres = (fechaMayorNotifTramPres != null)?fechaMayorNotifTramPres:fechaMayorEnvioTramPres;
 		CfgTipoExpediente cfgTipoExpediente = cfgTipoExpedienteService.obtenerCfgTipoExpedientePorValorTipoExpediente(expedientesPsanPdteRecepcionAlegacionesPRFor.getValorTipoExpediente().getId());
 		Date fechaMayorMasDiasAlegaciones = FechaUtils.sumarDiasAFecha(fechaMayorTramPres, (cfgTipoExpediente.getDiasAlegaciones()).intValue());
-		List<TramiteExpediente> tramitePresentacionAlegacFinalizado = tramiteExpedienteService.findTramiteFinalizadoByExpYTipoTramite(expedientesPsanPdteRecepcionAlegacionesPRFor.getId(), Constantes.TP_TRAM_ALEGPR);
+		List<TramiteExpediente> tramitePresentacionAlegacFinalizado = tramiteExpedienteService.findTramiteFinalizadoByExpYTipoTramite(expedientesPsanPdteRecepcionAlegacionesPRFor.getId(), Constantes.TIP_TRAM_ALEGPR);
 	
 		if(((FechaUtils.hoy()).after(fechaMayorMasDiasAlegaciones)) || (!(FechaUtils.hoy()).after(fechaMayorMasDiasAlegaciones) && !tramitePresentacionAlegacFinalizado.isEmpty())){
 			ValoresDominio valoresDominioSituacionPdteResolProcSanc = valoresDominioService.findValoresDominioByCodigoDomCodValDom(Constantes.COD_SIT, Constantes.PRPS);
@@ -394,6 +393,9 @@ public class TareasProgramadas extends BaseBean implements Serializable{
 		expedientesService.guardar(expedienteActual);
 		
 		situacionesAdicionalesExpedienteAux(expedienteActual);		
+		/*
+		copiarArticulosTipificadosUltimoTramiteAsociado(expedienteActual, newTramiteExp);
+		*/
 	}
 	
 	private void situacionesAdicionalesExpedienteAux(Expedientes expedienteActual) throws BaseException {
@@ -480,5 +482,32 @@ public class TareasProgramadas extends BaseBean implements Serializable{
 		}		
 		return txtAux;		
 	}
+	/*
+	private void copiarArticulosTipificadosUltimoTramiteAsociado (Expedientes expedientesPsanPdteRecepcionAlegacionesFor, TramiteExpediente newTramiteExp) throws BaseException {
+		Long idTramiteUltimo = tramiteExpedienteService.findIdMaxTramActivoConArtTipByExp(expedientesPsanPdteRecepcionAlegacionesFor.getId());
+		
+		if(idTramiteUltimo != null){
+			List<ArtTipExpdte> articulosTipificadosACopiar = artTipExpdteService.findArtTipExpByIdTramIdExp(expedientesPsanPdteRecepcionAlegacionesFor.getId(),idTramiteUltimo);	
+			if(articulosTipificadosACopiar != null && !articulosTipificadosACopiar.isEmpty()){
+				for(ArtTipExpdte articuloTipifExpediente : articulosTipificadosACopiar) {					
+					ArtTipExpdte articuloTipifExpedienteNuevo = new ArtTipExpdte();
+					articuloTipifExpedienteNuevo.setAclaracion(articuloTipifExpediente.getAclaracion());
+					articuloTipifExpedienteNuevo.setActivo(articuloTipifExpediente.getActivo());
+					articuloTipifExpedienteNuevo.setExpediente(expedientesPsanPdteRecepcionAlegacionesFor);
+					articuloTipifExpedienteNuevo.setFechaCreacion(FechaUtils.hoy());
+					articuloTipifExpedienteNuevo.setTramiteExpediente(newTramiteExp);
+					Usuario usuarioLogado = usuarioService.findByLogin(Constantes.USUARIO_SISTEMA);
+					articuloTipifExpedienteNuevo.setUsuCreacion(usuarioLogado.getLogin());
+					articuloTipifExpedienteNuevo.setValorArticuloInfringido(articuloTipifExpediente.getValorArticuloInfringido());
+					articuloTipifExpedienteNuevo.setValorGravedad(articuloTipifExpediente.getValorGravedad());
+					articuloTipifExpedienteNuevo.setValorTipificacion(articuloTipifExpediente.getValorTipificacion());					
+					artTipExpdteService.guardar(articuloTipifExpedienteNuevo);
+					
+				}					
+			}
+		}
+		
+	}
+	*/
 	
 }

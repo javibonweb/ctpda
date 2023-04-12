@@ -197,7 +197,7 @@ public class Constantes  implements Serializable {
 	public static final String PERMISO_NEW_EXPDOCGEN = "NEW_EXPDOCGEN";
 	
 	public static final String PERMISO_VER_DOCSOCULTOS = "VER_DOCS_OCULTOS";
-	
+	public static final String PERMISO_NEW_ALTAMASIVASUBTR = "NEW_ALTAMASIVASUBTR";
 	
 	/** * PERMISOS PARA PLAZOS DEL EXPEDIENTE */
 	public static final String PERMISO_LIST_PLAZOEXP = "LIST_PLAZOEXP";
@@ -491,8 +491,8 @@ public class Constantes  implements Serializable {
 	public static final String COD_SENTIDO_RESOLUCION = "SENT_RESOL";
 	public static final String COD_DERECHOS_RECLAM = "DER_RECL";
 	public static final String COD_ARTICULOS_AFEC = "ARTICULO";
-	
-	
+	public static final String COD_TIP_TAR_DOC_REV = "TIP_TAR_DOCUMENTO_REV";
+	public static final String COD_TIP_TAR_TRAM_REVT = "TIP_TAR_TRAMITE_REV";
 	/**
 	 * PLANTILLAS
 	 */
@@ -503,7 +503,7 @@ public class Constantes  implements Serializable {
 	public static final String PERMISO_EDIT_PLANTILLASDOC ="EDIT_PLANTILLASDOC";
 	public static final String PERMISO_SAVE_PLANTILLASDOC ="SAVE_PLANTILLASDOC";
 	public static final String PERMISO_NEW_PLANTILLASDOC ="NEW_PLANTILLASDOC";
-
+	
 	
 	/**
 	 * MOTIVOS DE RELACION
@@ -608,5 +608,14 @@ public class Constantes  implements Serializable {
 	 * USUARIO DEL SISTEMA
 	 */
 	public static final String USUARIO_SISTEMA = "SISTEMA";
+
+
+	public static final String TIP_TRAM_ALEGPR = "TIPO_TRAMITE_ALEGPR";
+
+
+	
+
+
+	
 	
 }

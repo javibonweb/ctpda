@@ -243,7 +243,10 @@ public class DatosExpedientesDatosSujetosBean extends BaseBean implements Serial
 	
 	@Autowired
 	private CfgTipoExpedienteService cfgTipoExpedienteService;
-
+	
+	@Getter
+	@Setter
+	private Boolean dpdNoVerificado;
 
 	@PostConstruct
 	@Override
@@ -432,7 +435,7 @@ public class DatosExpedientesDatosSujetosBean extends BaseBean implements Serial
 			
 			this.sujObligEmail = sujetoExpedientesSeleccionado.getEmail();
 			this.sujObligDpd = sujetoExpedientesSeleccionado.getDpd();
-
+			dpdNoVerificado = sujetoExpedientesSeleccionado.getNoVerificado();
 			
 			sujetoPrincipal = sujetoExpedientesSeleccionado.getPrincipal();
 		}
@@ -479,7 +482,7 @@ public class DatosExpedientesDatosSujetosBean extends BaseBean implements Serial
 			this.sujObligDpd = sujObligExpAux.getDpd();
 			this.sujObligNombreRazonsocial = sujObligExpAux.getNombreRazonsocial();
 			this.sujObligTelefono = sujObligExpAux.getTelefono();
-			
+			dpdNoVerificado = false;
 			FacesContext.getCurrentInstance().addMessage(MENSAJESASIGNARSUJETOS, new FacesMessage(FacesMessage.SEVERITY_INFO, "", mensajesProperties.getString(INCORPORACIONAUTOMATICASUJOBLIG) + " " + sujetoSeleccionado.getDescripcion()
 			+ " " + mensajesProperties.getString(EXISTENTEULTIMEXP) + " " + expAux.getNumExpediente()));
 			
@@ -645,6 +648,7 @@ public class DatosExpedientesDatosSujetosBean extends BaseBean implements Serial
 		sujetosObligadosExpedientes.setEmail(this.sujObligEmail);
 		sujetosObligadosExpedientes.setTelefono(this.sujObligTelefono);
 		sujetosObligadosExpedientes.setDpd(this.sujObligDpd);	
+		sujetosObligadosExpedientes.setNoVerificado(dpdNoVerificado);
 		sujetosObligadosExpedientes = sujetosObligadosExpedientesService.guardar(sujetosObligadosExpedientes);
 		
 		expedientes = expedientesService.obtener(expedientes.getId());
@@ -665,7 +669,7 @@ public class DatosExpedientesDatosSujetosBean extends BaseBean implements Serial
 					ValoresDominio valoresRelacionExpPer = valoresDominioService
 							.obtener(selectedNuevoMotivoRelacionId);
 					sujetoExpedienteAux.setValoresRelacionExpSuj(valoresRelacionExpPer);
-
+					sujetoExpedienteAux.setNoVerificado(dpdNoVerificado);
 				} else if (Boolean.TRUE.equals(sujetoPrincipal) && sujetoExpedienteAux.getPrincipal().equals(true)) {
 					sujetosObligadosExpedientes.setPrincipal(true);
 					sujetoExpedienteAux.setPrincipal(false);
@@ -763,6 +767,7 @@ public class DatosExpedientesDatosSujetosBean extends BaseBean implements Serial
 		this.sujObligEmail = null;
 		this.sujObligTelefono = null;
 		this.sujObligDpd = null;
+		dpdNoVerificado = null;
 		PrimeFaces.current().executeScript("PF('dialogAsignarMotRelaSujetos').hide();");
 		PrimeFaces.current().executeScript("PF('dialogSujetoExp').hide();");
 	}
@@ -776,6 +781,7 @@ public class DatosExpedientesDatosSujetosBean extends BaseBean implements Serial
 		this.sujObligEmail = sujetosObligadosExpedientesSeleccionado.getEmail();
 		this.sujObligDpd = sujetosObligadosExpedientesSeleccionado.getDpd();
 		this.sujObligTelefono = sujetosObligadosExpedientesSeleccionado.getTelefono();
+		dpdNoVerificado = sujetosObligadosExpedientesSeleccionado.getNoVerificado();
 		PrimeFaces.current().ajax().update(BLOQUEDPD);
 	}
 	
@@ -971,5 +977,13 @@ public class DatosExpedientesDatosSujetosBean extends BaseBean implements Serial
 			PrimeFaces.current().ajax().update(TABLASUJETOEXPEDIENTENULO);
 		}		
 	}
-
+	public void cambioNombreRazonSocialDpd () {
+		if(sujObligNombreRazonsocial != null && !sujObligNombreRazonsocial.isBlank()) {
+			sujObligDpd = true;
+		}else {
+			sujObligDpd = false;
+			dpdNoVerificado = false;
+		}
+	}
+	
 }

@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -429,7 +430,29 @@ public class DatosTramiteExpedienteBean extends BaseBean implements Serializable
 	@Getter
 	@Setter
 	private Boolean permisoRehabTramite;
+	@Getter
+	@Setter
+	private Boolean permisoNewAltaMasivaSubtramites;
 
+	@Getter
+	@Setter
+	private Long selectedSubtramiteMasivoId;
+	
+	@Getter
+	@Setter
+	private List<CfgExpedienteSubtramite> listaSubtratramitesMasivos;
+	
+	@Getter
+	@Setter
+	private Date fechaInicioSubtramiteMasivo;
+	
+	@Getter
+	@Setter
+	private Long selectedResponsablesSubtramiteMasivoId;
+	
+	@Getter
+	@Setter
+	private int numeroOcurrenciasCrear;
 	@Getter
 	@Setter
 	private Boolean editable;
@@ -662,7 +685,8 @@ public class DatosTramiteExpedienteBean extends BaseBean implements Serializable
 		permisoDesacExpTram = listaCodigoPermisos.contains(Constantes.PERMISO_DESAC_EXPTRAM);
 		
 		permisoRehabTramite = listaCodigoPermisos.contains(Constantes.PERMISO_REHAB_TRAMITE);
-
+		permisoNewAltaMasivaSubtramites = listaCodigoPermisos.contains(Constantes.PERMISO_NEW_ALTAMASIVASUBTR);
+		permisoRehabTramite = listaCodigoPermisos.contains(Constantes.PERMISO_REHAB_TRAMITE);
 		cargarExpediente();
 		valDomCanalSalida = new ValoresDominio();
 		tramiteExpediente = new TramiteExpediente();
@@ -4225,7 +4249,12 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 		if(ifFinalizarTramiteValidacionesComportamientos17Aux)		{
 			return "";
 		}
-		
+		boolean validacionTramiteResolucionSinDocResolucion = validacionTramiteResolucionSinDocResolucion(tramExp);
+		if(validacionTramiteResolucionSinDocResolucion) {
+			FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "","No puede finalizar el trámite sin vincular el documento de Resolución con la Resolución actual");
+			PrimeFaces.current().dialog().showMessageDynamic(message);
+			return "";
+		}
 		Usuario usuario = (Usuario)JsfUtils.getSessionAttribute(Constantes.USUARIO);
 		Date tramFechaFin=FechaUtils.fechaYHoraActualDate();
 		Date tramFechaFinReal=FechaUtils.fechaYHoraActualDate();
@@ -4355,7 +4384,23 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 		
 	}
 	
-
+	private boolean validacionTramiteResolucionSinDocResolucion (TramiteExpediente tramExp) {
+		boolean res = true;
+		if(tramExp.getTipoTramite().getCodigo().equals(Constantes.TIP_TRAM_RESOL)) {
+			if(tramExp.getDetalleExpdteTram() != null && tramExp.getDetalleExpdteTram().getNumResolucion() != null) {
+				Resolucion resolucionAux = resolucionService.findResolucionByNumeroResolucion(tramExp.getDetalleExpdteTram().getNumResolucion());
+				if(resolucionAux != null && resolucionAux.getId() != null) {
+					List<DocumentoResolucion> documentoResolucion = documentoResolucionService.findDocumentosResolucionByIdResol(resolucionAux.getId());
+					if(!documentoResolucion.isEmpty()) {
+						res = false;
+					}
+				}
+			}
+		}else {
+			res = false;
+		}		
+		return res;
+	}
 	private void actualizarCabeceraC012 (TramiteExpediente tramExp) {
 
 		if(Constantes.C012.equals(tramExp.getTipoTramite().getComportamiento())){
@@ -6392,7 +6437,11 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 	private void detExpTramComportamientoC005(DetalleExpdteTram detExpTram) {
 		if(Constantes.C005.equals(cfgExpTramite.getTipoTramite().getComportamiento())) {
 			detExpTram.setFechaEntrada(expedientes.getFechaEntrada());
-			detExpTram.setFechaRegistro(expedientes.getFechaEntrada());
+
+			if(!Constantes.XPC.equals(detExpTram.getExpediente().getValorTipoExpediente().getCodigo()))
+			{
+				detExpTram.setFechaRegistro(expedientes.getFechaEntrada());	
+			}
 		}
 	}
 	
@@ -6805,4 +6854,44 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 		return !(lista == null || lista.isEmpty());
 	}
 	
+	public void altaMasivaSubtramites(TramiteExpediente tramiteExpediente) {
+	
+			selectedSubtramiteMasivoId = null;
+			selectedResponsablesSubtramiteMasivoId = null;
+			fechaInicioSubtramiteMasivo = FechaUtils.hoy();
+			numeroOcurrenciasCrear = 0;
+			
+			//listaSubtratramitesMasivos = cfgExpedienteSubTramiteService.findSubtramitesMasivos(tramiteExpediente.getTipoTramite().getId(), expedientes.getValorTipoExpediente().getId());
+			
+			this.tramiteExpediente = tramiteExpediente;
+			
+			if(expedientes.getId()!=null) {
+				cabeceraDialog = mensajesProperties.getString("alta.masiva.subtramites") + " para el expediente "+ expedientes.getNumExpediente();
+			}else {
+					cabeceraDialog = mensajesProperties.getString("alta.masiva.subtramites");
+			}
+			
+			PrimeFaces.current().ajax().update(FORMFORMULARIOEXPEDIENTES);
+			PrimeFaces.current().executeScript("PF('dialogoAltaMasivaSubtramites').show();");
+		
+	}
+	private Optional<TramiteExpediente> getTramiteLista(Long idTram) {
+		return this.listaTramTramitesExp.stream()
+			.filter(tr -> tr.getId().equals(idTram))
+			.findFirst();
+	}
+	
+/*		
+	public void resetExisteTareaREVT(Long idTram) {
+		getTramiteLista(idTram).ifPresent(tr -> tr.setExisteTareaREVT(null));
+	}
+	
+	public void resetExisteTareaFYN(Long idTram) {
+		getTramiteLista(idTram).ifPresent(tr -> tr.setExisteTareaFYN(null));
+	}
+	
+	private void resetDatosExisteTarea() {
+		this.listaTramTramitesExp.forEach(TramiteExpediente::limpiarDatosExisteTarea);
+	}
+*/
 }

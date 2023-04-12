@@ -73,4 +73,11 @@ public class CfgExpedienteSubtramiteService extends AbstractCRUDService<CfgExped
 		return new BooleanBuilder();
 	}
 
+
+
+/*
+	public List<CfgExpedienteSubtramite> findSubtramitesMasivos(Long id, Long id1) {
+        return cfgExpedienteSubtramiteRepository.findSubtramitesMasivos(id, id1);
+    }
+*/
 }

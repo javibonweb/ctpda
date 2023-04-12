@@ -83,7 +83,11 @@
 						</p:selectOneMenu>
 					</div>
 				</div>
-				
+					<div class="celda-form">
+						<p:outputLabel
+							for="numResolucionOrig" value="#{mensaje['numero.resolucion.orig']}" />
+						<p:inputText id="numResolucionOrig" disabled="#{!editable}" size="15"
+							value="#{bean.resolucion.codigoResolucionOrig}" />
 				<div class="ui-g">
 				
 						<div class="celda-form">

@@ -17,5 +17,7 @@ public interface CfgExpedienteSubtramiteRepository extends AbstractCrudRepositor
 	@Query("SELECT expSubTram FROM CfgExpedienteSubtramite expSubTram WHERE expSubTram.tipoSubtramite.id =?1 AND expSubTram.valorTipoExpediente.id =?2 ORDER BY expSubTram.descripcion")
 	List<CfgExpedienteSubtramite> findSubTramites(@Param("idTipTram") Long idTipTram,@Param("idTipExp") Long idTipExp);
 
+	//List<CfgExpedienteSubtramite> findSubtramitesMasivos(Long id, Long id1);
+
 
 }

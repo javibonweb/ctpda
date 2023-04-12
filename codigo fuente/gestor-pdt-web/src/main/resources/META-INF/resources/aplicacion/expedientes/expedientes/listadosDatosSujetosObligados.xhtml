@@ -212,6 +212,10 @@
 						<p:selectBooleanCheckbox id="dpdSujOblig" disabled="true"
 							value="#{datosExpedientesDatosSujetosBean.sujObligDpd}"
 							itemLabel="#{mensaje['si']}" />
+					</p:outputPanel>	
+					<p:outputPanel styleClass="celda-form">
+						<p:outputLabel for="dpdNoVerificadoDatos" value="#{mensaje['no.verificado']}" />
+						<p:selectBooleanCheckbox id="dpdNoVerificadoDatos" value="#{datosExpedientesDatosSujetosBean.dpdNoVerificado}" itemLabel="#{mensaje['si']}" disabled="true"/>
 					</p:outputPanel>				
 				</div>	
 					
@@ -563,6 +567,8 @@
 					<p:inputText id="nombreRazonSocialSujeto"
 						value="#{datosExpedientesDatosSujetosBean.sujObligNombreRazonsocial}"
 						size="50" maxlength="100"/>
+						<p:ajax event="change" listener="#{datosExpedientesDatosSujetosBean.cambioNombreRazonSocialDpd}"
+						update="formFormularioExpedientes:tabViewPestanasExpediente:dpdSujeto,formFormularioExpedientes:tabViewPestanasExpediente:dpdNoVerificado" />
 				</div>
 				<div class="celda-form">
 					<p:outputLabel for="apellidosSujeto"

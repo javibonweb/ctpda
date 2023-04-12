@@ -1323,4 +1323,11 @@ public class TareasExpedienteService extends AbstractCRUDService<TareasExpedient
 		return this.tareasExpedienteRepository.findTareasExpActivasByExpedienteYSituacion(idExpediente, codSituacion);
 	}
 
+
+/*
+	public List<TareasExpediente> findTareasExpActivasByTramExpTiposTar(Long id, String codTipTarDocRev,
+			String codTipTarTramRevt) {
+		return this.tareasExpedienteRepository.findTareasExpActivasByTramExpTiposTar(id, codTipTarDocRev, codTipTarTramRevt);
+	}
+*/
 }

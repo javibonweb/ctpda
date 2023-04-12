@@ -99,6 +99,11 @@ public class SujetosObligadosExpedientes extends Auditable {
 	@Setter
 	private Boolean dpd;
 	
+	@Column(name = "L_NOVERIFICADO")
+	@Getter
+	@Setter
+	private Boolean noVerificado;
+	
 	@Column(name = "T_EMAIL")
 	@Size(max = 50)
 	@Getter

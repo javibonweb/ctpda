@@ -125,5 +125,6 @@ public interface TareasExpedienteRepository extends AbstractCrudRepository<Tarea
 	
 	@Query("SELECT tarExp FROM TareasExpediente tarExp WHERE tarExp.tramiteExpediente.id =?1 and tarExp.valorTipoTarea.id =?2 and tarExp.situacion = '"  + TareasExpediente.SITUACION_PENDIENTE + "'")
 	public List<TareasExpediente> findTareasExpActivasByTramExpTipTar(@Param("idTramExp") Long idTramExp, @Param("idTipTar") Long idTipTar);
+	//public List<TareasExpediente> findTareasExpActivasByTramExpTiposTar(Long id, String codTipTarDocRev, String codTipTarTramRevt);
 	
 }

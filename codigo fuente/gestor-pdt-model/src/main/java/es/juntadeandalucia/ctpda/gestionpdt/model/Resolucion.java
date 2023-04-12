@@ -73,6 +73,12 @@ public class Resolucion  extends Auditable{
 	@Setter
 	private Date fechaPublicacionWeb;
 	
+	@Column(name = " T_CODIGO_RESOL_ORIG")
+	@Size(max = 50)
+	@Getter
+	@Setter
+	private String codigoResolucionOrig;
+	
 	@OneToOne( fetch = FetchType.LAZY)
 	@JoinColumn(name = "RESOL_VALDOMSENTRESOL_ID", foreignKey = @ForeignKey(name = "GE_RESOL_VALDOMSENTRESOL_FK"))
 	private ValoresDominio valorSentidoResolucion;

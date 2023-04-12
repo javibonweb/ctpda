@@ -306,6 +306,55 @@
 				update="formFormularioExpedientes:panelPlazosCabecera,formFormularioExpedientes:panelActualizadoCabecera" />
 		</div>
 	</p:dialog>	
+<!-- DIALOGO ALTA MASIVA SUBTRAMITES -->
+	<p:dialog id="dialogoAltaMasivaSubtramites" header="#{datosTramiteExpedienteBean.cabeceraDialog}" widgetVar="dialogoAltaMasivaSubtramites" resizable="false" modal="true">						
+		<p:messages for="messagesDialogoAltaMasivaSubtramites" id="messagesDialogoAltaMasivaSubtramites" showDetail="true" closable="true">
+			<p:autoUpdate/> 
+        </p:messages>	
+        
+		<div class="ui-fluid">		
+			<div> 
+				<div class="celda-form">
+					<p:outputLabel for="listadoSubtramitesMasivo" value="#{mensaje['tipo.tramite']}: *" />
+					<p:selectOneMenu id="listadoSubtramitesMasivo" value="#{datosTramiteExpedienteBean.selectedSubtramiteMasivoId}" effect="fade">
+						<f:selectItem itemLabel="#{mensaje['seleccione.una.opcion']}" itemValue="" />
+						<f:selectItems value="#{datosTramiteExpedienteBean.listaSubtratramitesMasivos}" var="subtramiteMasivoList" 
+							itemLabel="#{subtramiteMasivoList.descripcion}" widgetVar="listadoSubtramitesMasivo" itemValue="#{subtramiteMasivoList.id}" />
+							<p:ajax event="change" listener="#{datosTramiteExpedienteBean.obtenerResponsableSubTramite(datosTramiteExpedienteBean.selectedSubtramiteMasivoId, true)}" 
+								process="@this" update="formFormularioExpedientes:tabViewPestanasExpediente:listadoResponsablesSubtramiteMasivo" />
+						<f:validateBean disabled="true"/>
+					</p:selectOneMenu>			
+				</div>
+			</div>
+			<div>
+				<div class="celda-form">
+					<p:outputLabel for="fechaInicioSubtramiteMasivo" value="#{mensaje['fecha.inicio']} *"/>
+					<p:datePicker id="fechaInicioSubtramiteMasivo" value="#{datosTramiteExpedienteBean.fechaInicioSubtramiteMasivo}" locale="es" pattern="dd/MM/yyyy" disabled="true" />
+					<p:message for="fechaInicioSubtramiteMasivo"/>
+				</div>
+			</div>
+			<div>	
+				<div class="celda-form">
+					<p:outputLabel for="listadoResponsablesSubtramiteMasivo" value="#{mensaje['responsable']} *"/>
+					<p:selectOneMenu id="listadoResponsablesSubtramiteMasivo" disabled="#{!editable}" value="#{datosTramiteExpedienteBean.selectedResponsablesSubtramiteMasivoId}">
+						<f:selectItem itemLabel="#{mensaje['seleccione.una.opcion']}" itemValue="#{null}" />
+						<f:selectItems value="#{datosTramiteExpedienteBean.listaResponsablesTram}" var="responsableSubMasivo" 
+							itemLabel="#{fu:ptoSusp(responsableSubMasivo.descripcion)}" widgetVar="listadoResponsablesSubtramiteMasivo" itemValue="#{responsableSubMasivo.id}" />
+					</p:selectOneMenu>
+				</div>
+			</div>	
+			<div>
+				<div class="celda-form">
+					<p:outputLabel for="numeroSubtramitesCrear" value="#{mensaje['numero.ocurrencias.crear']} *"/>
+					<p:spinner id="numeroSubtramitesCrear" value="#{datosTramiteExpedienteBean.numeroOcurrenciasCrear}" min="0" />
+				</div>
+			</div>							
+		</div>					
 
+		<div class="botonera-form ui-g-12 ui-md-12" align="right">
+			<p:commandButton  id="altaSubtramitesMasivos" value="#{mensaje['aceptar']}"
+				actionListener="#{datosTramiteExpedienteBean.altaTramite('altaMasiva', null, null, datosTramiteExpedienteBean.numeroOcurrenciasCrear)}" />
+		</div>	
+	</p:dialog>
 </ui:composition>
 </html>
