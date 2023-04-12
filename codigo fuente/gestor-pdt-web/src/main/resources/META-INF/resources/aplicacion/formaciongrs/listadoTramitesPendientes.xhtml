@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+				xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:pe="http://primefaces.org/ui/extensions"                
+                xmlns:sec="https://joinfaces.org/security">
+                
+<ui:composition  template="#{navegacionBean.get('TEMPLATE_LAYOUT_GENERICO')}">
+
+	<ui:define name="content">
+	
+		<h:form id="formListadoFormacionGRS">
+		
+			<p:messages for="messagesListadoFormacionGRS" id="messagesListadoFormacionGRS"
+				showDetail="true" closable="true">
+				<p:autoUpdate />
+			</p:messages>
+			
+			
+			<p:panel header="#{mensaje['formacion.grs']}">
+
+				<!-- PANEL FILTRO DE BUSQUEDA DE REGISTROS -->
+				<p:fieldset legend="#{mensaje['filtros.busqueda']}"
+					id="bloqueFiltroBusqueda" toggleable="true" toggleSpeed="250">
+
+					<div>
+						<div class="celda-form">
+							<p:outputLabel value="#{mensaje['tipo.tramite']}"
+								for="tipoTram_filtro" />
+							<p:selectOneMenu id="tipoTram_filtro"
+								value="#{tramitesPendientesBean.selectedTipoTramiteIdFiltro}"
+								style="min-width: 150px;">
+								<f:selectItem itemLabel="#{mensaje['todos']}" itemValue="" />
+								<f:selectItems
+									value="#{tramitesPendientesBean.listaTipoTramites}"
+									var="tipTramList" itemLabel="descripcion"
+									widgetVar="comboFiltroTipoTramites"
+									itemValue="#{tipTramList.id}" />
+							</p:selectOneMenu>
+						</div>
+						<div class="celda-form">
+							<p:outputLabel value="#{mensaje['responsable.tramite']}"
+								for="responsableTram_filtro" />
+							<p:selectOneMenu id="responsableTram_filtro"
+								value="#{tramitesPendientesBean.selectedResponsableTramIdFiltro}"
+								style="min-width: 150px;" filter="true" filterMatchMode="contains">
+								<f:selectItem itemLabel="#{mensaje['todos']}" itemValue="" />
+								<f:selectItems
+									value="#{tramitesPendientesBean.listaResponsablesTramitacion}"
+									var="respTramList" itemLabel="#{respTramList.descripcion}"
+									widgetVar="comboFiltroResponsableTram" itemValue="#{respTramList.id}" />
+							</p:selectOneMenu>
+						</div>
+						<div class="celda-form">
+							<p:outputLabel value="#{mensaje['tipo.expedientes']}"
+								for="tipoExpedientes_filtro" />
+							<p:selectOneMenu id="tipoExpedientes_filtro"
+								value="#{tramitesPendientesBean.selectedTipoExpedienteIdFiltro}"
+								style="min-width: 150px;">
+								<f:selectItem itemLabel="#{mensaje['todos']}" itemValue="" />
+								<f:selectItems
+									value="#{tramitesPendientesBean.listaValoresDominioTipoExp}"
+									var="tipExpList" itemLabel="Tipo expediente"
+									widgetVar="comboFiltroTipoExpedientes"
+									itemValue="#{tipExpList.id}" />
+							</p:selectOneMenu>
+						</div>												
+						<div class="celda-form">
+							<p:outputLabel for="numeroExpediente_filtro"
+								value="#{mensaje['numero.expediente']}" />
+							<p:inputText id="numeroExpediente_filtro" maxlength="255"
+								value="#{tramitesPendientesBean.numeroExpedienteFiltro}" />
+						</div>
+
+						<div class="celda-form">
+							<p:outputLabel value="#{mensaje['situacion']}"
+								for="situacion_filtro" />
+							<p:selectOneMenu id="situacion_filtro"
+								value="#{tramitesPendientesBean.selectedSituacionIdFiltro}"
+								style="min-width: 150px;">
+								<f:selectItem itemLabel="#{mensaje['todos']}" itemValue="" />
+								<f:selectItems
+									value="#{tramitesPendientesBean.listaValoresDominioSituacion}"
+									var="sitList" itemLabel="#{sitList.descripcion}"
+									widgetVar="comboFiltroSitacion" itemValue="#{sitList.id}" />
+							</p:selectOneMenu>
+						</div>
+					</div>
+					<div>
+						<div class="celda-form">
+							<p:outputLabel for="fechaLimite_filtro"
+								value="#{mensaje['rango.inicial']}" />
+							<p:datePicker id="fechaLimite_filtro" value="#{tramitesPendientesBean.fechaLimiteFiltro}" 
+								locale="es" monthNavigator="true" pattern="dd/MM/yyyy"
+								converterMessage="#{mensaje['formato.fecha.invalido']}" mask="true"/>
+							<p:message for="fechaLimite_filtro"/>
+						</div>
+						<div class="celda-form">
+							<p:outputLabel for="fechaRespuesta_filtro"
+								value="#{mensaje['rango.final']}" />
+							<p:datePicker id="fechaRespuesta_filtro" value="#{tramitesPendientesBean.fechaRespuestaFiltro}" 
+								locale="es" monthNavigator="true" pattern="dd/MM/yyyy"
+								converterMessage="#{mensaje['formato.fecha.invalido']}" mask="true"/>
+							<p:message for="fechaRespuesta_filtro"/>
+						</div>	
+						
+						<div class="celda-form">
+							<p:outputLabel for="persona_filtro" value="#{mensaje['persona']}" />
+							<p:inputText id="persona_filtro" maxlength="255"
+								value="#{tramitesPendientesBean.personaFiltro}" />
+						</div>
+						<div class="celda-form">
+							<p:outputLabel for="ident_persona_filtro" value="#{mensaje['ident.persona']}" />
+							<p:inputText id="ident_persona_filtro" maxlength="15"
+								value="#{tramitesPendientesBean.identPersonaFiltro}" />
+						</div>
+						<div class="celda-form">
+							<p:outputLabel for="sujetosObligados_filtro"
+								value="#{mensaje['sujeto.obligado']}" />
+							<p:inputText id="sujetosObligados_filtro" maxlength="255"
+								value="#{tramitesPendientesBean.sujetoObligadoFiltro}" />
+						</div>	
+						<div class="celda-form">
+							<p:outputLabel value="#{mensaje['responsable.expediente']}" for="responsable_filtro" />
+							<p:selectOneMenu id="responsable_filtro"
+								value="#{tramitesPendientesBean.selectedResponsableExpIdFiltro}"
+								style="min-width: 150px;" filter="true" filterMatchMode="contains">
+								<f:selectItem itemLabel="#{mensaje['todos']}" itemValue="" />
+								<f:selectItems
+									value="#{tramitesPendientesBean.listaResponsablesExpediente}"
+									var="respExpList" itemLabel="#{respExpList.descripcion}"
+									widgetVar="comboFiltroResponsableExp" itemValue="#{respExpList.id}" />
+							</p:selectOneMenu>
+						</div>
+					</div>
+
+					<div class="botonera-form">
+						<p:commandButton id="filtrar" icon="pi pi-filter"
+							value="#{mensaje['filtrar']}"
+							actionListener="#{tramitesAbiertosBean.buscar()}"
+							update="formListadoFormacionGRS:tipoTram_filtro,
+ 									formListadoFormacionGRS:responsableTram_filtro, 
+ 									formListadoFormacionGRS:tipoExpedientes_filtro, 
+ 									formListadoFormacionGRS:numeroExpediente_filtro, 
+ 									formListadoFormacionGRS:situacion_filtro, 
+ 									formListadoFormacionGRS:fechaRespuesta_filtro, 
+ 									formListadoFormacionGRS:fechaLimite_filtro,
+ 									formListadoFormacionGRS:persona_filtro, 
+ 									formListadoFormacionGRS:ident_persona_filtro, 
+ 									formListadoFormacionGRS:sujetosObligados_filtro, 
+ 									formListadoFormacionGRS:responsable_filtro"
+							onstart="PF('tramitesPendientesWV').paginator.setPage(0);" />
+						<p:commandButton id="limpiarFiltro"
+							value="#{mensaje['limpiar.filtro']}" icon="pi pi-filter-slash"
+							actionListener="#{tramitesPendientesBean.limpiarFiltro()}"
+							update="formListadoFormacionGRS:tipoTram_filtro,
+ 									formListadoFormacionGRS:responsableTram_filtro,
+ 									formListadoFormacionGRS:tipoExpedientes_filtro, 
+ 									formListadoFormacionGRS:numeroExpediente_filtro, 
+ 									formListadoFormacionGRS:situacion_filtro,
+ 									formListadoFormacionGRS:fechaRespuesta_filtro, 
+ 									formListadoFormacionGRS:fechaLimite_filtro,
+ 									formListadoFormacionGRS:persona_filtro, 
+  									formListadoFormacionGRS:ident_persona_filtro, 
+ 									formListadoFormacionGRS:sujetosObligados_filtro, 
+									formListadoFormacionGRS:responsable_filtro"
+							onstart="PF('tramitesPendientesWV').paginator.setPage(0);" />
+					</div>
+				</p:fieldset>
+			</p:panel> 
+			
+			<p:outputPanel id="panelListadoFormacionGRS">
+				<p:dataTable var="formacionPruebasGRS" id="listadoFormacionPruebasGRS"
+					value="#{tramitesPendientesBean.lazyModelDetalleExp}" paginator="true"
+					paginatorTemplate=" {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+					rowsPerPageTemplate="10,20,50,100" rows="10"
+					currentPageReportTemplate="#{mensaje['paginador.template']}"
+					selectionMode="single"
+					selection="#{tramitesPendientesBean.selectedDetalleExpdteTram}"
+					sortBy="#{tramitesPendientesBean.defaultOrden}"
+					sortOrder="ascending"
+					rowKey="#{detalleExpdteTram.id}" paginatorPosition="bottom"
+					widgetVar="tramitesPendientesWV">
+		
+					<!--  <p:column headerText="#{mensaje['codigo']}">
+						<h:outputText value="#{detalleExpdteTram.id}" /> 
+					</p:column>
+					
+				 	<p:column headerText="#{mensaje['activo']}">
+						<h:outputText rendered="#{formacionPruebasGRS.activa eq true}" value="#{mensaje['si']}"/> 
+						<h:outputText rendered="#{formacionPruebasGRS.activa eq false}" value="#{mensaje['no']}" /> 
+					</p:column> -->
+					
+					
+		 			<p:column headerText="#{mensaje['fecha.limite']}">
+						<h:outputText value="#{detalleExpdteTram.fechaLimite}" >  
+							<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+						</h:outputText>
+		 			</p:column> 
+		 			
+		 			<p:column headerText="#{mensaje['fecha.respuesta']}">
+						<h:outputText value="#{detalleExpdteTram.fechaRespuesta}" >  
+							<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+						</h:outputText>
+		 			</p:column> 
+		 			
+		 			<p:column headerText="#{mensaje['fecha.acreditacion']}">
+						<h:outputText value="#{detalleExpdteTram.fechaAcreditacion}" >  
+							<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+						</h:outputText>
+		 			</p:column> 
+		 			
+		 			<p:column headerText="#{mensaje['fecha.subsanacion']}">
+						<h:outputText value="#{detalleExpdteTram.fechaSubsanacion}" >  
+							<f:convertDateTime locale="es" pattern="dd/MM/yyyy" />
+						</h:outputText>
+		 			</p:column> 
+		 			
+		 			<!--  <p:column headerText="#{mensaje['usuario']}" sortBy="#{formacionPruebasGRS.usuario.login}">
+							<h:outputText value="#{formacionPruebasGRS.usuario.login}" />
+						</p:column>
+					
+					<p:column headerText="#{mensaje['usuario.creacion']}"> 
+						<h:outputText value="#{formacionPruebasGRS.usuCreacion}" /> 
+		 			</p:column> 
+		 			
+		 			<p:column headerText="#{mensaje['acciones']}">
+							<p:commandButton id="edicionFormacionGRS" widgetVar="edicionFormacionGRS"
+								icon="pi pi-pencil" action="#{formacionGRSBean.onEditar(formacionPruebasGRS.id)}"
+								immediate="true" >
+							</p:commandButton>
+							
+							<p:commandButton id="consultaFormacionGRS" widgetVar="consultaFormacionGRS"
+								icon="pi pi-eye" action="#{formacionGRSBean.onConsultar(formacionPruebasGRS.id)}"
+								immediate="true" >
+							</p:commandButton>
+							
+							<p:commandButton id="eliminarFormacionGRS" icon="pi pi-trash"
+								actionListener="#{formacionGRSBean.eliminarFormacionGRS(formacionPruebasGRS)}"
+								update="formListadoFormacionGRS:listadoFormacionPruebasGRS">
+								<p:confirm header="#{mensaje['confirmar.operacion']}" message="#{mensaje['pregunta.confirma.eliminar']}" icon="pi pi-info-circle" />
+							</p:commandButton>
+							
+							<p:commandButton id="desactivarFormacionGRS" icon="pi pi-times"
+								actionListener="#{formacionGRSBean.desactivarFormacionGRS(formacionPruebasGRS)}"
+								update="formListadoFormacionGRS:listadoFormacionPruebasGRS">
+								<p:confirm header="#{mensaje['confirmar.operacion']}" message="#{mensaje['pregunta.confirma.eliminar']}" icon="pi pi-info-circle" />
+							</p:commandButton>
+							
+							<p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true">
+								<div class="botonera-form" align="right">
+									<p:commandButton value="#{mensaje['si']}" type="button" styleClass="ui-confirmdialog-yes" />
+									<p:commandButton value="#{mensaje['no']}" type="button" styleClass="ui-confirmdialog-no ui-button-flat" />
+								</div>								
+							</p:confirmDialog>
+						</p:column>-->
+		 			
+		 			
+				</p:dataTable >
+			</p:outputPanel>
+			
+			<br/>
+			
+			<p:commandButton id="volver" value="#{mensaje['volver']}"
+				oncomplete="document.location.href='#{request.contextPath}/aplicacion/bienvenido.xhtml'">
+			</p:commandButton>
+		
+		</h:form>
+	
+	</ui:define>
+
+</ui:composition>
+</html>

@@ -137,6 +137,8 @@ public class DatosResolucionBean extends BaseBean implements Serializable {
 	private List<ValoresDominio> listaDerechosReclamadosResolucion;
 	@Getter @Setter
 	private List<ValoresDominio> selectedDerechosReclamadosResolucion;
+	@Getter @Setter
+	private String resolucionOriginal;
 	
 	@Getter
 	private List<ValoresDominio> listaArticulosAfectadosResolucion;
@@ -377,10 +379,14 @@ public class DatosResolucionBean extends BaseBean implements Serializable {
 	}
 	
 	
+	
+	
 	//*********************************************************
 	
 	private void aplicarFormulario() {
 		resolucion.setValorTipoResolucion(valoresDominioService.obtener(selectedNuevoTipoResolId));
+		
+		resolucion.setCodigoResolucionOriginal(resolucionOriginal);
 		
 		if(selectedNuevoSentidoResolId != null) {
 			resolucion.setValorSentidoResolucion(valoresDominioService.obtener(selectedNuevoSentidoResolId));

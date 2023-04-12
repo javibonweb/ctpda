@@ -124,7 +124,13 @@ public class MenuBean extends BaseBean implements Serializable{
         //LISTA DINAMICA A PARTIR DE DOMINIOS CON PUNTO DE MENU ACTIVOS.
         listaDominios = dominioService.findDominiosPuntoMenu();
         
-
+        /*
+         * 	MENU TRAMITES PENDIENTES
+         * */    	
+    	DefaultSubMenu submenuTramitesPendientes = new DefaultSubMenu();
+    	submenuTramitesPendientes.setLabel(mensajesProperties.getString("tramites.pendientes"));
+    	menuTramitesPendientes(submenuTramitesPendientes);
+    	
         /*
          * 	MENU GONZALO
          * */    	
@@ -521,7 +527,25 @@ public class MenuBean extends BaseBean implements Serializable{
             model.getElements().add(submenuFormacionGRS);
 		}
     }
-        
+       
+	
+	private void menuTramitesPendientes (DefaultSubMenu submenuTramitesPendientes) {
+
+		DefaultMenuItem itemTramitesPendientes = new DefaultMenuItem();
+		itemTramitesPendientes.setAjax(false);
+		itemTramitesPendientes.setAsync(false);
+		itemTramitesPendientes.setUpdate(DATAFORM);
+		itemTramitesPendientes.setValue(mensajesProperties.getString("tramites.pendientes"));
+		itemTramitesPendientes.setCommand("#{tramitesPendientesBean.redireccionMenu}");
+    	
+		submenuTramitesPendientes.getElements().add(itemTramitesPendientes);
+    
+	
+		if(!submenuTramitesPendientes.getElements().isEmpty()){
+            model.getElements().add(submenuTramitesPendientes);
+		}
+    }
+	
 
 	private void menuFormacionBlh (DefaultSubMenu submenuFormacionBlh) {
     	DefaultMenuItem itemFormacionBlh = new DefaultMenuItem();

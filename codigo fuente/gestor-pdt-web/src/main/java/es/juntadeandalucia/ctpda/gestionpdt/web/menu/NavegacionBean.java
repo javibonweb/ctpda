@@ -91,6 +91,7 @@ public class NavegacionBean implements Serializable{
 		//FormacionGRS
 		LISTADO_FORMACIONGRS,
 		FORM_FORMACIONGRS,
+		LISTADO_TRAMITES_PENDIENTES,
 
 		
 

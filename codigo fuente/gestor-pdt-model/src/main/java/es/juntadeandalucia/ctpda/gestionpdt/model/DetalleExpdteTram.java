@@ -277,6 +277,11 @@ public class DetalleExpdteTram extends Auditable{
 	@Setter
 	private Boolean api;
 	
+	@Column(name = "L_ESPERA_DOC")
+	@Getter
+	@Setter
+	private Long esperaDoc;
+	
 	@Column(name = "D_SEGUIMIENTO_CABECERA")
 	@Getter
 	@Setter

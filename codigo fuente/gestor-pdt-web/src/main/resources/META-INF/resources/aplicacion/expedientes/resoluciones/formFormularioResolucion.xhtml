@@ -82,6 +82,14 @@
 								itemLabel="#{t.descripcion}" itemValue="#{t.id}" />
 						</p:selectOneMenu>
 					</div>
+					<div class="celda-form">
+						<p:outputLabel for="originalResol" styleClass="p-d-block"
+							value="Resolucion original" />
+						<p:inputTextarea rows="6" cols="125" id="originalResol"  autoResize="false"
+							value="#{bean.resolucionOriginal}"
+							 maxlength="4000">
+						</p:inputTextarea>
+					</div>
 				</div>
 				
 				<div class="ui-g">
