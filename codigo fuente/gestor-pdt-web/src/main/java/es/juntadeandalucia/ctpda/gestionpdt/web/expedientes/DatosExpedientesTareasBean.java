@@ -12,6 +12,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 
+import es.juntadeandalucia.ctpda.gestionpdt.model.core.EntidadBasica;
 import org.apache.commons.lang3.ArrayUtils;
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.SelectEvent;
@@ -65,7 +66,7 @@ public class DatosExpedientesTareasBean extends BaseBean implements Serializable
 	private SesionBean sesionBean;	
 	
 	
-	
+
 	@Autowired
 	private TareasExpedienteService tareasExpedienteService;
 	@Autowired
@@ -187,10 +188,14 @@ public class DatosExpedientesTareasBean extends BaseBean implements Serializable
 	private List<TareasExpediente> listaTareasCierreAuto;
 	@Getter	@Setter
 	private List<TareasExpediente> selectedTareasCierreAuto;
-	
-	
-	
-	
+	@Getter	@Setter
+	private Long idTram;
+	@Getter	@Setter
+	private String codTipTarea;
+	@Getter	@Setter
+	private EntidadBasica tramExp;
+
+
 	@Override
 	@PostConstruct
 	public void init() {
@@ -227,12 +232,43 @@ public class DatosExpedientesTareasBean extends BaseBean implements Serializable
 		try {
 			cargarDatosDialogo();
 			PrimeFaces.current().executeScript(DIALOGTAREASHOW);
+			// HDU 1322
+			/*if(idTram != null && Constantes.COD_TIP_TAR_TRAM_FYN.equals(codTipTarea))
+			{
+				generarAvisoRevisionUsuarios(tramiteExpedienteService.obtener(idTram));
+			}*/
 		} catch (BaseException e) {
 			FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "", e.getMessage());
 			PrimeFaces.current().dialog().showMessageDynamic(message);
 		}			
 	}
-	
+
+	/*private void generarAvisoRevisionUsuarios(TramiteExpediente obtener) {
+		List<TareasExpediente> listadoTareasRev
+				= tareasExpedienteService.findTareasExpActivasByTramExpTiposTar(tramExp.getId(),
+				Constantes.COD_TIP_TAR_DOC_REV,
+				Constantes.COD_TIP_TAR_TRAM_REVT);
+
+
+		if(listadoTareasRev != null && !listadoTareasRev.isEmpty())
+		{
+			Boolean coincideUsuLogadoConResp = true;
+			int i = listadoTareasRev.size();
+			while( i > 0 && Boolean.TRUE.equals(coincideUsuLogadoConResp))
+			{
+				i--;
+
+				TareasExpediente tarExp = listadoTareasRev.get(i);
+				coincideUsuLogadoConResp = usuariosResponsablesService.esResponsableDeUsuario(tarExp.getResponsableTramitacion().getId(), sesionBean.getIdUsuarioSesion());
+				if(Boolean.FALSE.equals(coincideUsuLogadoConResp)) {
+					final String msg = mensajesProperties.getString("aviso.tareas.revisio.pendientes.otro.resp");
+					FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "", msg);
+					PrimeFaces.current().dialog().showMessageDynamic(message);
+				}
+			}
+	}
+	}*/
+
 	private void iniciarAlta() {
 		this.expediente = getExpedienteFormulario();
 		this.tarea = nuevaTarea();
