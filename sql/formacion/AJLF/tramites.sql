@@ -1,6 +1,6 @@
 rem  Comprobación UTF8: Esto aparece en árabe: أنا تظهر في اللغة العربية
 
-SPOOL logs/TRAMITES.LOG
+SPOOL logs/TRAMITES_AJLF.LOG
 ALTER SESSION SET "_ORACLE_SCRIPT"= TRUE;
 
 -----------------------
