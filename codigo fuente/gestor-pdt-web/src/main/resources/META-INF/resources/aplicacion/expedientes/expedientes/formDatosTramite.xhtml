@@ -129,7 +129,7 @@
 				rendered="#{editable and !(tramExp.cfgMetadatosTram.btVincularDoc == null) and vincularDocumentosBean.permisoVincular}"
 				action="#{vincularDocumentosBean.abrirDialogoVincularDocumentos(tramExp.id)}"
 				process="@this" update="dialogVincularDocs" immediate="true"
-				oncomplete="PF('dialogVincularDocs').show()">
+				oncomplete="PF('dialogVincularDocs').show();">
 			</p:commandButton>
 			
 			<p:outputPanel style="display:inline" styleClass="control-documentos">
@@ -419,17 +419,27 @@
 							<p:message for="fechaEnt" />
 						</div>
 						<div class="celda-form">
+							<!-- HdU 1313 - Comportamiento nuevo para que la fecha de registro no sea obligatoria en entrada de doc -->
 							<p:outputLabel
-								rendered="#{editable and tramExp.cfgMetadatosTram != null}"
+								rendered="#{editable and tramExp.cfgMetadatosTram != null and (tramExp.expediente.valorTipoExpediente.codigo == 'XPC')}"
+								for="fechaRegistroC005-#{tramExp.id}"
+								value="#{tramExp.cfgMetadatosTram.fechaRegistro}" />
+							<p:outputLabel
+								rendered="#{editable and tramExp.cfgMetadatosTram != null and (tramExp.expediente.valorTipoExpediente.codigo != 'XPC')}"
 								for="fechaRegistroC005-#{tramExp.id}"
 								value="#{tramExp.cfgMetadatosTram.fechaRegistro} *" />
 							<p:outputLabel
 								rendered="#{!editable and tramExp.cfgMetadatosTram != null}"
 								for="fechaRegistroC005-#{tramExp.id}" value="#{tramExp.cfgMetadatosTram.fechaRegistro}" />
 							<p:outputLabel
-								rendered="#{editable and tramExp.cfgMetadatosTram == null}"
+								rendered="#{editable and tramExp.cfgMetadatosTram == null and (tramExp.expediente.valorTipoExpediente.codigo == 'XPC')}"
+								for="fechaRegistroC005-#{tramExp.id}"
+								value="#{mensaje['etiqueta.pendiente.definir']}" />
+							<p:outputLabel
+								rendered="#{editable and tramExp.cfgMetadatosTram == null and (tramExp.expediente.valorTipoExpediente.codigo != 'XPC')}"
 								for="fechaRegistroC005-#{tramExp.id}"
 								value="#{mensaje['etiqueta.pendiente.definir']} *" />
+							<!-- FIN HdU 1313 - Comportamiento nuevo para que la fecha de registro no sea obligatoria en entrada de doc -->
 							<p:outputLabel
 								rendered="#{!editable and tramExp.cfgMetadatosTram == null}"
 								for="fechaRegistroC005-#{tramExp.id}" value="#{mensaje['etiqueta.pendiente.definir']}" />
@@ -1217,6 +1227,16 @@
 									rendered="#{(tramExp.expediente.valorTipoExpediente.codigo == 'RCO')  and !(tramExp.tipoTramite.codigo == 'ACNOADM')}">
 								</p:selectBooleanCheckbox>
 							</div>
+							<div class="celda-form">
+								<p:outputLabel rendered="#{(tramExp.tipoTramite.codigo == 'ACADM') || (tramExp.tipoTramite.codigo == 'ACADMHE')}"
+									for="checkInfoRemitidaC008-#{tramExp.id}"
+									value="#{tramExp.cfgMetadatosTram.informRemitida}" />
+								<p:selectBooleanCheckbox id="checkInfoRemitidaC008-#{tramExp.id}"
+									value="#{tramExp.detalleExpdteTram.infoRemitida}"
+									itemLabel="#{mensaje['si']}" disabled="#{!editable}"
+									rendered="#{(tramExp.tipoTramite.codigo == 'ACADM') || (tramExp.tipoTramite.codigo == 'ACADMHE')}">
+								</p:selectBooleanCheckbox>
+							</div>
 						</div>
 					</div>
 				</p:outputPanel>
@@ -1623,6 +1643,11 @@
 								monthNavigator="true" pattern="dd/MM/yyyy"
 								converterMessage="#{mensaje['formato.fecha.invalido']}"
 								mask="true" showButtonBar="true" readonlyInput="true">
+																<p:ajax event="change"
+									listener="#{datosTramiteExpedienteBean.actualizarBotoneraResolucion(tramExp, tramExp.selectedNuevoSentidoResolucionId,tramExp.selectedNuevoTipoResolucionId, tramExp.detalleExpdteTram.numResolucion)}"
+									process="@this"
+									update="crearResolucionC012-#{tramExp.id},asociarResolucionC012-#{tramExp.id}" />
+								
 							</p:datePicker>
 							<p:message for="fechaResolucionC012-#{tramExp.id}" />
 						</div>
@@ -2970,7 +2995,9 @@
 				
 				<!-- FIN DE LOS CAMPOS ASOCIADOS AL COMPORTAMIENTO C023 COMO TRAMITE -->				
 
-
+				<ui:include src="compTramites/formDatosTramite_C025.xhtml">
+					<ui:param name="tramExp" value="#{tramExp}" />
+				</ui:include>
 
 				<ui:include src="compTramites/formDatosTramite_C003.xhtml">
 					<ui:param name="tramExp" value="#{tramExp}" />
@@ -3012,9 +3039,38 @@
 				</p:fieldset>
 			</div>
 			
+			
+		<p:spacer height="10" />
+		<p:outputPanel rendered="#{datosArticulosTipificacionesBean.mostrarListadoArticulosTipificaciones(tramExp) == true}"
+			styleClass="panel-arttip-tramite panel-arttip-tramite-#{tramExp.id}">
+			<ui:include src="listadoArticulosTipificaciones.xhtml">
+				<ui:param name="id"
+					value="#{datosArticulosTipificacionesBean.getIdTablaListadoArticulosTipificaciones(tramExp.id)}" />
+				<ui:param name="css_class"
+					value="tabla-articulosTipificaciones-#{tramExp.id}" />
+				<ui:param name="value"
+					value="#{datosArticulosTipificacionesBean.getLazyArticulosTipificacionesTramite(tramExp.id, tramExp.expediente)}" />
+				<ui:param name="botonesVisibles"
+					value="true" />					
+				<ui:param name="es_listado_tramite" value="#{true}" />
+				<ui:param name="tipo_tramite" value="#{tramExp.tipoTramite.codigo}" />
+			</ui:include>
+			<div class="botonera-form">
+			<!-- BOTÓN PARA CREAR NUEVO ART TIP -->
+			<p:commandButton id="nuevaDialogArtTip" rendered="#{editable and ((tramExp.detalleExpdteTram.numeroPsan == null) and ((tramExp.expediente.valorTipoExpediente.codigo == 'RCO'))
+				or ((tramExp.expediente.valorTipoExpediente.codigo == 'PSAN')and (tramExp.detalleExpdteTram.numResolucion == null)))}"
+				value="#{mensaje['nuevo.art.tip']}" 
+				actionListener="#{datosArticulosTipificacionesBean.accesoFormularioAlta(tramExp.id)}"
+				process="@this" immediate="true" />  				
+		</div>	
+		</p:outputPanel>
+<!-- 		<p:spacer height="10" /> -->
+<!-- 		<p:spacer height="10" /> -->
+			
+			
 			<div class="botonera-form" align="right">
 
-				<p:outputPanel class="celda-form botones-tramite" id="botonesFYN_#{tramExp.id}">
+				<p:outputPanel class="celda-form botones-tramite" >
 				<p:commandButton id="guardarTramite_#{tramExp.id}" value="#{mensaje['guardar']}"
 					rendered="#{editable}"
 					action="#{datosTramiteExpedienteBean.guardarTramite(tramExp)}"
@@ -3025,7 +3081,7 @@
 						formFormularioExpedientes:tabViewPestanasExpediente:fechaEntrada,
 						@(.listado-extractos), @(.listado-antecedentes),
 						botonesFYN_#{tramExp.id}"
-					oncomplete="if(args.refrescarDocs) actualizar_documentos()" />
+					oncomplete="if(args.act_doc) actualizar_documentos()" />
 
 				<p:commandButton id="iniciarActividadTramite_#{tramExp.id}"
 					value="#{mensaje['iniciar.actividad']}"
@@ -3040,25 +3096,39 @@
 					action="#{datosExpedientesTareasBean.altaTareaTramite(tramExp)}"
 					process="@this" update="@form:dialogTarea" immediate="true" />
 
-				<p:commandButton id="altaTareaTramite-RevisarDocs_#{tramExp.id}"
-					value="#{mensaje['revisar.docs']}"
-					rendered="#{editable and datosTramiteExpedienteBean.permisoNewExpTareaDet == true and (tramExp.expediente.valorTipoExpediente.codigo != 'XPC') and tramExp.mostrarTareaREVT}"
-					action="#{datosExpedientesTareasBean.altaTareaTramiteRevisarDocs(tramExp)}"
-					process="@this" update="@form:dialogTarea" immediate="true" />
+				<p:outputPanel id="botonesREVT_#{tramExp.id}" style="display: inline">
+					<p:commandButton id="altaTareaTramite-EnviarRevisarDocs_#{tramExp.id}"
+						value="#{mensaje['enviar.revisar.docs']}"
+						rendered="#{editable and datosTramiteExpedienteBean.permisoNewTareaRev == true and (tramExp.expediente.valorTipoExpediente.codigo != 'XPC') and tramExp.mostrarTareaREVT and not datosExpedientesTareasBean.existeTareaREVTTramite(tramExp)}"
+						action="#{datosExpedientesTareasBean.altaTareaTramiteRevisarDocs(tramExp)}"
+						process="@this" update="@form:dialogTarea" immediate="true" />
+					<p:commandButton id="altaTareaTramite-VerRevisarDocs_#{tramExp.id}"
+						value="#{mensaje['ver.revisar.docs']}"
+						rendered="#{editable and datosTramiteExpedienteBean.permisoNewTareaRev == true and (tramExp.expediente.valorTipoExpediente.codigo != 'XPC') and tramExp.mostrarTareaREVT and datosExpedientesTareasBean.existeTareaREVTTramite(tramExp)}"
+						action="#{datosExpedientesTareasBean.verTareaTramiteRevisarDocs(tramExp)}"
+						process="@this" update="@form:dialogTarea" immediate="true" />
+				</p:outputPanel>
 
-
+				<p:outputPanel id="botonesFYN_#{tramExp.id}" style="display: inline">
 					<p:commandButton id="altaTareaTramite-EnviarFirmarNotificar_#{tramExp.id}" value="#{mensaje['enviar.firmar.notificar']}"
-						rendered="#{editable and datosTramiteExpedienteBean.permisoNewExpTareaDet == true  and (tramExp.expediente.valorTipoExpediente.codigo != 'XPC') and tramExp.mostrarTareaFYN and not datosExpedientesTareasBean.existeTareaFYNTramite(tramExp.id)}"
+						rendered="#{editable and datosTramiteExpedienteBean.permisoNewTareaFYN == true  and (tramExp.expediente.valorTipoExpediente.codigo != 'XPC') and tramExp.mostrarTareaFYN and not datosExpedientesTareasBean.existeTareaFYNTramite(tramExp)}"
 						action="#{datosExpedientesTareasBean.altaTareaTramiteFirmarNotificar(tramExp)}"
 						process="@this" update="@form:dialogTarea" immediate="true"/>					
+					
+					<p:commandButton id="altaMasivaSubtramites_#{tramExp.id}" value="#{mensaje['crear.paquete.trabajo']}"
+						rendered="#{editable and datosTramiteExpedienteBean.permisoNewAltaMasivaSubtramites == true  and tramExp.expediente.valorTipoExpediente.codigo != 'XPC' and datosExpedientesTareasBean.existeTareaFYNTramite(tramExp)}"
+						action="#{datosTramiteExpedienteBean.altaMasivaSubtramites(tramExp)}" 
+						update="formFormularioExpedientes:tabViewPestanasExpediente:fechaInicioTramite,formFormularioExpedientes:tabViewPestanasExpediente:fechaInicioSubtramiteMasivo,formFormularioExpedientes:tabViewPestanasExpediente:dialogoAltaMasivaSubtramites"/>
+						
 					<p:commandButton id="altaTareaTramite-VerFirmarNotificar_#{tramExp.id}" value="#{mensaje['ver.firmar.notificar']}"
-						rendered="#{editable and datosTramiteExpedienteBean.permisoNewExpTareaDet == true  and (tramExp.expediente.valorTipoExpediente.codigo != 'XPC') and tramExp.mostrarTareaFYN and datosExpedientesTareasBean.existeTareaFYNTramite(tramExp.id)}"
+						rendered="#{editable and datosTramiteExpedienteBean.permisoNewTareaFYN == true  and (tramExp.expediente.valorTipoExpediente.codigo != 'XPC') and tramExp.mostrarTareaFYN and datosExpedientesTareasBean.existeTareaFYNTramite(tramExp)}"
 						action="#{datosExpedientesTareasBean.verTareaTramiteFirmarNotificar(tramExp)}"
 						process="@this" update="@form:dialogTarea" immediate="true"/>					
-
+				</p:outputPanel>
+				
 				<p:commandButton id="eliminarTramite_#{tramExp.id}" value="#{mensaje['eliminar']}"
 					rendered="#{editable and datosTramiteExpedienteBean.permisoDesacExpTram == true}"
-					action="#{datosTramiteExpedienteBean.finalizarEliminarTramite(tramExp, 'eliminar')}"
+					action="#{datosTramiteExpedienteBean.finalizarEliminarTramite(tramExp, 'eliminar', 'eliminarTramite')}"
 					update=":formFormularioExpedientes,formFormularioExpedientes:panelActualizadoCabecera,formFormularioExpedientes:panelSituacionAdicionalCabecera,@(.listado-extractos), @(.listado-antecedentes)">
 					<p:confirm header="#{mensaje['confirmar.operacion']}" message="#{mensaje['pregunta.confirma.eliminar']}" icon="pi pi-info-circle" />
 				</p:commandButton>
@@ -3071,7 +3141,7 @@
 
 				<p:commandButton id="finalizarTramite_#{tramExp.id}" value="#{datosTramiteExpedienteBean.literalBotonFinalizar()}"
 					rendered="#{editable and datosTramiteExpedienteBean.permisoNewExpFinTram == true and tramExp.mostrarBotonFinalizar}"
-					action="#{datosTramiteExpedienteBean.finalizarEliminarTramite(tramExp, 'finalizar')}"
+					action="#{datosTramiteExpedienteBean.finalizarEliminarTramite(tramExp, 'finalizar', 'finalizarTramite')}"
 					update="formFormularioExpedientes, 
 						formFormularioExpedientes:panelActualizadoCabecera, 
 						formFormularioExpedientes:panelSituacionAdicionalCabecera,
@@ -3089,8 +3159,107 @@
 
 			</div>			
 		</div>
+				<!-- DIALOGO ART TIP -->
+		<p:dialog id="dialogArtTip-#{tramExp.id}" 
+			header="#{datosArticulosTipificacionesBean.cabeceraDialog}" widgetVar="dialogArtTip-#{tramExp.id}">
+
+				<p:messages for="messagesDialogArtTip" id="messagesDialogArtTip"
+					showDetail="true" closable="true">
+					<p:autoUpdate />
+				</p:messages>
+				
+				<div>
+						<div class="celda-form">
+							<p:outputLabel
+								for="comboArtInfringido-#{tramExp.id}"
+								value="#{mensaje['articulo.infringido']} *" />
+							<p:selectOneMenu id="comboArtInfringido-#{tramExp.id}"
+								value="#{datosArticulosTipificacionesBean.selectedNuevoTipoArtInfringidoId}">
+								<f:selectItem
+									itemLabel="#{mensaje['seleccione.una.opcion']}"
+									itemValue="#{null}" />
+								<f:selectItems
+									value="#{datosArticulosTipificacionesBean.listaValoresDominioArtInfringidos}"
+									var="artInfrList" itemLabel="#{artInfrList.descripcion}"
+									widgetVar="comboArtInfringido-#{tramExp.id}"
+									itemValue="#{artInfrList.id}" />
+								<p:ajax
+									listener="#{datosArticulosTipificacionesBean.onChangeArtTip(tramExp)}"
+									update="comboTipificacion-#{tramExp.id}, comboGravedad-#{tramExp.id}" />
+							</p:selectOneMenu>
+						</div>
+						<div class="celda-form">
+							<p:outputLabel
+								for="comboTipificacion-#{tramExp.id}"
+								value="#{mensaje['tipificacion']} *" />
+							<p:selectOneMenu id="comboTipificacion-#{tramExp.id}"
+								disabled="#{!datosArticulosTipificacionesBean.habilitarTipificacion}"
+								value="#{datosArticulosTipificacionesBean.selectedNuevaTipificacionId}">
+								<f:selectItem
+									itemLabel="#{mensaje['seleccione.una.opcion']}"
+									itemValue="#{null}"/>
+								<f:selectItems
+									value="#{datosArticulosTipificacionesBean.listaValoresDominioTipificaciones}"
+									var="tipifList" itemLabel="#{tipifList.descripcion}"
+									widgetVar="comboTipificacion-#{tramExp.id}"
+									itemValue="#{tipifList.id}" />
+								<p:ajax
+									listener="#{datosArticulosTipificacionesBean.onChangeArtTip(tramExp)}"
+									update="comboGravedad-#{tramExp.id}" />
+							</p:selectOneMenu>
+						</div>
+						<div class="celda-form">
+							<p:outputLabel
+								for="comboGravedad-#{tramExp.id}"
+								value="#{mensaje['gravedad']}" />
+							<p:selectOneMenu id="comboGravedad-#{tramExp.id}"
+								disabled="true"
+								value="#{datosArticulosTipificacionesBean.selectedNuevaGravedadId}">
+								<f:selectItem
+									itemLabel="#{mensaje['seleccione.una.opcion']}"
+									itemValue="#{null}" />
+								<f:selectItems
+									value="#{datosArticulosTipificacionesBean.listaValoresDominioGravedad}"
+									var="gravedadList" itemLabel="#{gravedadList.descripcion}"
+									widgetVar="comboGravedad-#{tramExp.id}"
+									itemValue="#{gravedadList.id}" />
+							</p:selectOneMenu>
+						</div>	
+				</div>
+				<div>
+					<div class="celda-form-block">
+					<p:outputLabel for="aclaraciones-#{tramExp.id}"	value="#{mensaje['aclaraciones']}" />
+						<p:inputTextarea rows="6" id="aclaraciones-#{tramExp.id}"
+							style="width:100%" value="#{datosArticulosTipificacionesBean.artTipExpdte.aclaracion}"
+							maxlength="250"
+							counter="textoAclaraciones-#{tramExp.id}"
+							counterTemplate="#{mensaje['counter.template']}" />
+					</div>
+
+					<div class="contador-char">
+						<h:outputText id="textoAclaraciones-#{tramExp.id}" />
+					</div>
+				</div>
+				
+				<div class="botonera-form" align="right">
+			<p:commandButton icon="pi pi-save"
+				id="btnGuardarArtTip-#{tramExp.id}" value="#{mensaje['aceptar']}"
+				actionListener="#{datosArticulosTipificacionesBean.guardarArtTip(tramExp)}" >
+			</p:commandButton>
+			<p:commandButton icon="pi pi-times" process="@this"
+				id="btnCancelarArtTip-#{tramExp.id}" value="#{mensaje['cancelar']}"
+				oncomplete="PF('dialogArtTip-#{tramExp.id}').hide()" >
+				<p:confirm header="#{mensaje['confirmar.operacion']}"
+					message="#{mensaje['pregunta.confirma.cancelar']}"
+					icon="pi pi-info-circle" />
+			</p:commandButton>	
+
+			    	</div>	
+		</p:dialog>							
 
 		<p:spacer height="10" />
+		<p:fieldset id="bloqueFirmas" legend="#{mensaje['firmas']}" rendered="#{tramExp.mostrarListadoFirmas}" toggleable="true"  collapsed="true" toggleSpeed="250">
+
 		<p:outputPanel rendered="#{tramExp.mostrarListadoFirmas}"
 			styleClass="panel-notif-tramite panel-firm-tramite-#{tramExp.id}">
 			<ui:include src="listadoFirmas.xhtml">
@@ -3104,11 +3273,14 @@
 				<ui:param name="tipo_tramite" value="#{tramExp.tipoTramite.codigo}" />
 			</ui:include>
 		</p:outputPanel>
+		</p:fieldset>
 		<p:spacer height="10" />
 		<p:spacer height="10" />
 		
 
 		<p:spacer height="10" />
+		<p:fieldset id="bloqueNotif" legend="#{mensaje['notificaciones']}" rendered="#{tramExp.mostrarListadoNotificaciones}" toggleable="true"  collapsed="true" toggleSpeed="250">
+		
 		<p:outputPanel rendered="#{tramExp.mostrarListadoNotificaciones}"
 			styleClass="panel-notif-tramite panel-notif-tramite-#{tramExp.id}">
 			<ui:include src="listadoNotificaciones.xhtml">
@@ -3122,6 +3294,8 @@
 				<ui:param name="tipo_tramite" value="#{tramExp.tipoTramite.codigo}" />
 			</ui:include>
 		</p:outputPanel>
+		
+		</p:fieldset>
 		<p:spacer height="10" />
 		<p:spacer height="10" />
 
@@ -3230,7 +3404,7 @@
 								rendered="#{editable and !(subTramExp.cfgMetadatosTram.btVincularDoc == null)}"
 								action="#{vincularDocumentosBean.abrirDialogoVincularDocumentos(subTramExp.id)}"
 								update="dialogVincularDocs"
-								oncomplete="PF('dialogVincularDocs').show()">
+								oncomplete="PF('dialogVincularDocs').show();">
 							</p:commandButton>
 						</div>
 
@@ -3703,7 +3877,7 @@
 								value="#{mensaje['guardar']}" rendered="#{editable}"
 								action="#{datosTramiteExpedienteBean.guardarSubTramite(subTramExp)}"
 								update=":formFormularioExpedientes,formFormularioExpedientes:tabViewPestanasExpediente:finalizarSubTramite"
-								oncomplete="if(args.refrescarDocs) actualizar_documentos()" />
+								oncomplete="if(args.act_doc) actualizar_documentos()" />
 						
 							<p:commandButton id="anyadirTareaSubTramite"
 								value="#{mensaje['anyadir.tarea']}" rendered="false"
@@ -3738,7 +3912,8 @@
 							<p:commandButton id="finalizarSubTramite"
 								value="#{mensaje['finalizar.subtramite']}"
 								rendered="#{editable and datosTramiteExpedienteBean.permisoNewExpFinTram == true and subTramExp.mostrarBotonFinalizar}"
-								action="#{datosTramiteExpedienteBean.finalizarSubTramite(subTramExp)}"> 
+								action="#{datosTramiteExpedienteBean.finalizarSubTramite(subTramExp)}"
+								oncomplete="if(args.act_doc) actualizar_documentos()" >
 								<p:confirm header="#{mensaje['confirmar.operacion']}" message="#{mensaje['pregunta.confirma.finalizar']}" icon="pi pi-info-circle" />
 							</p:commandButton>
 						</div>

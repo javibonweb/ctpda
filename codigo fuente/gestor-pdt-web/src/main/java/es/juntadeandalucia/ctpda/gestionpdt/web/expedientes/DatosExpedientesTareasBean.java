@@ -27,7 +27,6 @@ import es.juntadeandalucia.ctpda.gestionpdt.model.ResponsablesTramitacion;
 import es.juntadeandalucia.ctpda.gestionpdt.model.TareasExpediente;
 import es.juntadeandalucia.ctpda.gestionpdt.model.TramiteExpediente;
 import es.juntadeandalucia.ctpda.gestionpdt.model.Usuario;
-import es.juntadeandalucia.ctpda.gestionpdt.model.ValoresDominio;
 import es.juntadeandalucia.ctpda.gestionpdt.service.CfgTareasService;
 import es.juntadeandalucia.ctpda.gestionpdt.service.DocumentosExpedientesTramitesService;
 import es.juntadeandalucia.ctpda.gestionpdt.service.ExpedientesService;
@@ -47,6 +46,7 @@ import es.juntadeandalucia.ctpda.gestionpdt.web.core.Constantes;
 import es.juntadeandalucia.ctpda.gestionpdt.web.core.JsfUtils;
 import es.juntadeandalucia.ctpda.gestionpdt.web.core.LazyDataModelByQueryService;
 import es.juntadeandalucia.ctpda.gestionpdt.web.util.BaseBean;
+import es.juntadeandalucia.ctpda.gestionpdt.web.util.FacesUtils;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -113,7 +113,10 @@ public class DatosExpedientesTareasBean extends BaseBean implements Serializable
 	private boolean usuarioEsResponsable;
 	@Getter @Setter
 	private boolean usuarioEsResponsableSuperiorCreador;
-	
+
+	@Getter @Setter
+	private boolean usuarioEsResponsableVuelta;
+
 	@Getter
 	private String numeroExpediente;
 	@Getter
@@ -188,9 +191,12 @@ public class DatosExpedientesTareasBean extends BaseBean implements Serializable
 	@Getter	@Setter
 	private List<TareasExpediente> selectedTareasCierreAuto;
 	
+	@Getter
+	@Setter
+	boolean tareaFijada;
 	
 	
-	
+	@SuppressWarnings("unchecked")
 	@Override
 	@PostConstruct
 	public void init() {
@@ -201,7 +207,7 @@ public class DatosExpedientesTareasBean extends BaseBean implements Serializable
 		tarea.setObservaciones(observacionesExpedientes);		
 		plegado = true;
 		selectedTareasCierreAuto = new ArrayList<>();
-				
+		tareaFijada = false;
 		listaCodigoPermisos = (List<String>) JsfUtils.getSessionAttribute(Constantes.LISTACODIGOPERMISOS);
 		permisoCrearTareaDocExp = listaCodigoPermisos.contains(Constantes.PERMISO_CREAR_TAREADOCEXP);
 		permisoEditarTarea = listaCodigoPermisos.contains(Constantes.PERMISO_EDIT_TAREA);
@@ -227,6 +233,28 @@ public class DatosExpedientesTareasBean extends BaseBean implements Serializable
 		try {
 			cargarDatosDialogo();
 			PrimeFaces.current().executeScript(DIALOGTAREASHOW);
+
+			
+		} catch (BaseException e) {
+			FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "", e.getMessage());
+			PrimeFaces.current().dialog().showMessageDynamic(message);
+		}			
+	}
+	
+	private void altaTarea(Long idTram, String codTipTarea) {
+		iniciarAlta();
+		
+		try {
+			cargarDatosDialogo();
+			PrimeFaces.current().executeScript(DIALOGTAREASHOW);
+			
+// 	HdU 1322 - Aviso al enviar a firmar y notificar si hay tareas de revisión de otros usuarios pendientes en el trámite			
+			if(idTram != null && Constantes.COD_TIP_TAR_TRAM_FYN.equals(codTipTarea))
+			{
+				generarAvisoRevisionUsuarios(tramiteExpedienteService.obtener(idTram));	
+			}
+// FIN HdU 1322
+			
 		} catch (BaseException e) {
 			FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "", e.getMessage());
 			PrimeFaces.current().dialog().showMessageDynamic(message);
@@ -237,6 +265,7 @@ public class DatosExpedientesTareasBean extends BaseBean implements Serializable
 		this.expediente = getExpedienteFormulario();
 		this.tarea = nuevaTarea();
 		this.esAlta = true;
+		this.listaTareasCierreAuto = null;
 		this.setFormEditable(true);
 	}
 	
@@ -272,24 +301,79 @@ public class DatosExpedientesTareasBean extends BaseBean implements Serializable
 		altaTarea();		
 	}
 	
-	public void altaTareaTramiteRevisarDocs(TramiteExpediente tramExp) {
-		reset();
-		altaTareaTramite(tramExp.getId());		
-		//REVT debe existir
-		cargarDatosSegunTipoTarea("REVT");
+	private void altaTareaTramiteEnviarFirmNotif(Long idTram, String codTipTarea) {
+		cargarDatosTramite(idTram);
+		altaTarea(idTram, codTipTarea);		
 	}
 	
+	private void altaTareaTramite(TramiteExpediente tramExp, String codTipoTarea) {
+		if(Constantes.COD_TIP_TAR_TRAM_FYN.equals(codTipoTarea)) {
+			altaTareaTramiteEnviarFirmNotif(tramExp.getId(), codTipoTarea);
+		}else {
+			altaTareaTramite(tramExp);	
+		}
+				
+		//El código de tipo debe existir
+		cargarDatosSegunTipoTarea(codTipoTarea);
+	}
+	
+// 	HdU 1322 - Aviso al enviar a firmar y notificar si hay tareas de revisión de otros usuarios pendientes en el trámite
+	private void generarAvisoRevisionUsuarios(TramiteExpediente tramExp) {
+		
+		List<TareasExpediente> listadoTareasRev
+			= tareasExpedienteService.findTareasExpActivasByTramExpTiposTar(tramExp.getId(), 
+																			Constantes.COD_TIP_TAR_DOC_REV, 
+																			Constantes.COD_TIP_TAR_TRAM_REVT);
+
+		
+    	if(listadoTareasRev != null && !listadoTareasRev.isEmpty())
+    	{	
+    		Boolean coincideUsuLogadoConResp = true;
+    		int i = listadoTareasRev.size();
+    		while( i > 0 && Boolean.TRUE.equals(coincideUsuLogadoConResp)) 
+    		{	
+    			i--;
+    			
+    			TareasExpediente tarExp = listadoTareasRev.get(i);
+				coincideUsuLogadoConResp = usuariosResponsablesService.esResponsableDeUsuario(tarExp.getResponsableTramitacion().getId(), sesionBean.getIdUsuarioSesion()); 
+	    		if(Boolean.FALSE.equals(coincideUsuLogadoConResp)) {
+	    			final String msg = mensajesProperties.getString("aviso.tareas.revisio.pendientes.otro.resp");
+	    			FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "", msg);	
+	    			PrimeFaces.current().dialog().showMessageDynamic(message);
+	    		}
+    		}
+    	}
+		
+	}
+// FIN HdU 1322
+	
+	private void verTareaTramite(TramiteExpediente tramExp, String codTipoTarea)  {
+		tarea = this.tareasExpedienteService.getTareaPendienteTramite(tramExp.getId(), codTipoTarea);
+		this.consultarTarea();
+	}	
+	
+	//---------
+	
+	public void altaTareaTramiteRevisarDocs(TramiteExpediente tramExp) {
+		tareaFijada = true;
+		altaTareaTramite(tramExp, Constantes.COD_TIP_TAR_TRAM_REVT);
+	}
+	
+	
+	public void verTareaTramiteRevisarDocs(TramiteExpediente tramExp) {
+		verTareaTramite(tramExp, Constantes.COD_TIP_TAR_TRAM_REVT);
+	}	
+	//---
 	public void altaTareaTramiteFirmarNotificar(TramiteExpediente tramExp) {
-		reset();
-		altaTareaTramite(tramExp.getId());
-		//FYN debe existir
-		cargarDatosSegunTipoTarea(Constantes.COD_TIP_TAR_TRAM_FYN);
+		tareaFijada = true;
+		altaTareaTramite(tramExp, Constantes.COD_TIP_TAR_TRAM_FYN);
 	}
 	
 	public void verTareaTramiteFirmarNotificar(TramiteExpediente tramExp) {
-		tarea = this.tareasExpedienteService.getTareaFYNPendienteTramite(tramExp.getId());
-		this.consultarTarea();
+		verTareaTramite(tramExp, Constantes.COD_TIP_TAR_TRAM_FYN);
 	}
+	
+	//----------
 	
 	private void cargarDatosSegunTipoTarea(String codigo) {
 		if(null == listaTiposTareas) {
@@ -317,7 +401,8 @@ public class DatosExpedientesTareasBean extends BaseBean implements Serializable
 		
 		altaTareaTramite(doc.getIdTramiteExpediente());		
 		//REV debe existir
-		cargarDatosSegunTipoTarea("REV");
+		cargarDatosSegunTipoTarea(Constantes.COD_TIP_TAR_DOC_REV);
+		tareaFijada = true;
 	}
 	
 	//--------------------------------
@@ -394,6 +479,7 @@ public class DatosExpedientesTareasBean extends BaseBean implements Serializable
 	private void reset() {
 		this.listaTiposTareas = null;
 		this.listaResponsablesTramitacionTarea = null;
+		this.listaTareasCierreAuto = null;
 		
 		this.idTramiteExpediente = null;
 		this.tramiteExpediente = null;
@@ -409,8 +495,9 @@ public class DatosExpedientesTareasBean extends BaseBean implements Serializable
 		
 		this.usuarioEsResponsable = false;
 		this.usuarioEsResponsableSuperiorCreador = false;
-		
+		this.usuarioEsResponsableVuelta = false;
 		this.motivoRechazo = null;
+		
 	}
 	
 	private void cargarDatosDialogo() throws BaseException {
@@ -451,6 +538,7 @@ public class DatosExpedientesTareasBean extends BaseBean implements Serializable
             
 			setUsuarioEsResponsable();
 			setUsuarioEsResponsableSuperiorCreador();
+			setUsuarioEsResponsableVuelta();
         }
 
 	}
@@ -470,6 +558,16 @@ public class DatosExpedientesTareasBean extends BaseBean implements Serializable
 		}
 	}
 	
+
+	private void setUsuarioEsResponsableVuelta() {
+		usuarioEsResponsableVuelta = false;
+		var respVuelta = this.cfgTareaSeleccionada.getResponsableTareaVuelta();
+		
+		if (respVuelta != null && usuariosResponsablesService.esResponsableDeUsuario(respVuelta.getId(), sesionBean.getIdUsuarioSesion())) {
+			usuarioEsResponsableVuelta = true;
+		}
+	}
+
 	
 	//---------------------
 	//Fecha límite, responsable y descripciones modificables si el usuario es jefe del creador de la tarea
@@ -509,7 +607,7 @@ public class DatosExpedientesTareasBean extends BaseBean implements Serializable
 		if(null != this.idDocExpTramite) {
 			claveElemento = "de documento";
 		} else if(null != this.idTramiteExpediente && expediente!=null) {
-			claveElemento = "de tramite para el expediente "+expediente.getNumExpediente();
+			claveElemento = "de trámite para el expediente "+expediente.getNumExpediente();
 		} else if(expediente!=null){
 			claveElemento = "para el expediente "+expediente.getNumExpediente();
 		}else {
@@ -547,6 +645,7 @@ public class DatosExpedientesTareasBean extends BaseBean implements Serializable
 		
 		//Refrescamos la condicion
 		setUsuarioEsResponsable();
+		setUsuarioEsResponsableVuelta();
 	}
 	
 	private String getNombreUsuario(Usuario u) {
@@ -594,28 +693,6 @@ public class DatosExpedientesTareasBean extends BaseBean implements Serializable
 			this.tramiteExpediente = tramiteExpedienteService.obtener(this.idTramiteExpediente);
 		}
 	}
-	
-	public boolean existeTareaREV(DocumentosTramiteMaestra docTr) {
-
-		boolean b = false;
-		
-		TramiteExpediente tramExp = tramiteExpedienteService.obtener(docTr.getIdTramiteExpediente());
-		
-		Long idTipoTramSup = null;
-		if (tramExp.getTramiteExpedienteSup() != null) {
-			idTipoTramSup = tramExp.getTramiteExpedienteSup().getTipoTramite().getId();
-		}
-
-		ValoresDominio tareasREV = valoresDominioService.findValoresDominioByCodigoDomCodValDom("TAREAS", "REV");
-		List<CfgTareas> listaREV = cfgTareasService.findCfgTareas(tramExp.getExpediente().getValorTipoExpediente().getId(), tramExp.getTipoTramite().getId(), idTipoTramSup, tareasREV.getId(), true);
-		
-		if(listaREV != null && !listaREV.isEmpty()) {
-			b = true;
-			}
-
-		return b;
-	}
-
 	
 	public void cargarDatosCfgTarea() {
 		//Si es != null vendrá del select de tipos de tarea
@@ -706,7 +783,6 @@ public class DatosExpedientesTareasBean extends BaseBean implements Serializable
 			}
 		} catch (BaseException e) {
 			facesMsgErrorKey(CLAVE_ERROR_GENERICO);
-			e.printStackTrace();
 		}
 	}
 	
@@ -736,12 +812,12 @@ public class DatosExpedientesTareasBean extends BaseBean implements Serializable
 				tareasExpedienteService.cerrarTarea(tarea, sesionBean.getUsuarioSesion());
 				PrimeFaces.current().ajax().addCallbackParam(CALLBACK_PARAM_SAVED, true);
 				
-				//El tipo de tarea viene ya cargado 
-				if(tarea.getValorTipoTarea().getCodigo().equals(Constantes.COD_TIP_TAR_TRAM_FYN)) {
-					TramiteExpediente tram = tarea.getTramiteExpediente();
-					if(tram != null) {			
-						PrimeFaces.current().ajax().update(Constantes.JSFID_PESTANAS_EXP + ":botonesFYN_" + tram.getId());
-					}
+				//Limpiamos la caché de la vista
+				resetDatosExisteTarea(tarea);
+				
+				if(tarea.getEsTareaTipo(Constantes.COD_TIP_TAR_DOC_REV)) {
+					//Refrescar los documentos refrescará también el botón de tarea del documento
+					PrimeFaces.current().ajax().addCallbackParam(Constantes.CALLB_PARAM_ACT_DOC, true);
 				}
 				
 				final String msg = mensajesProperties.getString("tarea") + " " + mensajesProperties.getString("guardada.correctamente");
@@ -755,7 +831,6 @@ public class DatosExpedientesTareasBean extends BaseBean implements Serializable
 			}
 		} catch (BaseException e) {
 			facesMsgErrorKey(CLAVE_ERROR_GENERICO);
-			e.printStackTrace();
 		}
 	}
 	
@@ -795,6 +870,18 @@ public class DatosExpedientesTareasBean extends BaseBean implements Serializable
 		return true;
 	}
 	
+	public String descBotonGuardar() {
+		
+		String literal = getMessage("guardar");
+		
+		if (esAlta) {
+			literal = getMessage("crear.tarea");
+		}
+		
+		return literal;
+		
+	}
+	
 	public void previoGuardarTarea() {
 		if(!selectedTareasCierreAuto.isEmpty()) {		
 			PrimeFaces.current().ajax().update(Constantes.JSFID_FORMEXP + ":textoConfirmarCierreTareasAuto");
@@ -812,8 +899,10 @@ public class DatosExpedientesTareasBean extends BaseBean implements Serializable
 				
 				ObservacionesExpedientes obsExp = tarea.getObservaciones();
 				obsExp = observacionesExpedientesService.guardarObservacionesExpedientes(obsExp, obsExp.getTexto(), Constantes.COD_VAL_DOM_TIPOBS_TAR, tarea.getExpediente());
+				
 				tarea.setObservaciones(obsExp);
 				tarea = tareasExpedienteService.guardar(tarea, sesionBean.getUsuarioSesion());				
+				
 				obsExp.setTareaExpdte(tarea);
 				observacionesExpedientesService.guardar(obsExp);				
 								
@@ -824,32 +913,18 @@ public class DatosExpedientesTareasBean extends BaseBean implements Serializable
 				Expedientes exp = expedientesService.obtener(tarea.getExpediente().getId());
 				exp.getValorSituacionExpediente().getCodigo();
 				tarea.setExpediente(exp);
+				
 				//-------
 								
 				PrimeFaces.current().ajax().addCallbackParam(CALLBACK_PARAM_SAVED, true);
 				
 				if(esAlta) {
-					//Si ha cambiado el responsable tengo que recargar e informar al usuario
-					if(Boolean.TRUE.equals(cfgTareaSeleccionada.getCambioAutomaticoTramite()) && tarea.getCambiaResponsable()) {
-						//El cambio automático actualiza también la botonera (botonesFYN)
-						TramiteExpediente tram = tarea.getTramiteExpediente();
-						PrimeFaces.current().executeScript("recargar_responsable_tramite_" + tram.getId() + "()");
-							facesMsgInfo("El responsable del trámite '" + tram.getDescripcion()
-									+ "' ha pasado a ser '" + tram.getResponsable().getDescripcion() + "'.");
-					} else //Si no hay cambio tenemos que mirar al menos el tipo de tarea
-						if(tarea.getEsTareaTipo(Constantes.COD_TIP_TAR_TRAM_FYN)) {
-						TramiteExpediente tram = tarea.getTramiteExpediente();
-						PrimeFaces.current().ajax().update(Constantes.JSFID_PESTANAS_EXP + ":botonesFYN_" + tram.getId());
-					}
-					
-					for(TareasExpediente tCierre : selectedTareasCierreAuto) {
-						tareasExpedienteService.cerrarTareaInmediatamente(tCierre, sesionBean.getUsuarioSesion());
-					}
-					
+					accionesGuardarAlta();
 				}
 				
-				final String msg = getMessage("tarea") + " " + getMessage("guardada.correctamente");
 				PrimeFaces.current().ajax().addCallbackParam(CALLBACK_PARAM_SAVED, true);
+				
+				final String msg = getMessage("tarea") + " " + getMessage("guardada.correctamente");
 				FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "", msg);
 				FacesContext.getCurrentInstance().addMessage(MENSAJESFORMULARIO, message);
 			}
@@ -858,9 +933,101 @@ public class DatosExpedientesTareasBean extends BaseBean implements Serializable
 				PrimeFaces.current().dialog().showMessageDynamic(message);
 		} catch (BaseException e) {
 			facesMsgErrorKey(CLAVE_ERROR_GENERICO);
-			e.printStackTrace();
 		}
 		
+	}
+	
+	private void accionesGuardarAlta() throws BaseException {
+		//Si ha cambiado el responsable tengo que recargar e informar al usuario
+		if(Boolean.TRUE.equals(cfgTareaSeleccionada.getCambioAutomaticoTramite()) && tarea.getCambiaResponsable()) {
+			//El cambio automático actualiza también la botonera (botones FYN, REVT, etc.)
+			TramiteExpediente tram = tarea.getTramiteExpediente();
+			PrimeFaces.current().executeScript("recargar_responsable_tramite_" + tram.getId() + "()");
+				facesMsgInfo("El responsable del trámite '" + tram.getDescripcion()
+						+ "' ha pasado a ser '" + tram.getResponsable().getDescripcion() + "'.");
+		}
+		
+		boolean tareaCerradaREV = false;
+		for(TareasExpediente tCierre : selectedTareasCierreAuto) {
+			tareaCerradaREV |= tareasExpedienteService.esTareaTipo(tCierre.getId(), Constantes.COD_TIP_TAR_DOC_REV);
+			tareasExpedienteService.cerrarTareaInmediatamente(tCierre, sesionBean.getUsuarioSesion());
+			resetDatosExisteTarea(tCierre);
+		}
+		
+		//Este reseteo actualiza las botoneras de tipo tarea (REVT, FYN, etc.)
+		resetDatosExisteTarea(tarea);
+		
+		//Si he cerrado una tarea REV o la tarea que estoy dando de alta es REV tengo que actualizar los docs.
+		if(tarea.getEsTareaTipo(Constantes.COD_TIP_TAR_DOC_REV) || tareaCerradaREV) {
+			PrimeFaces.current().ajax().addCallbackParam(Constantes.CALLB_PARAM_ACT_DOC, true);
+		}		
+	}
+	
+	//************************************************
+	
+	public void resetDatosExisteTarea(TareasExpediente tar) {
+		final String codTipoTarea = tar.getValorTipoTarea().getCodigo();
+		
+		switch(codTipoTarea) {
+		case Constantes.COD_TIP_TAR_TRAM_REVT: 
+			resetExisteTareaREVT(tar);	break;
+		case Constantes.COD_TIP_TAR_TRAM_FYN: 
+			resetExisteTareaFYN(tar);	break;
+		default:
+		}
+		
+		updateBotonesTipoTareaTram(tar);
+	}	
+	
+	//---------------
+	
+	private void updateBotonesTipoTareaTram(TareasExpediente tarea) {
+		final String codTipoTarea = tarea.getValorTipoTarea().getCodigo();
+		
+		if(Constantes.COD_TIP_TAR_TRAM_REVT.equals(codTipoTarea)
+			|| Constantes.COD_TIP_TAR_TRAM_FYN.equals(codTipoTarea)) {
+			TramiteExpediente tram = tarea.getTramiteExpediente();
+			if(tram != null) {
+				this.pfUpdate(Constantes.JSFID_PESTANAS_EXP, "botones" + codTipoTarea + "_" + tram.getId());
+			}
+		}
+	}
+
+	//--------------
+	
+	public boolean existeTareaREVTTramite(TramiteExpediente tram) {
+		Boolean existe = tram.getExisteTareaREVT();
+		
+		if(null == existe) {
+			existe = this.tareasExpedienteService.existeTareaPendienteTramite(tram.getId(), Constantes.COD_TIP_TAR_TRAM_REVT);
+			tram.setExisteTareaREVT(existe);
+		}
+		
+		return existe;
+	}
+
+	private void resetExisteTareaREVT(TareasExpediente tar) {
+		Long idTram = tar.getTramiteExpediente().getId();
+		var tramBean = FacesUtils.getVar(DatosTramiteExpedienteBean.class);
+		tramBean.resetExisteTareaREVT(idTram);
+	}
+	
+	//--------------
+	
+	public boolean existeTareaFYNTramite(TramiteExpediente tram) {
+		Boolean existe = tram.getExisteTareaFYN();
+		
+		if(null == existe) {
+			existe = this.tareasExpedienteService.existeTareaPendienteTramite(tram.getId(), Constantes.COD_TIP_TAR_TRAM_FYN);
+			tram.setExisteTareaFYN(existe);
+		}
+		return existe;
+	}
+	
+	private void resetExisteTareaFYN(TareasExpediente tar) {
+		Long idTram = tar.getTramiteExpediente().getId();
+		var tramBean = FacesUtils.getVar(DatosTramiteExpedienteBean.class);
+		tramBean.resetExisteTareaFYN(idTram);
 	}
 	
 	//**********************************************
@@ -868,10 +1035,6 @@ public class DatosExpedientesTareasBean extends BaseBean implements Serializable
 	public void onRowSelect(final SelectEvent<TareasExpediente> event) {
 		plegado = false;						
 		tareaExpedienteSeleccionado = event.getObject();
-	}	
-
-	public boolean existeTareaFYNTramite(Long idTram) {
-		return this.tareasExpedienteService.existeTareaFYNPendienteTramite(idTram);
 	}
 	
 }

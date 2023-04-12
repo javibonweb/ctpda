@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -24,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import es.juntadeandalucia.ctpda.gestionpdt.model.AgrupacionesExpedientes;
+import es.juntadeandalucia.ctpda.gestionpdt.model.ArtTipExpdte;
 import es.juntadeandalucia.ctpda.gestionpdt.model.ArticuloAfectadoResolucion;
 import es.juntadeandalucia.ctpda.gestionpdt.model.ArticulosAfectadosExpedientes;
 import es.juntadeandalucia.ctpda.gestionpdt.model.CfgAutoSituacion;
@@ -41,6 +43,7 @@ import es.juntadeandalucia.ctpda.gestionpdt.model.DocumentoResolucion;
 import es.juntadeandalucia.ctpda.gestionpdt.model.DocumentosExpedientes;
 import es.juntadeandalucia.ctpda.gestionpdt.model.DocumentosExpedientesTramites;
 import es.juntadeandalucia.ctpda.gestionpdt.model.Expedientes;
+import es.juntadeandalucia.ctpda.gestionpdt.model.ExpedientesConceptos;
 import es.juntadeandalucia.ctpda.gestionpdt.model.ExpedientesRelacion;
 import es.juntadeandalucia.ctpda.gestionpdt.model.FirmasTramiteMaestra;
 import es.juntadeandalucia.ctpda.gestionpdt.model.NotificacionesTramiteMaestra;
@@ -63,6 +66,7 @@ import es.juntadeandalucia.ctpda.gestionpdt.model.Usuario;
 import es.juntadeandalucia.ctpda.gestionpdt.model.ValoresDominio;
 import es.juntadeandalucia.ctpda.gestionpdt.model.enums.Origenes;
 import es.juntadeandalucia.ctpda.gestionpdt.service.AgrupacionesExpedientesService;
+import es.juntadeandalucia.ctpda.gestionpdt.service.ArtTipExpdteService;
 import es.juntadeandalucia.ctpda.gestionpdt.service.ArticuloAfectadoResolucionService;
 import es.juntadeandalucia.ctpda.gestionpdt.service.ArticulosAfectadosExpedientesService;
 import es.juntadeandalucia.ctpda.gestionpdt.service.CfgAutoSituacionService;
@@ -79,6 +83,7 @@ import es.juntadeandalucia.ctpda.gestionpdt.service.DetalleExpdteTramService;
 import es.juntadeandalucia.ctpda.gestionpdt.service.DocumentoResolucionService;
 import es.juntadeandalucia.ctpda.gestionpdt.service.DocumentosExpedientesService;
 import es.juntadeandalucia.ctpda.gestionpdt.service.DocumentosExpedientesTramitesService;
+import es.juntadeandalucia.ctpda.gestionpdt.service.ExpedientesConceptosService;
 import es.juntadeandalucia.ctpda.gestionpdt.service.ExpedientesRelacionService;
 import es.juntadeandalucia.ctpda.gestionpdt.service.ExpedientesService;
 import es.juntadeandalucia.ctpda.gestionpdt.service.FirmasTramiteMaestraService;
@@ -202,6 +207,10 @@ public class DatosTramiteExpedienteBean extends BaseBean implements Serializable
 	private static final String FINALIZARCOMPORTAMIENTO14CAMPO = "finalizar.comportamientoc14.elcampo";
 	private static final String FINALIZARCOMPORTAMIENTO14VALOR = "finalizar.comportamientoc14.tener.valor";
 	private static final String CERRARTAREAS = "cerrar.tareas";
+	private static final String CERRARTRAMITEAVISO = "cerrar.tramite.aviso";
+	private static final String ABRIRREQINF = "abrir.req.inf";
+	
+	
 	
 	private static final long serialVersionUID = 1L;
 
@@ -416,6 +425,15 @@ public class DatosTramiteExpedienteBean extends BaseBean implements Serializable
 
 	@Getter
 	@Setter
+	private Boolean permisoNewTareaRev;
+
+	@Getter
+	@Setter
+	private Boolean permisoNewTareaFYN;
+
+	
+	@Getter
+	@Setter
 	private Boolean permisoNewExpPlazoDet;
 
 	@Getter
@@ -441,6 +459,9 @@ public class DatosTramiteExpedienteBean extends BaseBean implements Serializable
 
 	@Autowired
 	private AgrupacionesExpedientesService agrupacionesExpedientesService;
+	
+	@Autowired
+	private ArtTipExpdteService artTipExpdteService;
 
 	@Getter
 	@Setter
@@ -570,6 +591,9 @@ public class DatosTramiteExpedienteBean extends BaseBean implements Serializable
 
 	@Autowired
 	private ResponsablesTramitacionService responsablesTramitacionService;
+	
+	@Autowired
+	private ExpedientesConceptosService expedientesConceptosService;
 
 	@Getter
 	@Setter
@@ -640,6 +664,31 @@ public class DatosTramiteExpedienteBean extends BaseBean implements Serializable
 	@Autowired
 	private SesionBean sesionBean;
 	
+	@Getter
+	@Setter
+	private Boolean permisoNewAltaMasivaSubtramites;
+	
+	@Getter
+	@Setter
+	private Long selectedSubtramiteMasivoId;
+	
+	@Getter
+	@Setter
+	private List<CfgExpedienteSubtramite> listaSubtratramitesMasivos;
+	
+	@Getter
+	@Setter
+	private Date fechaInicioSubtramiteMasivo;
+	
+	@Getter
+	@Setter
+	private Long selectedResponsablesSubtramiteMasivoId;
+	
+	@Getter
+	@Setter
+	private int numeroOcurrenciasCrear;
+	
+	
 	@Override
 	@PostConstruct
 	public void init() {
@@ -657,10 +706,12 @@ public class DatosTramiteExpedienteBean extends BaseBean implements Serializable
 
 		permisoNewExpAct = listaCodigoPermisos.contains(Constantes.PERMISO_NEW_EXPACT);
 		permisoNewExpTareaDet = listaCodigoPermisos.contains(Constantes.PERMISO_NEW_EXPTAREADET);
+		permisoNewTareaRev = listaCodigoPermisos.contains(Constantes.PERMISO_NEW_TAREAREV);
+		permisoNewTareaFYN = listaCodigoPermisos.contains(Constantes.PERMISO_NEW_TAREAFYN);
 		permisoNewExpPlazoDet = listaCodigoPermisos.contains(Constantes.PERMISO_NEW_EXPPLAZODET);
 		permisoNewExpFinTram = listaCodigoPermisos.contains(Constantes.PERMISO_NEW_EXPFINTRAM);
 		permisoDesacExpTram = listaCodigoPermisos.contains(Constantes.PERMISO_DESAC_EXPTRAM);
-		
+		permisoNewAltaMasivaSubtramites = listaCodigoPermisos.contains(Constantes.PERMISO_NEW_ALTAMASIVASUBTR);
 		permisoRehabTramite = listaCodigoPermisos.contains(Constantes.PERMISO_REHAB_TRAMITE);
 
 		cargarExpediente();
@@ -819,6 +870,7 @@ public class DatosTramiteExpedienteBean extends BaseBean implements Serializable
 				tE.setTieneListaSubTramites(noTieneListaSub);
 				
 				actualizarVisibilidadListadoNotificaciones(tE);
+				
 				actualizarVisibilidadListadoFirmas(tE);
 				
 				actualizarVisibilidadInstruccionesTramite(tE);
@@ -871,6 +923,9 @@ public class DatosTramiteExpedienteBean extends BaseBean implements Serializable
 
 				this.listaTramTramitesExp.add(tE);
 			}
+			
+			//Cada vez que consulte los trámites conviene limpiar los campos cacheados
+			resetDatosExisteTarea();
 		}
 
 		PrimeFaces.current().ajax().update(FORMFORMULARIOEXPEDIENTES);
@@ -900,6 +955,7 @@ public class DatosTramiteExpedienteBean extends BaseBean implements Serializable
 			tramExp.setMostrarListadoNotificaciones(true);	
 		}
 	}
+
 	
 	private void actualizarVisibilidadListadoFirmas(TramiteExpediente tramExp)
 	{
@@ -989,6 +1045,7 @@ public class DatosTramiteExpedienteBean extends BaseBean implements Serializable
 				|| Constantes.C010.equals(comp)
 				|| Constantes.C012.equals(comp)
 				|| Constantes.C024.equals(comp)
+				|| Constantes.C025.equals(comp)
 				|| (Constantes.C011.equals(comp) && tE.getTramiteExpedienteSup() == null) 
 				|| (Constantes.C014.equals(comp) && tE.getTramiteExpedienteSup() == null) 
 				|| Constantes.C013.equals(comp)
@@ -999,7 +1056,7 @@ public class DatosTramiteExpedienteBean extends BaseBean implements Serializable
 				|| Constantes.C023.equals(comp)
 				|| (Constantes.C017.equals(comp) && tE.getTramiteExpedienteSup() == null)  ){			
 			// Cargar datos interesado y tipo interesado					
-			if(!Constantes.C010.equals(comp) && !Constantes.C012.equals(comp) && !Constantes.C024.equals(comp)){
+			if(!Constantes.C010.equals(comp) && !Constantes.C012.equals(comp) && !Constantes.C024.equals(comp) && !Constantes.C025.equals(comp)){
 				tE.setListaValoresDominioTipoInteresado(valoresDominioService.findValoresDominioActivosByCodigoDominio(ValoresDominioService.COD_TIP_INT));
 			}	
 			
@@ -1152,8 +1209,9 @@ public class DatosTramiteExpedienteBean extends BaseBean implements Serializable
 			cargarDatosDetalleTramExp011(trExp);
 			
 		}else if(Constantes.C012.equals(trExp.getTipoTramite().getComportamiento())
-				|| Constantes.C024.equals(trExp.getTipoTramite().getComportamiento())) {
-			cargarDatosDetalleTramExp012024(trExp);
+				|| Constantes.C024.equals(trExp.getTipoTramite().getComportamiento())
+				|| Constantes.C025.equals(trExp.getTipoTramite().getComportamiento())) {
+			cargarDatosDetalleTramExp012024025(trExp);
 		}
 	}
 	
@@ -1172,20 +1230,23 @@ public class DatosTramiteExpedienteBean extends BaseBean implements Serializable
 		}
 	}
 	
-	private void cargarDatosDetalleTramExp012024 (TramiteExpediente trExp) {
+	private void cargarDatosDetalleTramExp012024025 (TramiteExpediente trExp) {
 		if((detalleExpdteTram.getValorSentidoResolucion() != null)){
 			trExp.setSelectedNuevoSentidoResolucionId(detalleExpdteTram.getValorSentidoResolucion().getId());	
 		}
 		
-		if((detalleExpdteTram.getValorTipoResolucion() != null)){
-			trExp.setSelectedNuevoTipoResolucionId(detalleExpdteTram.getValorTipoResolucion().getId());	
+		if(!Constantes.C025.equals(trExp.getTipoTramite().getCodigo())){
+			if((detalleExpdteTram.getValorTipoResolucion() != null)){
+				trExp.setSelectedNuevoTipoResolucionId(detalleExpdteTram.getValorTipoResolucion().getId());	
+			}
+			trExp.setMostrarBotoneraResolucion(detalleExpdteTram.getFechaResolucion() == null && detalleExpdteTram.getValorSentidoResolucion() != null && detalleExpdteTram.getNumResolucion() == null);
+			trExp.setHabilitarVerResol(detalleExpdteTram.getNumResolucion() != null && !detalleExpdteTram.getNumResolucion().isEmpty());	
+			trExp.setMostrarCamposResol(detalleExpdteTram.getNumResolucion() != null && !detalleExpdteTram.getNumResolucion().isEmpty());
+			trExp.setHabilitarAsocResol(detalleExpdteTram.getNumResolucion() == null || detalleExpdteTram.getNumResolucion().isEmpty());
+			
+			calculaMensajeConfirmacion(trExp);
 		}
-		trExp.setMostrarBotoneraResolucion(detalleExpdteTram.getFechaResolucion() != null && detalleExpdteTram.getValorSentidoResolucion() != null && detalleExpdteTram.getNumResolucion() == null);
-		trExp.setHabilitarVerResol(detalleExpdteTram.getNumResolucion() != null && !detalleExpdteTram.getNumResolucion().isEmpty());	
-		trExp.setMostrarCamposResol(detalleExpdteTram.getNumResolucion() != null && !detalleExpdteTram.getNumResolucion().isEmpty());
-		trExp.setHabilitarAsocResol(detalleExpdteTram.getNumResolucion() == null || detalleExpdteTram.getNumResolucion().isEmpty());
-		
-		calculaMensajeConfirmacion(trExp);
+				
 	}
 	
 	private void cargarDatosDetalleTramExp011 (TramiteExpediente trExp) {
@@ -1398,14 +1459,24 @@ public class DatosTramiteExpedienteBean extends BaseBean implements Serializable
 
 	}
 	
+	//*****************************
+	
+	private Boolean hayTramiteSinEventos;
+	
 	public boolean hayTramite() {
-		expedientes = (Expedientes) JsfUtils.getSessionAttribute(EXPEDIENTEFORMULARIO);
-		if (expedientes.getId() == null) {
-			expedientes = (Expedientes) JsfUtils.getSessionAttribute(EXPEDIENTE);
+		if(hayTramiteSinEventos == null) {
+			expedientes = (Expedientes) JsfUtils.getSessionAttribute(EXPEDIENTEFORMULARIO);
+			if (expedientes.getId() == null) {
+				expedientes = (Expedientes) JsfUtils.getSessionAttribute(EXPEDIENTE);
+			}
+			
+			hayTramiteSinEventos = cfgExpedienteTramiteService.existeTramitessinEventosByTipExpSitExp(expedientes.getValorTipoExpediente().getId(),expedientes.getValorSituacionExpediente().getId());
 		}
 		
-		return cfgExpedienteTramiteService.existeTramitessinEventosByTipExpSitExp(expedientes.getValorTipoExpediente().getId(),expedientes.getValorSituacionExpediente().getId());
+		return hayTramiteSinEventos;
 	}
+	
+	//******************************
 	
 	public boolean vistaEspecialEntradas() {
 		
@@ -1442,18 +1513,24 @@ public String literalBotonFinalizar() {
 		return literalBoton;
 	}
 	
-	
+	//************************
+
+	private Boolean hayEventoDeExp;
 	
 	public boolean hayEvento() {
-		expedientes = (Expedientes) JsfUtils.getSessionAttribute(EXPEDIENTEFORMULARIO);
-		if (expedientes.getId() == null) {
-			expedientes = (Expedientes) JsfUtils.getSessionAttribute(EXPEDIENTE);
+		if(hayEventoDeExp == null) {
+			expedientes = (Expedientes) JsfUtils.getSessionAttribute(EXPEDIENTEFORMULARIO);
+			if (expedientes.getId() == null) {
+				expedientes = (Expedientes) JsfUtils.getSessionAttribute(EXPEDIENTE);
+			}
+			
+			hayEventoDeExp = cfgExpedienteTramiteService.existeEventosByTipExpSitExp(expedientes.getValorTipoExpediente().getId(),expedientes.getValorSituacionExpediente().getId());
 		}
 		
-		return cfgExpedienteTramiteService.existeEventosByTipExpSitExp(expedientes.getValorTipoExpediente().getId(),expedientes.getValorSituacionExpediente().getId());
+		return hayEventoDeExp;
 	}
 
-	
+	//***********************
 
 	public void iniciarTramite(String tramite) {
 		this.selectedNuevoResponsableTramId=null;
@@ -1482,18 +1559,18 @@ public String literalBotonFinalizar() {
 			} else {
 				if (tramite.equals(EVENTO)) {
 				
-				listaTramites = cfgExpedienteTramiteService.findExpEventosByTipExpSitExp(expedientes.getValorTipoExpediente().getId(),expedientes.getValorSituacionExpediente().getId());
+				listaTramites = cfgExpedienteTramiteService.findExpEventosByTipExpSitExpOrden(expedientes.getValorTipoExpediente().getId(),expedientes.getValorSituacionExpediente().getId());
 
 				} else {
 
 					if (tramite.equals(SINEVENTO)) {
 						
-						listaTramites = cfgExpedienteTramiteService.findExpTramitessinEventosByTipExpSitExp(expedientes.getValorTipoExpediente().getId(),expedientes.getValorSituacionExpediente().getId());
+						listaTramites = cfgExpedienteTramiteService.findExpTramitessinEventosByTipExpSitExpOrden(expedientes.getValorTipoExpediente().getId(),expedientes.getValorSituacionExpediente().getId());
 
 						} else {
 
 					
-					listaTramites = cfgExpedienteTramiteService.findExpTramitesByTipExpSitExp(expedientes.getValorTipoExpediente().getId(),expedientes.getValorSituacionExpediente().getId());
+					listaTramites = cfgExpedienteTramiteService.findExpTramitesByTipExpSitExpOrden(expedientes.getValorTipoExpediente().getId(),expedientes.getValorSituacionExpediente().getId());
 						}
 				}
 			}
@@ -1536,7 +1613,7 @@ public String literalBotonFinalizar() {
 		}		
 	}
 
-	public String altaTramite(String tramite, String origenAltaTramite, CfgExpedienteTramite cfgExpedienteTramite) {
+	public String altaTramite(String tramite, String origenAltaTramite, CfgExpedienteTramite cfgExpedienteTramite, int numeroAltas) {
 		expedientes = (Expedientes) JsfUtils.getSessionAttribute(EXPEDIENTEFORMULARIO);
 		if (expedientes.getId() == null) {
 			expedientes = (Expedientes) JsfUtils.getSessionAttribute(EXPEDIENTE);
@@ -1549,9 +1626,83 @@ public String literalBotonFinalizar() {
 		} else if (tramite.equals(ACTIVIDAD)) {
 
 			altaSubTramite();
+			
+		} else if (tramite.equals("altaMasiva")) {
+			altaMasivaSubtramites(numeroAltas);
 		}
 
 		return "";
+	}
+	
+	private String altaMasivaSubtramites (int numeroAltas) {
+		if (selectedSubtramiteMasivoId == null || fechaInicioSubtramiteMasivo == null || selectedResponsablesSubtramiteMasivoId == null) {					
+			FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "",mensajesProperties.getString(CAMPOSOBLIGATORIOS));
+			PrimeFaces.current().dialog().showMessageDynamic(message);
+			return "";
+			
+		}else {
+			for(int i = 0; i < numeroAltas; i++) {
+				try {					
+					TramiteExpediente subTramExp = new TramiteExpediente();
+					cfgExpSubTramite = cfgExpedienteSubTramiteService.obtener(selectedSubtramiteMasivoId);
+					subTramExp.setExpediente(expedientes);
+					subTramExp.setTipoTramite(cfgExpSubTramite.getTipoTramite());
+					subTramExp.setNivel(this.tramiteExpediente.getNivel() + 1);
+					subTramExp.setTramiteExpedienteSup(this.tramiteExpediente);
+					subTramExp.setDescripcion(cfgExpSubTramite.getDescripcion());
+					subTramExp.setDescripcionAbrev(cfgExpSubTramite.getDescripcionAbrev());
+					subTramExp.setFechaIni(this.fechaInicioSubtramiteMasivo);
+					subTramExp.setResponsable(responsablesTramitacionService.obtener(this.selectedResponsablesSubtramiteMasivoId));
+					subTramExp.setFinalizado(false);
+					subTramExp.setActivo(true);	
+					Usuario usuario = (Usuario)JsfUtils.getSessionAttribute(Constantes.USUARIO);
+					subTramExp.setUsuarioTramitador(usuario);
+					
+					ObservacionesExpedientes obsExp = null;
+					obsExp = observacionesExpedientesService.guardarObservacionesExpedientes(null,null, Constantes.COD_VAL_DOM_TIPOBS_TRA, expedientes);
+
+					subTramExp.setObservaciones(obsExp);				
+					subTramExp = tramiteExpedienteService.altaTramite(usuario, subTramExp);
+					obsExp.setTramiteExpdte(subTramExp);
+					observacionesExpedientesService.guardar(obsExp);					
+					expedientes = utilsComun.expedienteUltimaModificacion(expedientes, subTramExp.getFechaModificacion(),subTramExp.getFechaCreacion(), subTramExp.getUsuModificacion(), subTramExp.getUsuCreacion());
+
+					/** ALTA DETALLE TRAMITE EXPEDIENTE SEGUN COMPORTAMIENTO */
+					DetalleExpdteTram detExpTram = new DetalleExpdteTram();
+					detExpTram.setActivo(true);
+					detExpTram.setExpediente(expedientes);
+					detExpTram.setTramiteExpediente(subTramExp);					
+					detExpTram.setExtractoExpediente(false);
+					detExpTram.setAntecedentesExpediente(false);					
+					if (Constantes.C003.equals(subTramExp.getTipoTramite().getComportamiento())) {
+						detExpTram.setValorTipoInteresado(null);
+						detExpTram.setValorDominioInteresado(null);
+						detExpTram.setValorResultadoNotificacion(valoresDominioService.findValoresDominioByCodigoDomCodValDom(Constantes.COD_RES_NOTIF,Constantes.COD_VAL_DOM_PDTE));
+						detExpTram.setValorTipoPlazo(valoresDominioService.findValoresDominioByCodigoDomCodValDom(Constantes.COD_TIP_PLA_TEMP,Constantes.COD_VAL_DOM_DN));
+					}					
+					if(Constantes.C016.equals(subTramExp.getTipoTramite().getComportamiento())) {
+						detExpTram.setFechaEnvio(FechaUtils.hoy());
+					}
+					detExpTram = detalleExpdteTramService.guardar(detExpTram);
+					expedientes = utilsComun.expedienteUltimaModificacion(expedientes, detExpTram.getFechaModificacion(),detExpTram.getFechaCreacion(), detExpTram.getUsuModificacion(), detExpTram.getUsuCreacion());
+
+					inicializarCampos();					
+					aplicarSituacionAdicional(subTramExp, subTramExp.getDetalleExpdteTram());
+					datosEvolucionExpedienteBean.onChangeListaTipoTramite();
+					datosExpedientesBean.actualizarCabecera(expedientes, null, null, null);
+					
+				} catch (BaseException e) {
+					FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "",mensajesProperties.getString(MENSAJEERROR));
+					PrimeFaces.current().dialog().showMessageDynamic(message);
+					log.error(e.getMessage());
+				}
+			}
+			
+			FacesContext.getCurrentInstance().addMessage(MENSAJESFORMULARIO,new FacesMessage(FacesMessage.SEVERITY_INFO, "",SUBTRAMITEMSJ + " " + mensajesProperties.getString(GUARDADOCORRECTAMENTE)));
+			PrimeFaces.current().ajax().update(FORMFORMULARIOEXPEDIENTES);
+		}
+		
+		return "";		
 	}
 
 	public String altaSubTramite() {
@@ -1726,6 +1877,7 @@ public String literalBotonFinalizar() {
 				detExpTram.setExtractoExpediente(false);
 				detExpTram.setAntecedentesExpediente(false);
 				detExpTram.setImposicionMedidas(false);
+				detExpTram.setInfoRemitida(false);
 				this.establecerTipoInteresadoDetalleTramExp(tramExp, detExpTram);
 				guardarDetalleTramiteExpInteresado(tramExp, detExpTram);
 				
@@ -1736,14 +1888,16 @@ public String literalBotonFinalizar() {
 				detExpTramComportamientoC005(detExpTram);
 				detExpTramComportamientoC007(detExpTram);
 				detExpTramComportamientoC009(detExpTram);
-				detExpTramComportamientoC012024(detExpTram,tramExp);
+				detExpTramComportamientoC012024025(detExpTram,tramExp);
 				detExpTramComportamientoC013(detExpTram);
 				detExpTramComportamientoC014(detExpTram);
 				detExpTramComportamientoC017(detExpTram);
 				detExpTramComportamientoC008(detExpTram,tramExp);
 				detExpTram = detalleExpdteTramService.guardar(detExpTram);
 				expedientes = utilsComun.expedienteUltimaModificacion(expedientes,detExpTram.getFechaModificacion(),detExpTram.getFechaCreacion(),detExpTram.getUsuModificacion(),detExpTram.getUsuCreacion());
-								
+				
+				revisarArticulosTipificadosExpdte(tramExp);
+				
 				inicializarCampos();
 			} catch (BaseException e) {
 				FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "",mensajesProperties.getString(MENSAJEERROR));
@@ -1770,12 +1924,53 @@ public String literalBotonFinalizar() {
 		return "";
 	}
 	
+	public void revisarArticulosTipificadosExpdte(TramiteExpediente tramExp) throws BaseException
+	{	/** PARA EL COMPORTAMIENTO C025, DEBEMOS CONSULTAR EL ULTIMO TRAMITE ASOCIADO AL EXPEDIENTE QUE TENGA 
+	 		DATOS REGISTRADOS DE ARTICULOS TIPIFICADOS Y COPIARLOS PARA ESTE TRÁMTE SI ES QUE EXISTEN. **/
+		if(Constantes.C025.equals(tramExp.getTipoTramite().getComportamiento())
+				|| Constantes.C012.equals(tramExp.getTipoTramite().getComportamiento())
+				|| Constantes.C014.equals(tramExp.getTipoTramite().getComportamiento())){
+			Long idTramMaxArtTip = tramiteExpedienteService.findIdMaxTramActivoConArtTipByExp(expedientes.getId());
+			copiarArtTipExpdte(expedientes, tramExp, idTramMaxArtTip);
+		}
+	}
+	
+	public void copiarArtTipExpdte(Expedientes exp, TramiteExpediente tramExpNuevo, Long idTramOrigen) throws BaseException
+	{
+		if(idTramOrigen!= null)
+		{
+			List<ArtTipExpdte> listaArtTipExpdte = artTipExpdteService.findArtTipExpByIdTramIdExp(expedientes.getId(),idTramOrigen);
+			
+			if(listaArtTipExpdte != null && !listaArtTipExpdte.isEmpty())
+			{
+				for(ArtTipExpdte artTipExpdte: listaArtTipExpdte) {
+					
+					ArtTipExpdte artTipExpdteNuevo = new ArtTipExpdte();
+					artTipExpdteNuevo.setAclaracion(artTipExpdte.getAclaracion());
+					artTipExpdteNuevo.setActivo(artTipExpdte.getActivo());
+					artTipExpdteNuevo.setExpediente(exp);
+					artTipExpdteNuevo.setFechaCreacion(FechaUtils.hoy());
+					artTipExpdteNuevo.setTramiteExpediente(tramExpNuevo);
+					Usuario usuario = (Usuario)JsfUtils.getSessionAttribute(Constantes.USUARIO);
+					artTipExpdteNuevo.setUsuCreacion(usuario.getLogin());
+					artTipExpdteNuevo.setValorArticuloInfringido(artTipExpdte.getValorArticuloInfringido());
+					artTipExpdteNuevo.setValorGravedad(artTipExpdte.getValorGravedad());
+					artTipExpdteNuevo.setValorTipificacion(artTipExpdte.getValorTipificacion());
+					
+					artTipExpdteService.guardar(artTipExpdteNuevo);
+					
+				}					
+			}
+		}
+	}
+				
+				
+				
 	public String guardarTramite(TramiteExpediente tramExpediente) {
 		boolean guardadoOk = false;
 		
-		aplicarDetalleTramite(tramExpediente, tramExpediente.getDetalleExpdteTram());
+		aplicarDetalleTramite(tramExpediente, tramExpediente.getDetalleExpdteTram(), false);
 		
-		aplicarFechaTramiteInfoRelevante(tramExpediente, tramExpediente.getDetalleExpdteTram());
 		aplicarSituacionAdicional(tramExpediente, tramExpediente.getDetalleExpdteTram());
 		boolean descCambiada = tramExpediente.cambiaDescripcion();
 		
@@ -1799,7 +1994,7 @@ public String literalBotonFinalizar() {
 
 		if(guardadoOk) {
 			if(descCambiada) {
-				PrimeFaces.current().ajax().addCallbackParam("refrescarDocs", true);
+				PrimeFaces.current().ajax().addCallbackParam(Constantes.CALLB_PARAM_ACT_DOC, true);
 			}
 			
 			if(mostrarMsgCambioResp) {
@@ -1816,63 +2011,6 @@ public String literalBotonFinalizar() {
 		return "";
 	}
 
-	/** METODO QUE GUARDA LA FECHA DE ENTRADA DE LOS TRAMIES ASI COMO INFORMACIÓN RELEVANTE DEL PROPIO TRAMITE.
-	 * EN FUNCION DEL COMPORTAMIENTO O DEL CODIGO DEL TRÁMITE, GUARDAREMOS UNOS DATOS U OTROS. **/
-	public void aplicarFechaTramiteInfoRelevante(TramiteExpediente traExp, DetalleExpdteTram detExpTram)
-	{
-		String comportamiento = traExp.getTipoTramite().getComportamiento();
-		String codTipoTram = traExp.getTipoTramite().getCodigo();
-		
-		/** COMPORTAMIENTO TRAMITE: 
-		 *  - C001: ENTRADA DOCUMENTO, PRESENTACIÓN DE ALEGACIONES y ENTRADA DOCUMENTO NO SOLICITADO.
-		 *  - C005: INICIO EXPEDIENTE. **/
-		if (Constantes.C001.equals(comportamiento) || Constantes.C005.equals(comportamiento)
-				|| Constantes.C023.equals(comportamiento)) {
-			traExp.setFechaTramite(detExpTram.getFechaEntrada());
-			ValoresDominio valDomCanalEntrada = detExpTram.getValorCanalEntrada();
-			
-			if(valDomCanalEntrada != null)
-			{
-				traExp.setInformacionRelevante(valDomCanalEntrada.getAbreviatura());
-			}
-		}
-		
-		/** CODIGO TRAMITE: 
-		 * - FIRM: FIRMA DOCUMENTO.
-		 * - RESOL: RESOLUCIÓN. **/
-		if(Constantes.TIP_TRAM_FIRM.equals(codTipoTram))
-		{
-			traExp.setFechaTramite(detExpTram.getFechaFirma());
-		}
-		
-		if(Constantes.TIP_TRAM_RESOL.equals(codTipoTram))
-		{
-			traExp.setFechaTramite(detExpTram.getFechaResolucion());		
-			traExp.setInformacionRelevante(detExpTram.getNumResolucion());
-		}
-		
-		if (Constantes.C008.equals(comportamiento))
-		{
-			if (!traExp.getTipoTramite().getCodigo().equals(Constantes.TIP_TRAM_ACADMHE)) {
-				
-				traExp.setFechaTramite(detExpTram.getFechaInforme());
-			}
-			String txtInf = null;
-			if (detExpTram.getValorTipoAdmision() != null) {
-				txtInf = valoresDominioService.findValorDominioById(detExpTram.getValorTipoAdmision().getId()).getDescripcion();
-			}
-			
-			
-			if (detExpTram.getValorMotivoInadmision() != null) {
-				txtInf =  txtInf + " " +  valoresDominioService.findValorDominioById(detExpTram.getValorMotivoInadmision().getId()).getDescripcion();
-			}
-
-
-						
-			traExp.setInformacionRelevante(txtInf);
-		}
-		
-	}
 	
 	/** METODO QUE GUARDA INFORMACIÓN DE LA SITUACIÓN EN LA QUE ESTÁ CADA TRÁMITE O SUBTRÁMITE.
 	 * PARA INTEGRAR A CONTINUACIÓN EN LOS DATOS DEL EXPEDIENTE Y MOSTRARLO EN PANTALLA. **/
@@ -1906,15 +2044,11 @@ public String literalBotonFinalizar() {
 		
 		String descAbrev = traExp.getTipoTramite().getDescripcionAbrev();
 		
-		if (detExpTram.getFechaRespuesta() != null) {
+		if (detExpTram.getFechaRespuesta() != null || detExpTram.getFechaAcreditacion() != null || detExpTram.getFechaSubsanacion() != null) {
 			txtSitAdic =descAbrev + " respondido";						
 		}
 		else {
 			
-			if(detExpTram.getValorResultadoNotificacion() != null) {
-				txtSitAdic = descAbrev + " notif " + detExpTram.getValorResultadoNotificacion().getDescripcion();
-				}
-			else {
 				if (detExpTram.getFechaNotificacion() != null) {
 				txtSitAdic = descAbrev + " notificado";}
 				else {
@@ -1923,7 +2057,7 @@ public String literalBotonFinalizar() {
 					}
 					else {txtSitAdic = descAbrev + " sin enviar";}
 				}
-			}
+			
 		}
 		
 		
@@ -1997,6 +2131,11 @@ public String literalBotonFinalizar() {
 			
 			txtSitAdic = sitAdicNot(detExpTram, tramiteSuperior, tipInt);
 		
+		}
+		
+		
+		if  (detExpTram.getAcuseRecibo() != null && detExpTram.getAcuseRecibo().equals(Boolean.FALSE)){
+			txtSitAdic = "";
 		}
 		
 		traExp.setSituacionAdicional(txtSitAdic);
@@ -2385,6 +2524,10 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 			return false;
 		}
 
+		//Se podría afinar detectando si el trámite tiene que ver con tipificaciones
+		var beanTipif = FacesUtils.getVar(DatosArticulosTipificacionesBean.class);
+		beanTipif.resetDatosMostrarListadosTipificaciones();
+
 		/**
 		 * GUARDARMOS EL DETALLE DEL TRAMITE EN FUNCION DEL COMPORTAMIENTO:
 		 */
@@ -2421,6 +2564,9 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 			} else if(Constantes.C008.equals(tramExpediente.getTipoTramite().getComportamiento())) {
 				actualizarAPIEnExpdte(tramExpediente);
 				datosExpedientesBean.actualizarCabecera(expedientes, null, null, null);
+			} else if(Constantes.C020.equals(tramExpediente.getTipoTramite().getComportamiento())) {
+					actualizarAPIEnExpdteINIAPI(tramExpediente);
+					datosExpedientesBean.actualizarCabecera(expedientes, null, null, null);
 			} else if(Constantes.C018.equals(tramExpediente.getTipoTramite().getComportamiento()) || Constantes.C013.equals(tramExpediente.getTipoTramite().getComportamiento())) {
 				actualizarMedidasEnExpdte(tramExpediente);
 				datosExpedientesBean.actualizarCabecera(expedientes, null, null, null);}
@@ -2547,7 +2693,7 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 	}
 	
 	
-	private void aplicarDetalleTramite(TramiteExpediente traExp, DetalleExpdteTram detExpTram) {
+	private void aplicarDetalleTramite(TramiteExpediente traExp, DetalleExpdteTram detExpTram, Boolean opFinalizar) {
 		
 		selectedNuevoResultNotificacion(traExp, detExpTram);
 
@@ -2627,13 +2773,19 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 
 			case Constantes.C012:
 
-				guardarDetalleTramiteExpC012C024(traExp, detExpTram);
+				guardarDetalleTramiteExpC012C024025(traExp, detExpTram, opFinalizar);
 							
 			break;
 
 			case Constantes.C024:
 
-				guardarDetalleTramiteExpC012C024(traExp, detExpTram);
+				guardarDetalleTramiteExpC012C024025(traExp, detExpTram, opFinalizar);
+							
+			break;
+			
+			case Constantes.C025:
+
+				guardarDetalleTramiteExpC012C024025(traExp, detExpTram, opFinalizar);
 							
 			break;
 
@@ -2752,6 +2904,22 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 		}
 	}
 	
+	public void guardarDetalleTramiteExpC012C024025(TramiteExpediente traExp, DetalleExpdteTram detExpTram, Boolean opFinalizar){
+		
+		if(!Constantes.C025.equals(traExp.getTipoTramite().getComportamiento())){
+	
+			guardarDetalleTramiteExpC012C024(traExp, detExpTram);
+
+		}
+		
+		guardarDetalleTramiteExpSentidoResolVinc(traExp, detExpTram);
+
+		
+		if(!Constantes.C025.equals(traExp.getTipoTramite().getComportamiento()) && Boolean.TRUE.equals(opFinalizar)) {
+			actualizarExpedienteConImposicionMedidas(detExpTram,traExp);	
+		}
+	}
+	
 	public void guardarDetalleTramiteExpC012C024(TramiteExpediente traExp, DetalleExpdteTram detExpTram){
 		if(this.numResolVinc != null){
 			detExpTram.setNumResolucion(this.numResolVinc);	
@@ -2769,6 +2937,21 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 			actualizarResolucionConFechaResolucion(detExpTram);
 		}
 		
+		if(this.valorDomTipoResolVinc != null){
+			detExpTram.setValorTipoResolucion(this.valorDomTipoResolVinc);
+		}else {
+			if(traExp.getSelectedNuevoTipoResolucionId() != null){
+				detExpTram.setValorTipoResolucion(valoresDominioService.obtener(traExp.getSelectedNuevoTipoResolucionId()));	
+			}else{
+				detExpTram.setValorTipoResolucion(null);
+			}
+		}	
+	}
+	
+	
+	public void guardarDetalleTramiteExpSentidoResolVinc(TramiteExpediente traExp, DetalleExpdteTram detExpTram){
+		
+		
 		if(this.valorDomSentidoResolVinc != null){
 			detExpTram.setValorSentidoResolucion(this.valorDomSentidoResolVinc);
 		}else{
@@ -2778,18 +2961,6 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 				detExpTram.setValorSentidoResolucion(null);
 			}
 		}
-		
-		if(this.valorDomTipoResolVinc != null){
-			detExpTram.setValorTipoResolucion(this.valorDomTipoResolVinc);
-		}else {
-			if(traExp.getSelectedNuevoTipoResolucionId() != null){
-				detExpTram.setValorTipoResolucion(valoresDominioService.obtener(traExp.getSelectedNuevoTipoResolucionId()));	
-			}else{
-				detExpTram.setValorTipoResolucion(null);
-			}
-		}		
-		
-		actualizarExpedienteConImposicionMedidas(detExpTram,traExp);
 	}
 	
 	private void actualizarExpedienteConImposicionMedidas(DetalleExpdteTram detExpTram,TramiteExpediente traExp){
@@ -2821,6 +2992,8 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 		}		
 	}
 	
+
+	
 	public void actualizarResolucionConFechaResolucion(DetalleExpdteTram detExpTram)
 	{
 		Resolucion resol = resolucionService.findResolucionByNumeroResolucion(detExpTram.getNumResolucion());
@@ -2835,6 +3008,8 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 				PrimeFaces.current().dialog().showMessageDynamic(message);
 				log.error(e.getMessage());
 			}
+			
+			PrimeFaces.current().ajax().update(FORMFORMULARIOEXPEDIENTES);
 		}
 	}
 	
@@ -2865,8 +3040,6 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 			detExpTram.setValorInstructorAPI(null);
 		}
 		
-		actualizarExpedienteConImposicionMedidas(detExpTram,traExp);
-
 	}	
 	
 	public void guardarDetalleTramiteExpC003(TramiteExpediente traExp, DetalleExpdteTram detExpTram)
@@ -3178,6 +3351,24 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 				facesMsgErrorKey(FECHAACUERDONOSUPFECHAACTUAL);
 				return false;
 			}
+			
+		return validoGuardar;
+	}
+
+	
+	public boolean validacionesFinalizarDetalleTramExpC019C008(TramiteExpediente trEx)
+	{
+		boolean validoGuardar = true;
+	
+		/**
+		 * VALIDACION FECHAS COMPORTAMIENTO C019 Y C008
+		 */
+			if(trEx.getDetalleExpdteTram().getFechaInforme() != null  &&
+					(trEx.getDetalleExpdteTram().getFechaInforme().after(FechaUtils.hoy())))
+			{
+				facesMsgErrorKey(FECHAACUERDONOSUPFECHAACTUAL);
+				return false;
+			}
 	
 				
 		if(trEx.getSelectedNuevoTipoAdmisionId() != null)
@@ -3192,6 +3383,8 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 		
 		return validoGuardar;
 	}
+	
+	
 	
 	public boolean validacionesGuardarDetalleTramExpC015(TramiteExpediente trEx)
 	{
@@ -3766,7 +3959,7 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 
 		if(guardadoOk) {
 			if(descCambiada) {
-				PrimeFaces.current().ajax().addCallbackParam("refrescarDocs", true);
+				PrimeFaces.current().ajax().addCallbackParam(Constantes.CALLB_PARAM_ACT_DOC, true);
 			}
 			
 			if(mostrarMsgCambioResp) {
@@ -3789,8 +3982,7 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 
 	private boolean guardarSubTramiteAux(TramiteExpediente subTramExpediente) throws BaseException {
 			
-		aplicarDetalleTramite(subTramExpediente, subTramExpediente.getDetalleExpdteTram());
-		aplicarFechaTramiteInfoRelevante(subTramExpediente, subTramExpediente.getDetalleExpdteTram());
+		aplicarDetalleTramite(subTramExpediente, subTramExpediente.getDetalleExpdteTram(), false);
 		aplicarSituacionAdicional(subTramExpediente, subTramExpediente.getDetalleExpdteTram());
 		
 		
@@ -3817,6 +4009,9 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 			return false;
 		}
 
+		var beanTipif = FacesUtils.getVar(DatosArticulosTipificacionesBean.class);
+		beanTipif.resetDatosMostrarListadosTipificaciones();
+		
 		/**
 		 * GUARDARMOS EL DETALLE DEL TRAMITE EN FUNCION DEL COMPORTAMIENTO:
 		 */
@@ -3831,7 +4026,7 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 	}
 	
 	@Transactional(TxType.REQUIRED)
-	public String finalizarEliminarTramite(TramiteExpediente tramExp, String tipoOperacion) {
+	public String finalizarEliminarTramite(TramiteExpediente tramExp, String tipoOperacion, String origenPeticion) {
 
 		/**
 		 * ELIMINAR TRAMITE: PARA ELIMINAR UN TRAMITE TIENEN QUE ESTAR ELIMINADOS LOS
@@ -3859,7 +4054,7 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 
 		if (tipoOperacion.equals(ELIMINAR)) {
 			eliminarTramite(listaSubTramitesAsociadosActivosNoFinalizados, listaTramitesBD,
-					haySubTramites, tramExp);
+					haySubTramites, tramExp, origenPeticion);
 		} else if (tipoOperacion.equals(FINALIZAR)) {
 			return finalizarTramite(listaSubTramitesAsociadosActivosNoFinalizados, listaTramitesBD,
 					haySubTramites, tramExp);
@@ -3868,13 +4063,13 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 		return "";
 	}
 
-	public void eliminarTramite(List<TramiteExpediente> listaSubTramitesAsociadosActivos,List<TramiteExpediente> listaTramitesBD, Boolean existeSubTramitesAsociadosTemporales,TramiteExpediente tramExp) {
+	public void eliminarTramite(List<TramiteExpediente> listaSubTramitesAsociadosActivos,List<TramiteExpediente> listaTramitesBD, Boolean existeSubTramitesAsociadosTemporales,TramiteExpediente tramExp, String origenPeticion) {
 
 		if (!listaSubTramitesAsociadosActivos.isEmpty() || Boolean.TRUE.equals(existeSubTramitesAsociadosTemporales)) {
 			FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "",mensajesProperties.getString("eliminar.subtramites.activos"));
 			PrimeFaces.current().dialog().showMessageDynamic(message);
 			PrimeFaces.current().ajax().update(FORMFORMULARIOEXPEDIENTES);
-		} else if (0 != this.documentosExpedientesTramitesService.countDocExpTramByIdTramExp(tramExp.getId())){
+		} else if ((0 != this.documentosExpedientesTramitesService.countDocExpTramByIdTramExp(tramExp.getId())) && (!origenPeticion.equals("anulacionPorError"))) {
 			FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "",mensajesProperties.getString("eliminar.tiene.docs"));
 			PrimeFaces.current().dialog().showMessageDynamic(message);
 			PrimeFaces.current().ajax().update(FORMFORMULARIOEXPEDIENTES);
@@ -3897,6 +4092,10 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 			}else{
 				datosExpedientesBean.actualizarCabecera(expedientes, null, null, null);
 			}
+			
+			//Se podría afinar detectando si el trámite tiene que ver con tipificaciones
+			var beanTipif = FacesUtils.getVar(DatosArticulosTipificacionesBean.class);
+			beanTipif.resetDatosMostrarListadosTipificaciones();
 		}
 
 	}
@@ -3915,18 +4114,36 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 				//Generamos plazos para el expediente 
 				//Plazo de acuerdo				
 				Date fechaLimite = null;
-				/** EL PLAZO DE ACUERDO ASOCIADO AL EXPEDIENTE SE CALCULA EN BASE AL PLAZO ADICIONAL. */			
-				if ((tramExp.getExpediente().getValorTipoExpediente().getCodigo().equals("RCE")) || (tramExp.getExpediente().getValorTipoExpediente().getCodigo().equals("RCO"))) {
-					fechaLimite = utilsComun.generarPlazoExpdte(tramExp.getId(), null,	expedientes.getFechaEntrada(), Constantes.COD_VAL_DOM_ACU, Constantes.COD_VAL_DOM_DN, plazoAdicional, "A", expedientes);
+				/** EL PLAZO DE ACUERDO ASOCIADO AL EXPEDIENTE SE CALCULA EN BASE AL PLAZO ADICIONAL. */
+				
+				switch (tramExp.getExpediente().getValorTipoExpediente().getCodigo()) {
+					case "RCE":{
+						fechaLimite = utilsComun.generarPlazoExpdte(tramExp.getId(), null,	expedientes.getFechaEntrada(), Constantes.COD_VAL_DOM_ACU, Constantes.COD_VAL_DOM_DN, plazoAdicional, "A", expedientes);
+						break;
+					}
+					
+					case "RCO":{
+						fechaLimite = utilsComun.generarPlazoExpdte(tramExp.getId(), null,	expedientes.getFechaEntrada(), Constantes.COD_VAL_DOM_ACA, Constantes.COD_VAL_DOM_DN, plazoAdicional, "A", expedientes);
+						break;
+					}
+					
+					case "PSAN":{
+						fechaLimite = expedientes.getFechaEntrada();
+						break;
+					}
+					
+					default:
+						break;
+				
 				}
 				
-				if ((tramExp.getExpediente().getValorTipoExpediente().getCodigo().equals("PSAN"))) {
-					fechaLimite = expedientes.getFechaEntrada();
-				}
-					
 				//Plazo de resolución
-				/** EL PLAZO DE RESOLUCION ASOCIADO AL EXPEDIENTE SE CALCULA EN BASE AL PLAZO DE ACUERDO. */			
-				utilsComun.generarPlazoExpdte(tramExp.getId(), null, fechaLimite,Constantes.COD_VAL_DOM_RES, Constantes.COD_VAL_DOM_DN, 0, "A", expedientes);
+				/** EL PLAZO DE RESOLUCION ASOCIADO AL EXPEDIENTE SE CALCULA EN BASE AL PLAZO DE ACUERDO. */
+				if (tramExp.getExpediente().getValorTipoExpediente().getCodigo().equals("RCO")) {
+					utilsComun.generarPlazoExpdte(tramExp.getId(), null, fechaLimite,Constantes.COD_VAL_DOM_AIR, Constantes.COD_VAL_DOM_DN, 0, "A", expedientes);
+				} else {
+					utilsComun.generarPlazoExpdte(tramExp.getId(), null, fechaLimite,Constantes.COD_VAL_DOM_RES, Constantes.COD_VAL_DOM_DN, 0, "A", expedientes);
+				}
 
 				datosExpedientesBean.limpiarPanelPlazos();
 				List<PlazosExpdte> plazosExpdte = plazosExpdteService.plazosExpdteActivosNoCumplidosByExpediente(expedientes.getId());
@@ -3940,6 +4157,7 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 			{
 				actualizarPlazosExpdteC008(tramExp);
 			}
+			actualizarPlazosExpdteC020(tramExp);
 			actualizarPlazosExpdteC012(tramExp);
 			actualizarPlazosExpdteC024(tramExp);
 			actualizarPlazosExpdteC014(tramExp);
@@ -4023,25 +4241,32 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 
 	
 	private void actualizarPlazosExpdteC008 (TramiteExpediente tramExp) throws BaseException {
-
-			PlazosExpdte plazosACU = plazosExpdteService.findPlazosExpdteByExpTipPla(expedientes.getId(),valoresDominioService.findValoresDominioByCodigoDomCodValDom(Constantes.COD_TIPO_PLAZO, Constantes.COD_VAL_DOM_ACU).getId());
+		
+		
+			String tipPlazoACU = "";
+			String tipPlazoRES = "";
+			
+			if (tramExp.getExpediente().getValorTipoExpediente().getCodigo().equals("RCO")){
+				tipPlazoACU = Constantes.COD_VAL_DOM_ACA;
+				tipPlazoRES = Constantes.COD_VAL_DOM_AIR;			
+			} else {
+				tipPlazoACU = Constantes.COD_VAL_DOM_ACU;
+				tipPlazoRES = Constantes.COD_VAL_DOM_RES;	
+			}
+			
+			PlazosExpdte plazosACU = plazosExpdteService.findPlazosExpdteByExpTipPla(expedientes.getId(),valoresDominioService.findValoresDominioByCodigoDomCodValDom(Constantes.COD_TIPO_PLAZO, tipPlazoACU).getId());
 			
 			PlazosExpdte plazosPRSC = plazosExpdteService.findPlazosExpdteByExpTipPla(expedientes.getId(),valoresDominioService.findValoresDominioByCodigoDomCodValDom(Constantes.COD_TIPO_PLAZO, Constantes.COD_VAL_DOM_PRSC).getId());
 
 			if(plazosACU != null) {
 				/** CERRAMOS PLAZO ASOCIADO AL ACUERDO. */
-				utilsComun.generarPlazoExpdte(tramExp.getId(),"FIN",null,Constantes.COD_VAL_DOM_ACU, Constantes.COD_VAL_DOM_DN,	0, "A",expedientes);
-							
-				Date fechaInicioResolucion;
-				if (tramExp.getDetalleExpdteTram().getFechaInforme() != null) {
-					fechaInicioResolucion = tramExp.getDetalleExpdteTram().getFechaInforme();
-				}
-				else
-				{
-					fechaInicioResolucion = plazosACU.getFechaLimite();
-				}
+
+				Date fechaInicioResolucion = calcFechaInicioResol(tramExp);
+
+				utilsComun.generarPlazoExpdte(tramExp.getId(),"FIN",null,tipPlazoACU, Constantes.COD_VAL_DOM_DN,	0, "A",expedientes);
+								
 				/** GENERAMOS EL PLAZO ASOCIADO A LA RESOLUCION. */			
-				utilsComun.generarPlazoExpdte(tramExp.getId(),null,fechaInicioResolucion ,Constantes.COD_VAL_DOM_RES, Constantes.COD_VAL_DOM_DN, 0, "A", expedientes);
+				utilsComun.generarPlazoExpdte(tramExp.getId(),null,fechaInicioResolucion ,tipPlazoRES, Constantes.COD_VAL_DOM_DN, 0, "A", expedientes);
 			}
 			
 			if(plazosPRSC != null) {
@@ -4060,6 +4285,122 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 				}				
 				datosExpedientesBean.actualizarCabecera(expedientes, null, null, null);
 			}
+			
+			actualizarAPIC008(tramExp);
+		
+	}
+	
+	private void actualizarAPIC008 (TramiteExpediente tramExp) throws BaseException {
+
+		if (tramExp.getDetalleExpdteTram().getApi().equals(Boolean.TRUE)) {
+			
+			Date fechaInicioResolucion = tramExp.getDetalleExpdteTram().getFechaInforme();
+			
+			if (calcFechaInicioPorNOTAPI(tramExp) != null) {
+				fechaInicioResolucion = calcFechaInicioPorNOTAPI(tramExp);
+			}
+			
+		fechaInicioResolucion = utilsComun.generarPlazoExpdte(null,null,fechaInicioResolucion,Constantes.COD_VAL_DOM_API, Constantes.COD_VAL_DOM_DN,	0, "A",expedientes);
+		
+		/** GENERAMOS EL PLAZO ASOCIADO A LA RESOLUCION. */			
+		utilsComun.generarPlazoExpdte(tramExp.getId(),null,fechaInicioResolucion ,Constantes.COD_VAL_DOM_AIR, Constantes.COD_VAL_DOM_DN, 0, "A", expedientes);
+		
+		}
+	}
+
+	private void actualizarPlazosExpdteC020 (TramiteExpediente tramExp) throws BaseException {
+
+		if(Constantes.C020.equals(tramExp.getTipoTramite().getComportamiento())){
+
+			/** CERRAMOS PLAZO ASOCIADO AL ACUERDO. */
+
+			Date fechaInicioResolucion = tramExp.getDetalleExpdteTram().getFechaInforme();
+			
+			if (calcFechaInicioPorNOTAPI(tramExp) != null) {
+				fechaInicioResolucion = calcFechaInicioPorNOTAPI(tramExp);
+			}
+			
+			fechaInicioResolucion = utilsComun.generarPlazoExpdte(null,null,fechaInicioResolucion,Constantes.COD_VAL_DOM_API, Constantes.COD_VAL_DOM_DN,	0, "A",expedientes);
+			
+			/** GENERAMOS EL PLAZO ASOCIADO A LA RESOLUCION. */			
+			utilsComun.generarPlazoExpdte(tramExp.getId(),null,fechaInicioResolucion ,Constantes.COD_VAL_DOM_AIR, Constantes.COD_VAL_DOM_DN, 0, "A", expedientes);
+				
+			datosExpedientesBean.limpiarPanelPlazos();
+			List<PlazosExpdte> plazosExpdte = plazosExpdteService.plazosExpdteActivosNoCumplidosByExpediente(expedientes.getId());
+			if(!plazosExpdte.isEmpty()) {
+				datosExpedientesBean.actualizarCabecera(expedientes, null, null, plazosExpdte);
+			}else {
+				datosExpedientesBean.actualizarCabecera(expedientes, null, null, null);
+			}				
+			datosExpedientesBean.actualizarCabecera(expedientes, null, null, null);
+		}
+	}
+
+	private Date calcFechaInicioPorNOTAPI(TramiteExpediente tramExp) {
+		
+		Date fechaNotificacion = null;
+		
+		boolean encontrado = false;		
+		
+		SujetosObligadosExpedientes sujetoExp = 
+				sujetosObligadosExpedientesService.obtenerSujetosObligadosExpedientePrincipalPorExpediente(tramExp.getExpediente().getId());
+				
+		List<TramiteExpediente> tramNotSO = tramiteExpedienteService.findSubTramExpByTramExpActivosCodTramOrdDesc(tramExp.getId(), "NOT");
+		
+		for(TramiteExpediente tNSO: tramNotSO)
+		{
+		
+		if 	(tNSO.getDetalleExpdteTramMappedBy().getSujetosObligadosInteresado() != null && tNSO.getDetalleExpdteTramMappedBy().getSujetosObligadosInteresado().getId().equals(sujetoExp.getSujetosObligados().getId()) && !encontrado){
+		
+			
+			if (tNSO.getDetalleExpdteTramMappedBy().getFechaEnvio() != null) {
+		
+				fechaNotificacion = tNSO.getDetalleExpdteTramMappedBy().getFechaEnvio();
+			}			
+			if (tNSO.getDetalleExpdteTramMappedBy().getFechaNotificacion() != null) {
+				
+				fechaNotificacion = tNSO.getDetalleExpdteTramMappedBy().getFechaNotificacion();
+			}			
+
+			encontrado = true;
+			}
+		
+		}
+		
+		return fechaNotificacion;
+		
+	}
+	
+	
+	private Date calcFechaInicioResol(TramiteExpediente tramExp) throws BaseException {
+		
+		Date fechaInicioResolucion;
+		
+		PlazosExpdte plazosACU = null;
+		
+		if(tramExp.getExpediente().getValorTipoExpediente().getCodigo().equals("RCO")) {
+			plazosACU = plazosExpdteService.findPlazosExpdteByExpTipPla(expedientes.getId(),valoresDominioService.findValoresDominioByCodigoDomCodValDom(Constantes.COD_TIPO_PLAZO, Constantes.COD_VAL_DOM_ACA).getId());
+		}
+		else {
+			plazosACU = plazosExpdteService.findPlazosExpdteByExpTipPla(expedientes.getId(),valoresDominioService.findValoresDominioByCodigoDomCodValDom(Constantes.COD_TIPO_PLAZO, Constantes.COD_VAL_DOM_ACU).getId());			
+		}
+
+		
+		if (tramExp.getDetalleExpdteTram().getFechaInforme() != null && (tramExp.getDetalleExpdteTram().getFechaInforme().compareTo(plazosACU.getFechaLimite()) < 0) ){
+			fechaInicioResolucion = tramExp.getDetalleExpdteTram().getFechaInforme();
+		}
+		else
+		{
+			fechaInicioResolucion = plazosACU.getFechaLimite();
+		}
+		
+		if (Boolean.TRUE.equals(tramExp.getExpediente().getApi())) {
+			
+			fechaInicioResolucion = utilsComun.generarPlazoExpdte(null,null,fechaInicioResolucion,Constantes.COD_VAL_DOM_API, Constantes.COD_VAL_DOM_DN,	0, "C",expedientes);
+			
+		}
+			
+		return fechaInicioResolucion;
 		
 	}
 	
@@ -4100,6 +4441,10 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 		
 		aplicarSituacionAdicional(subTramExp, subTramExp.getDetalleExpdteTram());
 		
+		//Se podría afinar detectando si el trámite tiene que ver con tipificaciones
+		var beanTipif = FacesUtils.getVar(DatosArticulosTipificacionesBean.class);
+		beanTipif.resetDatosMostrarListadosTipificaciones();
+
 
 		FacesContext.getCurrentInstance().addMessage(MENSAJESFORMULARIO, new FacesMessage(FacesMessage.SEVERITY_INFO,
 				"", SUBTRAMITEMSJ + mensajesProperties.getString(ELIMINADOCORRECTAMENTE)));
@@ -4114,8 +4459,7 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 	@Transactional(TxType.REQUIRED)
 	public String finalizarTramite(List<TramiteExpediente> listaSubTramitesAsociados,List<TramiteExpediente> listaTramitesBD, Boolean existeSubTramitesAsociadosTemporales,TramiteExpediente tramExp) {
 
-		aplicarDetalleTramite(tramExp, tramExp.getDetalleExpdteTram());
-		aplicarFechaTramiteInfoRelevante(tramExp, tramExp.getDetalleExpdteTram());
+		aplicarDetalleTramite(tramExp, tramExp.getDetalleExpdteTram(), true);
 
 		/**
 		 * VALIDAMOS QUE NO EXISTAN SUBTRAMITES ACTIVOS
@@ -4226,6 +4570,14 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 			return "";
 		}
 		
+		/** validacion para el tramite de resolucion: No puede finalizar el trámite sin vincular el documento de Resolución con la Resolución actual*/
+		boolean validacionTramiteResolucionSinDocResolucion = validacionTramiteResolucionSinDocResolucion(tramExp);
+		if(validacionTramiteResolucionSinDocResolucion) {
+			FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "","No puede finalizar el trámite sin vincular el documento de Resolución con la Resolución actual");
+			PrimeFaces.current().dialog().showMessageDynamic(message);
+			return "";
+		}
+		
 		Usuario usuario = (Usuario)JsfUtils.getSessionAttribute(Constantes.USUARIO);
 		Date tramFechaFin=FechaUtils.fechaYHoraActualDate();
 		Date tramFechaFinReal=FechaUtils.fechaYHoraActualDate();
@@ -4304,6 +4656,23 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 		return retorno;
 	}
 	
+	private boolean validacionTramiteResolucionSinDocResolucion (TramiteExpediente tramExp) {
+		boolean res = true;
+		if(tramExp.getTipoTramite().getCodigo().equals(Constantes.TIP_TRAM_RESOL)) {
+			if(tramExp.getDetalleExpdteTram() != null && tramExp.getDetalleExpdteTram().getNumResolucion() != null) {
+				Resolucion resolucionAux = resolucionService.findResolucionByNumeroResolucion(tramExp.getDetalleExpdteTram().getNumResolucion());
+				if(resolucionAux != null && resolucionAux.getId() != null) {
+					List<DocumentoResolucion> documentoResolucion = documentoResolucionService.findDocumentosResolucionByIdResol(resolucionAux.getId());
+					if(!documentoResolucion.isEmpty()) {
+						res = false;
+					}
+				}
+			}
+		}else {
+			res = false;
+		}		
+		return res;
+	}	
 	
 	private void actualizarInfVariableCabecera(TramiteExpediente tramExp) {
 		
@@ -4345,9 +4714,12 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 				nuevaCabecera = nuevaCabecera + " (" + detallesTramite.getValorMotivoInadmision().getAbreviatura()+ ")";
 				expAct.setDescSeguimiento2(null);			
 			}
-
+			
+			if (nuevaCabecera.length() > 50) {
+				nuevaCabecera = nuevaCabecera.substring(0, 49);
+			}
+			
 			expAct.setInfSeguimiento1(nuevaCabecera);
-
 				
 		}
 		
@@ -4375,6 +4747,10 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 				
 			nuevaCabecera = nuevaCabecera + " (MEDIDAS)";
 			}
+
+			if (nuevaCabecera.length() > 50) {
+				nuevaCabecera = nuevaCabecera.substring(0, 49);
+			}
 						
 			expAct.setInfSeguimiento2(nuevaCabecera);
 			
@@ -4389,19 +4765,20 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 				nuevaCabecera=fechaFormateada+" - "+ detallesTramite.getValorSentidoResolucion().getDescripcion() + " - " + detallesTramite.getNumResolucion();
 				
 				Expedientes expAct = tramExp.getExpediente();
-				if (Boolean.TRUE.equals(detallesTramite.getImposicionMedidas())) {
-					
-				nuevaCabecera = nuevaCabecera + " (MEDIDAS)";
-				}
-							
-				expAct.setInfSeguimiento3(nuevaCabecera);
-								
-			}
-				
-				
+				nuevaCabecera = actualizarCabeceraC012Aux(nuevaCabecera,detallesTramite);
+				expAct.setInfSeguimiento3(nuevaCabecera);								
+			}				
+		}	
+	}
+	
+	private String actualizarCabeceraC012Aux (String nuevaCabecera, DetalleExpdteTram detallesTramite) {
+		if (Boolean.TRUE.equals(detallesTramite.getImposicionMedidas())) {
+			nuevaCabecera = nuevaCabecera + " (MEDIDAS)";
 		}
-
-		
+		if (nuevaCabecera.length() > 50) {
+			nuevaCabecera = nuevaCabecera.substring(0, 49);
+		}
+		return nuevaCabecera;
 	}
 	
 
@@ -4420,7 +4797,11 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 			nuevaCabecera=fechaFormateada+" - Inicio PSAN "+ detallesTramite.getNumeroPsan();
 			
 			Expedientes expAct = tramExp.getExpediente();
-						
+
+			if (nuevaCabecera.length() > 50) {
+				nuevaCabecera = nuevaCabecera.substring(0, 49);
+			}
+			
 			expAct.setInfSeguimiento2(nuevaCabecera);
 			
 			}
@@ -4435,7 +4816,11 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 			nuevaCabecera=fechaFormateada;
 			
 			Expedientes expAct = tramExp.getExpediente();
-						
+
+			if (nuevaCabecera.length() > 50) {
+				nuevaCabecera = nuevaCabecera.substring(0, 49);
+			}
+			
 			expAct.setInfSeguimiento1(nuevaCabecera);
 			
 			}
@@ -4450,15 +4835,20 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 		
 		if(Constantes.TIP_TRAM_PRES.equals(tramExp.getTipoTramite().getCodigo())) {
 
+			DetalleExpdteTram detallesTramite= tramExp.getDetalleExpdteTram();
 			String nuevaCabecera="";
 			Date fecha= FechaUtils.hoy();
 			String pattern = Constantes.FECHA_DDMMYYYY;
 			SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
 			String fechaFormateada = simpleDateFormat.format(fecha);
-			nuevaCabecera=fechaFormateada;
+			nuevaCabecera=fechaFormateada +" - "+ detallesTramite.getValorSentidoResolucion().getDescripcion();
 			
 			Expedientes expAct = tramExp.getExpediente();
-						
+
+			if (nuevaCabecera.length() > 50) {
+				nuevaCabecera = nuevaCabecera.substring(0, 49);
+			}
+
 			expAct.setInfSeguimiento2(nuevaCabecera);
 			
 		}
@@ -4539,6 +4929,25 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 		}
 		
 	}
+	
+	private void actualizarAPIEnExpdteINIAPI(TramiteExpediente tramExp)
+	{
+		Expedientes exp = tramExp.getExpediente();
+		
+		exp.setApi(true);
+				
+		try {
+			expedientesService.guardar(exp);
+			datosExpedientesDatosGeneralesBean.actualizarPestanyaDatosGral(exp);
+		} catch (BaseException e) {
+			FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "",
+					mensajesProperties.getString(MENSAJEERROR));
+			PrimeFaces.current().dialog().showMessageDynamic(message);
+			log.error(e.getMessage());
+		}
+		
+	}
+
 	
 	private void actualizarMedidasEnExpdte(TramiteExpediente tramExp)
 	{
@@ -4745,8 +5154,7 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 
 	public String finalizarSubTramite(TramiteExpediente subTramExp) {
 
-		aplicarDetalleTramite(subTramExp, subTramExp.getDetalleExpdteTram());
-		aplicarFechaTramiteInfoRelevante(subTramExp, subTramExp.getDetalleExpdteTram());
+		aplicarDetalleTramite(subTramExp, subTramExp.getDetalleExpdteTram(), true);
 
 
 		/**
@@ -4837,9 +5245,7 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 	{
 		TramiteExpediente tramExpSup = subTramExp.getTramiteExpedienteSup();
 		
-		if(esUltimoSubtramAbierto(subTramExp) && tramExpSup != null)
-		{
-		
+		if(esUltimoSubtramAbierto(subTramExp) && tramExpSup != null) {		
 			TipoTramite tipTramExpSup = tramExpSup.getTipoTramite();
 			
 			/****/
@@ -4849,8 +5255,10 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 			/**PARA CADA TIPO DE CONFIGURACION DE TAREAS RECUPERADA DEBEMOS COMPROBAR SI EXISTE UNA TAREA CON ESE TIPO DE CONFIGURACIÓN
 			 * PARA EL TRÁMITE SUPERIOR EN CURSO. **/
 			
+			if(listaTareas != null && !listaTareas.isEmpty()) {
+			
 			cerrarTareasTramSupParaConfigTarea(listaTareas, tramExpSup);
-
+			}
 		}
 	}
 	
@@ -4858,10 +5266,12 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 	{
 		Usuario usuario = (Usuario)JsfUtils.getSessionAttribute(Constantes.USUARIO);
 		
-		if(listaTareas != null && !listaTareas.isEmpty())
-		{
-			
-			String mensajeConfirmCierreTareas = mensajesProperties.getString(CERRARTAREAS);
+				
+			var tarBean = FacesUtils.getVar(DatosExpedientesTareasBean.class);
+			String mensajeConfirmCierreTareas = "";
+			String mensajeAvisoCierreTramite = mensajesProperties.getString(CERRARTRAMITEAVISO);
+			String mensajeAvisoReqInf = mensajesProperties.getString(ABRIRREQINF);
+
 			StringBuilder descTareas = new StringBuilder();
 			for(CfgTareas cfgTar: listaTareas)
 			{
@@ -4869,22 +5279,41 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 				
 				if(listaTareasTramSup != null && !listaTareasTramSup.isEmpty()){
 					
-					for(TareasExpediente tareaExp: listaTareasTramSup)
-					{
+					for(TareasExpediente tareaExp: listaTareasTramSup) {
+						mensajeConfirmCierreTareas = mensajesProperties.getString(CERRARTAREAS);
 						descTareas = descTareas.append("'" + tareaExp.getDescripcion() + "' ");
-						
 						tareasExpedienteService.cerrarTarea(tareaExp, usuario);
+						tarBean.resetDatosExisteTarea(tareaExp);
+						//Este código se usaría para refrescar los documentos, 
+						//pero parece que ya se hace por otro sitio. Lo dejamos comentado por si acaso.
+						/*if tareaExp es de tipo REV
+							PrimeFaces.current().ajax().addCallbackParam(Constantes.CALLB_PARAM_ACT_DOC, true)
+						*/
 					}
 				}
 			}
 			
 			this.mensajeConfirmacionCierreTareas = mensajeConfirmCierreTareas + descTareas;
 			
-			if(!this.mensajeConfirmacionCierreTareas.equals(mensajesProperties.getString(CERRARTAREAS)))
+			if(Boolean.FALSE.equals(tramExpSup.getTipoTramite().getEnEsperaRespuesta())) {
+				
+				this.mensajeConfirmacionCierreTareas = mensajeConfirmacionCierreTareas + mensajeAvisoCierreTramite;
+				
+			}
+			
+			if (tramExpSup.getDetalleExpdteTram().getInfoRemitida() != null && Boolean.TRUE.equals(tramExpSup.getDetalleExpdteTram().getInfoRemitida())) 
+			
+			{ 
+				this.mensajeConfirmacionCierreTareas = mensajeConfirmacionCierreTareas + mensajeAvisoReqInf;
+			}
+				
+								
+			if(this.mensajeConfirmacionCierreTareas != null && !this.mensajeConfirmacionCierreTareas.isEmpty())
+				
 			{
 				PrimeFaces.current().executeScript("PF('dialogConfirmCierreTarea-" + tramExpSup.getId() + COMANDOSHOW);	
 			}
-		}
+		
 	}
 	
 	/**
@@ -5032,7 +5461,7 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 				&& !(StringUtils.isBlank(trEx.getDetalleExpdteTram().getDatosCanalSalida()));
 	}
 
-	private boolean accionesAntesFinalizarSubTramite(TramiteExpediente tramExp) throws BaseException {
+	public boolean accionesAntesFinalizarSubTramite(TramiteExpediente tramExp) throws BaseException {
 		String comp = tramExp.getTipoTramite().getComportamiento();
 		boolean accionesOk = true;
 		
@@ -5066,8 +5495,8 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 	
 	private void copiarCamposATramiteSup(TramiteExpediente tramExp, TramiteExpediente tramExpSup) {
 		DetalleExpdteTram detalle = tramExp.getDetalleExpdteTram();
+		
 		DetalleExpdteTram detalleSup = tramExpSup.getDetalleExpdteTram();
-
 		copiarValorTipoInteresado(detalle, detalleSup);					
 		copiarPersonasInteresado(detalle, detalleSup);					
 		copiarSujetosObligadosInteresado(detalle, detalleSup);
@@ -5080,8 +5509,8 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 	}
 	
 	private void copiarValorTipoInteresado(DetalleExpdteTram dtOri, DetalleExpdteTram dtDest) {
-		if(null == dtDest.getValorTipoInteresado()) {
-			dtDest.setValorTipoInteresado(dtOri.getValorTipoInteresado());
+		if(null == dtDest.getValorTipoInteresado() && null != dtOri.getValorTipoInteresado()) {			
+				dtDest.setValorTipoInteresado(dtOri.getValorTipoInteresado());
 		}
 	}
 	
@@ -5878,36 +6307,29 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 		
 	}
 	
-	public Long obtenerResponsableSubTramite(Long idSubTramite){
+	public Long obtenerResponsableSubTramite(Long idSubTramite, boolean altaMasiva){
 		Long idResponsableDefecto=null;
 		if(idSubTramite!=null) {
-			
+			CfgExpedienteSubtramite subTramExp= cfgExpedienteSubTramiteService.obtener(idSubTramite);
+			/** si no está informado (esta a null) y está marcado el "Id_Resp_tram", se preselecciona por defecto el responsable del trámite superior.*/
+			if(subTramExp.getResponsablesTramitacion()==null && subTramExp.getResponsable().equals(true)) {
+				idResponsableDefecto=this.tramiteExpediente.getResponsable().getId();		
+				/** si  está informado se preselecciona el responsable por defecto.*/
+			}else if(subTramExp.getResponsablesTramitacion()!=null) {			
+				idResponsableDefecto=subTramExp.getResponsablesTramitacion().getId();				
+			}else {				
+				/** ninguna de las anteriores premisas, se preselecciona el del expediente */			
+				idResponsableDefecto= expedientes.getResponsable().getId();
+			}
+		}
 		
-		CfgExpedienteSubtramite subTramExp= cfgExpedienteSubTramiteService.obtener(idSubTramite);
-		/*si no está informado (esta a null) y está marcado el "Id_Resp_tram", 
-		 * se preselecciona por defecto el responsable del trámite superior.*/
-		
-		
-		if(subTramExp.getResponsablesTramitacion()==null && subTramExp.getResponsable().equals(true)) {
-			idResponsableDefecto=this.tramiteExpediente.getResponsable().getId();	
-			this.selectedNuevoResponsableSubTramId=idResponsableDefecto;		
-			
-			/*si  está informado se preselecciona el responsable por defecto.*/
-		}else if(subTramExp.getResponsablesTramitacion()!=null) {
-			
-			idResponsableDefecto=subTramExp.getResponsablesTramitacion().getId();	
-			this.selectedNuevoResponsableSubTramId=idResponsableDefecto;
-			
+		if(altaMasiva) {
+			selectedResponsablesSubtramiteMasivoId = idResponsableDefecto;
+			return selectedResponsablesSubtramiteMasivoId;
 		}else {
-			
-			//ninguna de las anteriores premisas, se preselecciona el del expediente
-			
-			idResponsableDefecto= expedientes.getResponsable().getId();
-			this.selectedNuevoResponsableSubTramId=idResponsableDefecto;
+			this.selectedNuevoResponsableSubTramId = idResponsableDefecto;
+			return this.selectedNuevoResponsableSubTramId;
 		}
-		}
-		return this.selectedNuevoResponsableSubTramId;
-		
 	}
 	
 	private void guardarDetalleTramiteExpC016(TramiteExpediente traExp, DetalleExpdteTram detExpTram) {
@@ -5961,6 +6383,7 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 			String numeroExpedientePsan = seriesService.nextNumeroSerie(valorDominioTipoExp.getCodigo(), FechaUtils.ahora());
 			ValoresDominio valorDominioSituacion = valoresDominioService.findValoresDominioByCodigoDomCodValDom(Constantes.COD_SIT, Constantes.PIPS);
 			ResponsablesTramitacion responsablesTramitacion = responsablesTramitacionService.findResponsableTramitacionByCodResp(tramiteExpedienteActual.getDetalleExpdteTram().getValorInstructorAPI().getCodigo());
+			
 			Expedientes expedienteNuevoPsan = new Expedientes();
 			expedienteNuevoPsan.setNumExpediente(numeroExpedientePsan);		
 			expedienteNuevoPsan.setNombreExpediente(Constantes.PSAN+" "+expedientes.getNumExpediente());
@@ -5977,6 +6400,7 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 			expedienteNuevoPsan.setAbstencionRecusacion(expedientes.getAbstencionRecusacion());
 			expedienteNuevoPsan.setTramitacionAnonima(expedientes.getTramitacionAnonima());
 			expedienteNuevoPsan.setValorInstructorAPI(tramiteExpedienteActual.getDetalleExpdteTram().getValorInstructorAPI());
+			
 			CfgTipoExpediente cfgTipoExp = cfgTipoExpedienteService.obtenerCfgTipoExpedientePorValorTipoExpediente(expedienteNuevoPsan.getValorTipoExpediente().getId());
 			
 			if (cfgTipoExp.getTipoTramiteSeg1() != null) {
@@ -5992,6 +6416,8 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 			}
 			
 			expedienteNuevoPsan = expedientesService.guardar(expedienteNuevoPsan);	
+			
+			trasladarConceptos(tramiteExpedienteActual, expedienteNuevoPsan);
 			
 			List<PersonasExpedientes> personasExpedientes = personasExpedientesService.obtenerListaPersonaExpedientePorExpedientePrincipalYNoPrincipal(expedientes.getId());
 			CfgTipoExpediente cfgTipoExpediente = cfgTipoExpedienteService.obtenerCfgTipoExpedientePorValorTipoExpediente(valorDominioTipoExp.getId());
@@ -6014,6 +6440,7 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 				sujetosObligadosExpedientesNuevo.setSujetosObligados(sujetosObligadosExpedientes.get(i).getSujetosObligados());
 				sujetosObligadosExpedientesNuevo.setExpediente(expedienteNuevoPsan);
 				sujetosObligadosExpedientesNuevo.setValoresRelacionExpSuj(cfgTipoExpediente.getValorMotivoRelacionSujeto());
+				sujetosObligadosExpedientesNuevo.setNoVerificado(sujetosObligadosExpedientes.get(i).getNoVerificado());
 				sujetosObligadosExpedientesService.guardar(sujetosObligadosExpedientesNuevo);
 			}
 			
@@ -6034,7 +6461,7 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 			tramiteExpedienteNuevo.setNivel(tramiteExpedienteAux.getNivel());	
 			tramiteExpedienteNuevo.setDescripcion(tramiteExpedienteAux.getDescripcion());				
 			tramiteExpedienteNuevo.setDescripcionAbrev(tramiteExpedienteAux.getDescripcionAbrev());
-			tramiteExpedienteNuevo.setFechaIni(tramiteExpedienteAux.getFechaFin());	
+			tramiteExpedienteNuevo.setFechaIni(tramiteExpedienteAux.getFechaIni());	
 			tramiteExpedienteNuevo.setFechaTramite(tramiteExpedienteAux.getFechaTramite());		
 			tramiteExpedienteNuevo.setInformacionRelevante(tramiteExpedienteAux.getInformacionRelevante());	
 			tramiteExpedienteNuevo.setSituacionAdicional(tramiteExpedienteAux.getSituacionAdicional());	
@@ -6128,6 +6555,27 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 			}
 			
 			
+			List<ArtTipExpdte> listaArtTipExpdte = artTipExpdteService.findArtTipExpByIdTramIdExp(expedientes.getId(),tramiteExpedienteActual.getId());
+			
+			for(ArtTipExpdte artTipExpdte: listaArtTipExpdte) {
+				
+				ArtTipExpdte artTipExpdteNuevo = new ArtTipExpdte();
+				artTipExpdteNuevo.setAclaracion(artTipExpdte.getAclaracion());
+				artTipExpdteNuevo.setActivo(artTipExpdte.getActivo());
+				artTipExpdteNuevo.setExpediente(expedienteNuevoPsan);
+				artTipExpdteNuevo.setFechaCreacion(FechaUtils.hoy());
+				artTipExpdteNuevo.setTramiteExpediente(tramiteExpedienteNuevoAux);
+				Usuario usuario = (Usuario)JsfUtils.getSessionAttribute(Constantes.USUARIO);
+				artTipExpdteNuevo.setUsuCreacion(usuario.getLogin());
+				artTipExpdteNuevo.setValorArticuloInfringido(artTipExpdte.getValorArticuloInfringido());
+				artTipExpdteNuevo.setValorGravedad(artTipExpdte.getValorGravedad());
+				artTipExpdteNuevo.setValorTipificacion(artTipExpdte.getValorTipificacion());
+				
+				artTipExpdteService.guardar(artTipExpdteNuevo);
+				
+			}
+
+			
 			
 			List<DocumentosExpedientes> documentosExpedientes = documentosExpedientesService.findDocumentosActivosByExpdteIdTramExp(expedientes.getId(),tramiteExpedienteActual.getId());
 			for(int i = 0; i < documentosExpedientes.size(); i++) {
@@ -6177,6 +6625,28 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 			}
 			PrimeFaces.current().dialog().showMessageDynamic(message);
 			log.error("generarExpedientePsan - " + e.getMessage());
+		}
+	}
+	
+	private void trasladarConceptos(TramiteExpediente tramExp, Expedientes expedienteNuevoPsan)
+	{
+		List<ExpedientesConceptos> listaConceptos =  expedientesConceptosService.obtenerListExpedientesConceptosPorExpediente(tramExp.getExpediente().getId());
+		
+		if(listaConceptos != null && !listaConceptos.isEmpty())
+		{
+        	for(ExpedientesConceptos expCon: listaConceptos)
+        	{
+        		ExpedientesConceptos expConPSAN = new ExpedientesConceptos();
+        		expConPSAN.setExpediente(expedienteNuevoPsan);
+        		expConPSAN.setValorDominioConcepto(expCon.getValorDominioConcepto());
+        		try {
+					expedientesConceptosService.guardar(expConPSAN);
+				} catch (BaseException e) {
+					FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "",mensajesProperties.getString(MENSAJEERROR));
+					PrimeFaces.current().dialog().showMessageDynamic(message);
+					log.error(e.getMessage());
+				}
+        	}
 		}
 	}
 	
@@ -6319,7 +6789,8 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 				|| Constantes.C017.equals(trExp.getTipoTramite().getComportamiento())
 				|| Constantes.C018.equals(trExp.getTipoTramite().getComportamiento())
 				|| Constantes.C024.equals(trExp.getTipoTramite().getComportamiento())
-				|| Constantes.C023.equals(trExp.getTipoTramite().getComportamiento())){	
+				|| Constantes.C023.equals(trExp.getTipoTramite().getComportamiento())
+				|| Constantes.C025.equals(trExp.getTipoTramite().getComportamiento())){	
 			trExp.setListaIdentifIntSujOblig(sujetosObligadosExpedientesService.obtenerSujetosObligadosExpediente(expedientes.getId()));
 			List<PersonasExpedientes> listaPersonasPorExpediente = personasExpedientesService.obtenerPersPorExpediente(expedientes.getId());
 			trExp.setListaIdentifIntPersDTO(cargarPersonasYRepresentantes(listaPersonasPorExpediente));
@@ -6392,7 +6863,12 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 	private void detExpTramComportamientoC005(DetalleExpdteTram detExpTram) {
 		if(Constantes.C005.equals(cfgExpTramite.getTipoTramite().getComportamiento())) {
 			detExpTram.setFechaEntrada(expedientes.getFechaEntrada());
-			detExpTram.setFechaRegistro(expedientes.getFechaEntrada());
+// HdU 1313 - Comportamiento nuevo para que la fecha de registro no sea obligatoria en entrada de doc
+			if(!Constantes.XPC.equals(detExpTram.getExpediente().getValorTipoExpediente().getCodigo()))
+			{
+				detExpTram.setFechaRegistro(expedientes.getFechaEntrada());	
+			}
+// FIN HdU 1313 - Comportamiento nuevo para que la fecha de registro no sea obligatoria en entrada de doc
 		}
 	}
 	
@@ -6411,34 +6887,41 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 		}
 	}
 	
-	private void detExpTramComportamientoC012024(DetalleExpdteTram detExpTram,TramiteExpediente tramExp) {
+	private void detExpTramComportamientoC012024025(DetalleExpdteTram detExpTram,TramiteExpediente tramExp) {
 		if(Constantes.C012.equals(cfgExpTramite.getTipoTramite().getComportamiento())
-				|| Constantes.C024.equals(cfgExpTramite.getTipoTramite().getComportamiento())){
+				|| Constantes.C024.equals(cfgExpTramite.getTipoTramite().getComportamiento())
+				|| Constantes.C025.equals(cfgExpTramite.getTipoTramite().getComportamiento())){
 			if(tramExp.getSelectedNuevoSentidoResolucionId() != null){
 				detExpTram.setValorSentidoResolucion(valoresDominioService.obtener(tramExp.getSelectedNuevoSentidoResolucionId()));	
 			}	
 			
-			/** RECUPERAMOS EL TIPO DE RESOLUCION QUE TIENE ASOCIADO EL TIPO DE EXPEDIENTE*/
-			Expedientes exp = tramExp.getExpediente();
-			CfgTipoExpediente cfgTipoExp = cfgTipoExpedienteService.obtenerCfgTipoExpedientePorValorTipoExpediente(exp.getValorTipoExpediente().getId());
-			if(cfgTipoExp != null){
-				
-				ValoresDominio valorTipoResol = null;
-				if(Constantes.C012.equals(tramExp.getTipoTramite().getComportamiento()))
-				{
-					valorTipoResol = cfgTipoExp.getValorTipoResolucion();
-				}else
-				{
-					valorTipoResol = cfgTipoExp.getValorTipoResolRecurso();
-				}
-				if(valorTipoResol != null){
-					detExpTram.setValorTipoResolucion(valorTipoResol);
-					tramExp.setSelectedNuevoTipoResolucionId(valorTipoResol.getId());
-				}else{
-					detExpTram.setValorTipoResolucion(null);
-					tramExp.setSelectedNuevoTipoResolucionId(null);
+			if(!Constantes.C025.equals(cfgExpTramite.getTipoTramite().getComportamiento()))
+			{
+				/** RECUPERAMOS EL TIPO DE RESOLUCION QUE TIENE ASOCIADO EL TIPO DE EXPEDIENTE*/
+				Expedientes exp = tramExp.getExpediente();
+				CfgTipoExpediente cfgTipoExp = cfgTipoExpedienteService.obtenerCfgTipoExpedientePorValorTipoExpediente(exp.getValorTipoExpediente().getId());
+				if(cfgTipoExp != null){					
+					detExpTramComportamientoC012024025Aux(tramExp,cfgTipoExp,detExpTram);
 				}
 			}
+			
+		}
+	}
+	
+	private void detExpTramComportamientoC012024025Aux (TramiteExpediente tramExp, CfgTipoExpediente cfgTipoExp, DetalleExpdteTram detExpTram) {
+		ValoresDominio valorTipoResol = null;
+		if(Constantes.C012.equals(tramExp.getTipoTramite().getComportamiento())){
+			valorTipoResol = cfgTipoExp.getValorTipoResolucion();
+		}else{
+			valorTipoResol = cfgTipoExp.getValorTipoResolRecurso();
+		}
+		
+		if(valorTipoResol != null){
+			detExpTram.setValorTipoResolucion(valorTipoResol);
+			tramExp.setSelectedNuevoTipoResolucionId(valorTipoResol.getId());
+		}else{
+			detExpTram.setValorTipoResolucion(null);
+			tramExp.setSelectedNuevoTipoResolucionId(null);
 		}
 	}
 	
@@ -6464,15 +6947,23 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 	private void detExpTramComportamientoC008(DetalleExpdteTram detExpTram,TramiteExpediente tramExp) {
 		if(Constantes.C008.equals(cfgExpTramite.getTipoTramite().getComportamiento())) {
 			ValoresDominio tipoAdmision = new ValoresDominio();
+			Boolean incluyeReq = false;
 			if(cfgExpTramite.getTipoTramite().getCodigo().equals(Constantes.TIP_TRAM_ACADM)) {
+				incluyeReq = true;
+				tramExp.setInformacionRelevante("Incluye requerimiento");
 				tipoAdmision = valoresDominioService.findValoresDominioByCodigoDomCodValDom(Constantes.COD_DOM_TIP_ADM, Constantes.COD_VAL_DOM_ADM);
 			}else if(cfgExpTramite.getTipoTramite().getCodigo().equals(Constantes.TIP_TRAM_ACADMHE)) {
+				incluyeReq = true;
+				tramExp.setInformacionRelevante("Incluye requerimiento");
 				tipoAdmision = valoresDominioService.findValoresDominioByCodigoDomCodValDom(Constantes.COD_DOM_TIP_ADM, Constantes.COD_VAL_DOM_AHE);
 			}else if(cfgExpTramite.getTipoTramite().getCodigo().equals(Constantes.TIP_TRAM_ACNOADM)) {
+				tramExp.setInformacionRelevante("");
 				tipoAdmision = valoresDominioService.findValoresDominioByCodigoDomCodValDom(Constantes.COD_DOM_TIP_ADM, Constantes.COD_VAL_DOM_INA);
 			}
 			tramExp.setSelectedNuevoTipoAdmisionId(tipoAdmision.getId());
 			detExpTram.setValorTipoAdmision(tipoAdmision);
+			detExpTram.setInfoRemitida(incluyeReq);
+
 		}
 	}
 	
@@ -6572,15 +7063,33 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 		if(Constantes.C008.equals(tramExp.getTipoTramite().getComportamiento())){
 			cargarCondicionCambioSituacion008(tramExp);			
 			actualizarTipoAdmisMotivoInadmEnExpdte(tramExp);
-			
-		
-	
-			
 		}
 	}
 	
-	private void finalizarTramiteComportamientoC010(TramiteExpediente tramExp) {
+	private void finalizarTramiteComportamientoC010(TramiteExpediente tramExp)  {
 		if(Constantes.C010.equals(tramExp.getTipoTramite().getComportamiento())){
+			
+			try {
+				
+				utilsComun.generarPlazoExpdte(null,"FIN",null,Constantes.COD_VAL_DOM_API, Constantes.COD_VAL_DOM_DN,	0, "A",expedientes);
+				
+				Date fechaInicioResolucion = tramExp.getDetalleExpdteTram().getFechaInforme();
+				
+				if (calcFechaInicioPorNOTAPI(tramExp) != null) {
+					fechaInicioResolucion = calcFechaInicioPorNOTAPI(tramExp);
+				}
+				
+				
+				/** GENERAMOS EL PLAZO ASOCIADO A LA RESOLUCION. */			
+				utilsComun.generarPlazoExpdte(tramExp.getId(),null,fechaInicioResolucion ,Constantes.COD_VAL_DOM_AIR, Constantes.COD_VAL_DOM_DN, 0, "A", expedientes);
+
+				
+			} catch (BaseException e) {
+				FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "",mensajesProperties.getString(MENSAJEERROR));
+				PrimeFaces.current().dialog().showMessageDynamic(message);
+				log.error(e.getMessage());
+			}
+			
 			cargarCondicionCambioSituacion010(tramExp);			
 		}
 	}
@@ -6615,6 +7124,7 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 		if(Constantes.TIP_TRAM_SUB.equals(tramExp.getTipoTramite().getCodigo()) 
 			||Constantes.C008.equals(tramExp.getTipoTramite().getComportamiento())
 			||Constantes.C023.equals(tramExp.getTipoTramite().getComportamiento())
+			||Constantes.C020.equals(tramExp.getTipoTramite().getComportamiento())
 			||Constantes.C014.equals(tramExp.getTipoTramite().getComportamiento())
 			||Constantes.C024.equals(tramExp.getTipoTramite().getComportamiento())
 			||Constantes.C012.equals(tramExp.getTipoTramite().getComportamiento()))	{
@@ -6688,7 +7198,7 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 	}
 	
 	private boolean finalizarTramiteValidacionesComportamientos8Validaciones(TramiteExpediente tramExp) {
-		return Constantes.C008.equals(tramExp.getTipoTramite().getComportamiento()) && !validacionesGuardarDetalleTramExpC019C008(tramExp) ;
+		return Constantes.C008.equals(tramExp.getTipoTramite().getComportamiento()) && !validacionesFinalizarDetalleTramExpC019C008(tramExp) ;
 	}
 	
 	private boolean finalizarTramiteValidacionesComportamientos10PropApi(TramiteExpediente tramExp) {
@@ -6737,9 +7247,7 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 	private boolean validacionesObligatoriedadFinalizarTramiteComportamiento6Obligatorios (DetalleExpdteTram detExpTram,TramiteExpediente tramExp) {
 		return Constantes.C006.equals(tramExp.getTipoTramite().getComportamiento()) && 
 				(detExpTram.getValorTipoInteresado() == null 
-					|| detExpTram.getValorDominioInteresado() == null 
-					|| detExpTram.getValorCanalSalida() == null 
-					|| detExpTram.getDatosCanalSalida().isEmpty());
+					|| detExpTram.getValorDominioInteresado() == null);
 	}
 	
 	private boolean validacionesObligatoriedadFinalizarTramiteComportamiento6FechaEnvio (DetalleExpdteTram detExpTram,TramiteExpediente tramExp) {
@@ -6769,7 +7277,8 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 					|| tramExp.getDetalleExpdteTram().getIdentifEntrada() == null
 					|| tramExp.getDetalleExpdteTram().getValorCanalEntrada() == null
 					||tramExp.getDetalleExpdteTram().getValorTipoInteresado() == null
-					|| tramExp.getDetalleExpdteTram().getFechaRegistro() == null);
+					|| (!Constantes.XPC.equals(tramExp.getExpediente().getValorTipoExpediente().getCodigo()) && tramExp.getDetalleExpdteTram().getFechaRegistro() == null)); //HdU 1313 - Comportamiento nuevo para que la fecha de registro no sea obligatoria en entrada de doc
+		
 	}
 	
 	private boolean validacionesObligatoriedadFinalizarTramiteComportamiento5181823 (TramiteExpediente tramExp) {
@@ -6803,6 +7312,59 @@ public String guardarArticulosAfectadosResolucion(Resolucion resolucion, Tramite
 		var lista = bean.getCategoriasTramite(tramExp.getId());
 		
 		return !(lista == null || lista.isEmpty());
+	}
+	
+	public void altaMasivaSubtramites(TramiteExpediente tramiteExpediente) {
+		try {
+			selectedSubtramiteMasivoId = null;
+			selectedResponsablesSubtramiteMasivoId = null;
+			fechaInicioSubtramiteMasivo = FechaUtils.hoy();
+			numeroOcurrenciasCrear = 0;
+			
+			listaSubtratramitesMasivos = cfgExpedienteSubTramiteService.findSubtramitesMasivos(tramiteExpediente.getTipoTramite().getId(), expedientes.getValorTipoExpediente().getId());
+			
+			this.tramiteExpediente = tramiteExpediente;
+			
+			if(expedientes.getId()!=null) {
+				cabeceraDialog = mensajesProperties.getString("alta.masiva.subtramites") + " para el expediente "+ expedientes.getNumExpediente();
+			}else {
+					cabeceraDialog = mensajesProperties.getString("alta.masiva.subtramites");
+			}
+			
+			PrimeFaces.current().ajax().update(FORMFORMULARIOEXPEDIENTES);
+			PrimeFaces.current().executeScript("PF('dialogoAltaMasivaSubtramites').show();");
+		} catch (ValidacionException e) {
+			FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "", mensajesProperties.getString(NOEXISTEREGISTROCONFIG));
+			PrimeFaces.current().dialog().showMessageDynamic(message);
+			log.error("iniciarActividad - " + message.getDetail());
+		}
+	}
+	
+	//---------------------------------------------------------------
+	
+	private Optional<TramiteExpediente> getTramiteLista(Long idTram) {
+		return this.listaTramTramitesExp.stream()
+			.filter(tr -> tr.getId().equals(idTram))
+			.findFirst();
+	}
+	
+	//Refresco de datos cacheados de tareas de trámites
+	//El control del refresco en pantalla (update) se hace desde DatosExpedientesTareasBean
+	
+	//Lo óptimo sería que listaTramTramitesExp fuera un LinkedHashMap 
+	// pero dejarlo así no tiene impacto en el sistema: 
+	//  Pocas llamadas y pocos elementos en la lista. Raramente será > 20.
+		
+	public void resetExisteTareaREVT(Long idTram) {
+		getTramiteLista(idTram).ifPresent(tr -> tr.setExisteTareaREVT(null));
+	}
+	
+	public void resetExisteTareaFYN(Long idTram) {
+		getTramiteLista(idTram).ifPresent(tr -> tr.setExisteTareaFYN(null));
+	}
+	
+	private void resetDatosExisteTarea() {
+		this.listaTramTramitesExp.forEach(TramiteExpediente::limpiarDatosExisteTarea);
 	}
 	
 }
