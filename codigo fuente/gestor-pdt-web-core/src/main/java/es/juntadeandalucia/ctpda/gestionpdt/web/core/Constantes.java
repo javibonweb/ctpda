@@ -187,6 +187,9 @@ public class Constantes  implements Serializable {
 	public static final String PERMISO_NEW_EXPFINTRAM = "NEW_EXPFINTRAM";
 	public static final String PERMISO_DESAC_EXPTRAM = "DESAC_EXPTRAM";
 
+	//HDU 1327
+	public static final String PERMISO_NEW_ALTAMASIVASUBTR = "NEW_ALTAMASIVASUBTR";
+
 	public static final String PERMISO_CONS_EXPDOC = "CONS_EXPDOC";
 	public static final String PERMISO_EDIT_EXPDOC = "EDIT_EXPDOC";
 	public static final String PERMISO_DESAC_EXPDOC = "DESAC_EXPDOC";

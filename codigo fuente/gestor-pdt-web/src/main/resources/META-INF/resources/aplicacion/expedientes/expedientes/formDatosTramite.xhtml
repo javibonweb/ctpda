@@ -3050,7 +3050,13 @@
 					<p:commandButton id="altaTareaTramite-EnviarFirmarNotificar_#{tramExp.id}" value="#{mensaje['enviar.firmar.notificar']}"
 						rendered="#{editable and datosTramiteExpedienteBean.permisoNewExpTareaDet == true  and (tramExp.expediente.valorTipoExpediente.codigo != 'XPC') and tramExp.mostrarTareaFYN and not datosExpedientesTareasBean.existeTareaFYNTramite(tramExp.id)}"
 						action="#{datosExpedientesTareasBean.altaTareaTramiteFirmarNotificar(tramExp)}"
-						process="@this" update="@form:dialogTarea" immediate="true"/>					
+						process="@this" update="@form:dialogTarea" immediate="true"/>
+					<!-- HDU 1327 -->
+					<p:commandButton id="altaMasivaSubtramites_#{tramExp.id}" value="#{mensaje['crear.paquete.trabajo']}"
+									 rendered="#{editable and datosTramiteExpedienteBean.permisoNewAltaMasivaSubtramites == true  and tramExp.expediente.valorTipoExpediente.codigo != 'XPC' and datosExpedientesTareasBean.existeTareaFYNTramite(tramExp)}"
+									 action="#{datosTramiteExpedienteBean.altaMasivaSubtramites(tramExp)}"
+									 update="formFormularioExpedientes:tabViewPestanasExpediente:fechaInicioTramite,formFormularioExpedientes:tabViewPestanasExpediente:fechaInicioSubtramiteMasivo,formFormularioExpedientes:tabViewPestanasExpediente:dialogoAltaMasivaSubtramites"/>
+					<!-- HDU 1327 -->
 					<p:commandButton id="altaTareaTramite-VerFirmarNotificar_#{tramExp.id}" value="#{mensaje['ver.firmar.notificar']}"
 						rendered="#{editable and datosTramiteExpedienteBean.permisoNewExpTareaDet == true  and (tramExp.expediente.valorTipoExpediente.codigo != 'XPC') and tramExp.mostrarTareaFYN and datosExpedientesTareasBean.existeTareaFYNTramite(tramExp.id)}"
 						action="#{datosExpedientesTareasBean.verTareaTramiteFirmarNotificar(tramExp)}"
